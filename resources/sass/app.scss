@@ -1,0 +1,43 @@
+.login {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.bi-list {
+  font-size: x-large;
+  cursor: pointer;
+}
+
+.ready {
+  position: relative;
+  .sampleImg {
+    width: 100vw;
+  }
+  .fade-enter-active, .fade-leave-active {
+    transition: opacity .5s;
+  }
+  .fade-enter, .fade-leave-to {
+    opacity: 0;
+  }
+  .menu {
+    position: absolute;
+    right: 0;
+    top: 0px;
+    color: black;
+    background-color: white;
+    p {
+      text-align: center;
+      margin: 5px 0px 5px;
+      cursor: pointer;
+      border-bottom: aliceblue;
+    }
+    :hover {
+      background-color: #ffc9d7;
+    }
+  }
+}
+
+.centerButton {
+  text-align: center;
+}
