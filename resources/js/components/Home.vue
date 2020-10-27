@@ -25,33 +25,49 @@
       <div class="row">
         <div class="col-lg-4"></div>
         <div class="col-lg-4 centerButton" div v-if="type === 'A'">
-          <button @click="changeB()" type="button" class="btn btn-primary btn-lg">出勤</button>
+          <button @click="changeB(), taskOpen(), start()" type="button" class="btn btn-primary btn-lg">出勤</button>
         </div>
         <div class="col-lg-4 centerButton" div v-if="type === 'B'">
-          <button @click="changeC()" type="button" class="btn btn-primary btn-lg">休入</button>
-          <button @click="changeA()" type="button" class="btn btn-primary btn-lg">退勤</button>
+          <button @click="changeC(), stop(), reset(), start(), restName(), taskOpen()" type="button" class="btn btn-primary btn-lg">休入</button>
+          <button @click="changeA(), stop(), reset(), emptytask(), taskOpen()" type="button" class="btn btn-primary btn-lg">退勤</button>
         </div>
         <div class="col-lg-4 centerButton" div v-if="type === 'C'">
-          <button @click="changeB()" type="button" class="btn btn-primary btn-lg">休出</button>
+          <button @click="changeB(), stop(), reset(), start(), emptytask(), taskOpen()" type="button" class="btn btn-primary btn-lg">休出</button>
         </div>
         <div class="col-lg-4"></div>
 
         <div class="col-lg-3"></div>
         <div class="col-lg-6">
-          <div class="row">
+          <div v-if="isTask" class="row">
             <div class="col-lg-8">
-              <select class="form-select" aria-label="Default select example">
-                <option selected>タスクを選択してください</option>
+              <select id="select-box1" class="form-select" aria-label="Default select example" v-model="selected">
+                <option :value="null" disabled>タスクを選択してください</option>
                 <option v-for="task in tasks">{{ task }}</option>
               </select>
             </div>
             <div class="col-lg-4 centerButton">
-              <button type="button" class="btn btn-primary">タスク切替</button>
+              <button @click="taskName(), stop(), reset(), start(), test()" type="button" class="btn btn-primary">タスク切替</button>
+              <button @click="test()" type="button" class="btn btn-primary">テスト</button>
             </div>
           </div>
         </div>
         <div class="col-lg-3"></div>
-        
+
+        <div class="col-lg-4"></div>
+        <div class="col-lg-4">
+          <div class="row">
+            <div class="col-lg-2"></div>
+            <div class="col-lg-5">
+              <p>{{ taskLabel }}</p>
+            </div>
+            <div class="col-lg-3">
+              <p v-if="isTime">{{formattedElapsedTime}}</p>
+            </div>
+            <div class="col-lg-2"></div>
+          </div>
+        </div>
+        <div class="col-lg-4"></div>
+
       </div>
     </div>
     
@@ -79,6 +95,7 @@
 
 <script>
 import Drawer from "vue-simple-drawer";
+import vSelect from 'vue-select';
 
 export default {
   components: {
@@ -92,7 +109,23 @@ export default {
       open: false,
       align: 'right',
       type: 'A',
-      tasks: ['メールチェック', '朝礼', '作業', '会議', '研修', '外出', '離席', 'その他']
+      isTask: false,
+      selected: null,
+      tasks: ['メールチェック', '朝礼', '作業', '会議', '研修', '外出', '離席', 'その他'],
+      isTaskButton: true,
+      currentTime: new Date(),
+      taskLabel: '',
+      elapsedTime: 0,
+      timer: undefined,
+      isTime: false
+    }
+  },
+  computed: {
+    formattedElapsedTime() {
+      const date = new Date(null);
+      date.setSeconds(this.elapsedTime / 1000);
+      const utc = date.toUTCString();
+      return utc.substr(utc.indexOf(":") - 2, 8);
     }
   },
   methods: {
@@ -113,6 +146,36 @@ export default {
     },
     changeC() {
       this.type = 'C'
+    },
+    taskOpen() {
+      this.isTask = !this.isTask
+    },
+    start() {
+      this.timer = setInterval(() => {
+        this.elapsedTime += 1000;
+      }, 1000);
+    },
+    stop() {
+      clearInterval(this.timer);
+    },
+    reset() {
+      this.elapsedTime = 0;
+    },
+    
+    taskName() {
+      this.taskLabel = this.selected;
+      this.isTime = true;
+    },
+    restName() {
+      this.taskLabel = '休憩';
+      this.isTime = true;
+    },
+    emptytask() {
+      this.taskLabel = '';
+      this.isTime = false;
+    },
+    test() {
+      document.getElementById('select-box1').selectedIndex = 0;
     },
   }
 };

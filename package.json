@@ -30,6 +30,8 @@
   "dependencies": {
     "bootstrap": "^4.5.3",
     "bootstrap-vue": "^2.18.0",
+    "moment": "^2.29.1",
+    "vue-select": "^3.10.8",
     "vue-simple-drawer": "^1.0.6"
   }
 }
