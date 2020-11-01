@@ -5,3 +5,6 @@ Route::get('/', function () {
 Route::get('/schedule', function () {
     return view('schedule');
 });
+Route::get('/register', function () {
+  return view('auth.register.index');
+});

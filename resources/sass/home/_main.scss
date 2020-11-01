@@ -1,0 +1,101 @@
+.headerLeftTop {
+  align-items: flex-end;
+  display: flex;
+}
+.headerLeftBottom {
+  align-self: flex-end;
+  display: flex;
+}
+.login {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+a {
+  text-decoration: none !important; 
+  color: #ffffff !important;
+}
+.bi-list {
+  font-size: x-large;
+  cursor: pointer;
+}
+
+.centerButton {
+  text-align: center;
+  padding: 22px 0px 30px;
+}
+
+.kindOfTask {
+  margin-bottom: 30px;
+}
+.taskButton {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.tasksShow {
+  display: flex;
+  place-content: center;
+  margin-bottom: 30px;
+  .taskLabelContainer {
+    text-align-last: center;
+    align-self: center;
+    margin: 10px;
+    .taskLabelshow {
+      color: #292929;
+      background-color: #fcd98f;
+      border-bottom: solid 6px #df9700;
+      border-radius: 10px;
+      box-shadow: 0 4px 5px rgba(0, 0, 0, .4);
+      padding: 10px;
+      margin-bottom: 0;
+      &:before {
+      }
+    }
+  }
+}
+
+.clock {
+  font-family: 'Share Tech Mono', monospace;
+  color: #ffffff;
+  text-align: center;
+  color: black;
+  .timeshow {
+      letter-spacing: 0.05em;
+      font-size: 60px;
+      padding: 5px 0;
+      margin-bottom: 0;
+  }
+}
+
+.tableName {
+  text-align: center;
+  border-radius: 5px;
+}
+
+.ready {
+  position: relative;
+  .fade-enter-active, .fade-leave-active {
+    transition: opacity .5s;
+  }
+  .fade-enter, .fade-leave-to {
+    opacity: 0;
+  }
+  .menu {
+    position: absolute;
+    right: 0;
+    top: 0px;
+    color: black;
+    background-color: white;
+    p {
+      text-align: center;
+      margin: 5px 0px 5px;
+      cursor: pointer;
+      border-bottom: aliceblue;
+    }
+    :hover {
+      background-color: #ffc9d7;
+    }
+  }
+}

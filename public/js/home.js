@@ -194,6 +194,73 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -205,18 +272,24 @@ __webpack_require__.r(__webpack_exports__);
       group: 'YJC',
       isActive: false,
       username: '浅田　剛明',
-      open: false,
-      align: 'right',
       type: 'A',
       isTask: false,
-      selected: null,
+      selected: 'initial',
       tasks: ['メールチェック', '朝礼', '作業', '会議', '研修', '外出', '離席', 'その他'],
-      isTaskButton: true,
-      currentTime: new Date(),
       taskLabel: '',
+      count: 0,
+      currentTime: new Date(),
       elapsedTime: 0,
       timer: undefined,
-      isTime: false
+      isTime: false,
+      open: false,
+      align: 'right',
+      startTime: '00:00:00',
+      startRestTime: '00:00:00',
+      endRestTime: '00:00:00',
+      endTime: '00:00:00',
+      records: [],
+      attendanceRecords: []
     };
   },
   computed: {
@@ -263,8 +336,28 @@ __webpack_require__.r(__webpack_exports__);
       this.elapsedTime = 0;
     },
     taskName: function taskName() {
-      this.taskLabel = this.selected;
-      this.isTime = true;
+      if (this.count != 0 && this.selected != 'initial') {
+        this.records.push({
+          name: this.taskLabel,
+          totalTime: this.formattedElapsedTime
+        });
+      }
+
+      if (this.count != 0 && this.selected == 'initial') {
+        this.records.push({
+          name: this.taskLabel,
+          totalTime: this.formattedElapsedTime
+        });
+        this.taskLabel = '';
+        this.isTime = false;
+        this.count = 0;
+      } else if (this.selected == 'initial') {
+        return;
+      } else {
+        this.taskLabel = this.selected;
+        this.isTime = true;
+        this.count = 1;
+      }
     },
     restName: function restName() {
       this.taskLabel = '休憩';
@@ -273,9 +366,65 @@ __webpack_require__.r(__webpack_exports__);
     emptytask: function emptytask() {
       this.taskLabel = '';
       this.isTime = false;
+      this.count = 0;
     },
-    test: function test() {
-      document.getElementById('select-box1').selectedIndex = 0;
+    changeSB: function changeSB() {
+      this.selected = 'initial';
+    },
+    startWork: function startWork() {
+      this.records = [];
+      var date = new Date();
+      var gmt = date.toString();
+      this.startTime = gmt.substr(gmt.indexOf(":") - 2, 8);
+      this.attendanceRecords.push({
+        name: '出勤',
+        time: this.startTime
+      });
+    },
+    startRest: function startRest() {
+      if (this.taskLabel != '') {
+        this.records.push({
+          name: this.taskLabel,
+          totalTime: this.formattedElapsedTime
+        });
+      }
+
+      var date = new Date();
+      var gmt = date.toString();
+      this.startRestTime = gmt.substr(gmt.indexOf(":") - 2, 8);
+      this.attendanceRecords.push({
+        name: '休入',
+        time: this.startRestTime
+      });
+    },
+    endRest: function endRest() {
+      this.records.push({
+        name: this.taskLabel,
+        totalTime: this.formattedElapsedTime
+      });
+      var date = new Date();
+      var gmt = date.toString();
+      this.endRestTime = gmt.substr(gmt.indexOf(":") - 2, 8);
+      this.attendanceRecords.push({
+        name: '休出',
+        time: this.endRestTime
+      });
+    },
+    endWork: function endWork() {
+      if (this.taskLabel != '') {
+        this.records.push({
+          name: this.taskLabel,
+          totalTime: this.formattedElapsedTime
+        });
+      }
+
+      var date = new Date();
+      var gmt = date.toString();
+      this.endTime = gmt.substr(gmt.indexOf(":") - 2, 8);
+      this.attendanceRecords.push({
+        name: '退勤',
+        time: this.endTime
+      });
     }
   }
 });
@@ -770,14 +919,18 @@ var render = function() {
     { attrs: { id: "home" } },
     [
       _c("header", [
-        _c("div", { staticClass: "container-fluid" }, [
+        _c("div", { staticClass: "bg-dark text-white container-fluid" }, [
           _c("div", { staticClass: "row" }, [
-            _c("div", { staticClass: "col-lg-12" }, [
-              _c("h5", [_vm._v("会社名：" + _vm._s(_vm.group))])
+            _c("div", { staticClass: "col-lg-12 headerLeftTop" }, [
+              _c("h5", [_vm._v("会社名：")]),
+              _vm._v(" "),
+              _c("h3", [_vm._v(_vm._s(_vm.group))])
             ]),
             _vm._v(" "),
-            _c("div", { staticClass: "col-lg-9" }, [
-              _c("p", [_vm._v("ユーザー名：" + _vm._s(_vm.username))])
+            _c("div", { staticClass: "col-lg-9 headerLeftBottom" }, [
+              _c("p", [_vm._v("ユーザー名：")]),
+              _vm._v(" "),
+              _c("h5", [_vm._v(_vm._s(_vm.username))])
             ]),
             _vm._v(" "),
             _c("div", { staticClass: "col-lg-3 login" }, [
@@ -819,222 +972,261 @@ var render = function() {
         ])
       ]),
       _vm._v(" "),
-      _c("div", { staticClass: "container" }, [
-        _c("div", { staticClass: "row" }, [
-          _c("div", { staticClass: "col-lg-4" }),
-          _vm._v(" "),
-          _vm.type === "A"
-            ? _c(
-                "div",
-                { staticClass: "col-lg-4 centerButton", attrs: { div: "" } },
-                [
-                  _c(
-                    "button",
-                    {
-                      staticClass: "btn btn-primary btn-lg",
-                      attrs: { type: "button" },
-                      on: {
-                        click: function($event) {
-                          _vm.changeB(), _vm.taskOpen(), _vm.start()
-                        }
-                      }
-                    },
-                    [_vm._v("出勤")]
-                  )
-                ]
-              )
-            : _vm._e(),
-          _vm._v(" "),
-          _vm.type === "B"
-            ? _c(
-                "div",
-                { staticClass: "col-lg-4 centerButton", attrs: { div: "" } },
-                [
-                  _c(
-                    "button",
-                    {
-                      staticClass: "btn btn-primary btn-lg",
-                      attrs: { type: "button" },
-                      on: {
-                        click: function($event) {
-                          _vm.changeC(),
-                            _vm.stop(),
-                            _vm.reset(),
-                            _vm.start(),
-                            _vm.restName(),
-                            _vm.taskOpen()
-                        }
-                      }
-                    },
-                    [_vm._v("休入")]
-                  ),
-                  _vm._v(" "),
-                  _c(
-                    "button",
-                    {
-                      staticClass: "btn btn-primary btn-lg",
-                      attrs: { type: "button" },
-                      on: {
-                        click: function($event) {
-                          _vm.changeA(),
-                            _vm.stop(),
-                            _vm.reset(),
-                            _vm.emptytask(),
-                            _vm.taskOpen()
-                        }
-                      }
-                    },
-                    [_vm._v("退勤")]
-                  )
-                ]
-              )
-            : _vm._e(),
-          _vm._v(" "),
-          _vm.type === "C"
-            ? _c(
-                "div",
-                { staticClass: "col-lg-4 centerButton", attrs: { div: "" } },
-                [
-                  _c(
-                    "button",
-                    {
-                      staticClass: "btn btn-primary btn-lg",
-                      attrs: { type: "button" },
-                      on: {
-                        click: function($event) {
-                          _vm.changeB(),
-                            _vm.stop(),
-                            _vm.reset(),
-                            _vm.start(),
-                            _vm.emptytask(),
-                            _vm.taskOpen()
-                        }
-                      }
-                    },
-                    [_vm._v("休出")]
-                  )
-                ]
-              )
-            : _vm._e(),
-          _vm._v(" "),
-          _c("div", { staticClass: "col-lg-4" }),
-          _vm._v(" "),
-          _c("div", { staticClass: "col-lg-3" }),
-          _vm._v(" "),
-          _c("div", { staticClass: "col-lg-6" }, [
-            _vm.isTask
-              ? _c("div", { staticClass: "row" }, [
-                  _c("div", { staticClass: "col-lg-8" }, [
-                    _c(
-                      "select",
-                      {
-                        directives: [
-                          {
-                            name: "model",
-                            rawName: "v-model",
-                            value: _vm.selected,
-                            expression: "selected"
-                          }
-                        ],
-                        staticClass: "form-select",
-                        attrs: {
-                          id: "select-box1",
-                          "aria-label": "Default select example"
-                        },
-                        on: {
-                          change: function($event) {
-                            var $$selectedVal = Array.prototype.filter
-                              .call($event.target.options, function(o) {
-                                return o.selected
-                              })
-                              .map(function(o) {
-                                var val = "_value" in o ? o._value : o.value
-                                return val
-                              })
-                            _vm.selected = $event.target.multiple
-                              ? $$selectedVal
-                              : $$selectedVal[0]
-                          }
-                        }
-                      },
-                      [
-                        _c(
-                          "option",
-                          {
-                            attrs: { disabled: "" },
-                            domProps: { value: null }
-                          },
-                          [_vm._v("タスクを選択してください")]
-                        ),
-                        _vm._v(" "),
-                        _vm._l(_vm.tasks, function(task) {
-                          return _c("option", [_vm._v(_vm._s(task))])
-                        })
-                      ],
-                      2
-                    )
-                  ]),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "col-lg-4 centerButton" }, [
+      _c("div", { staticClass: "mainContainer" }, [
+        _c("div", { staticClass: "container" }, [
+          _c("div", { staticClass: "row" }, [
+            _c("div", { staticClass: "col-lg-4" }),
+            _vm._v(" "),
+            _vm.type === "A"
+              ? _c(
+                  "div",
+                  { staticClass: "col-lg-4 centerButton", attrs: { div: "" } },
+                  [
                     _c(
                       "button",
                       {
-                        staticClass: "btn btn-primary",
+                        staticClass: "btn btn-primary btn-lg",
                         attrs: { type: "button" },
                         on: {
                           click: function($event) {
-                            _vm.taskName(),
-                              _vm.stop(),
-                              _vm.reset(),
+                            _vm.changeB(),
+                              _vm.taskOpen(),
                               _vm.start(),
-                              _vm.test()
+                              _vm.startWork()
                           }
                         }
                       },
-                      [_vm._v("タスク切替")]
+                      [_vm._v("出勤")]
+                    )
+                  ]
+                )
+              : _vm._e(),
+            _vm._v(" "),
+            _vm.type === "B"
+              ? _c(
+                  "div",
+                  { staticClass: "col-lg-4 centerButton", attrs: { div: "" } },
+                  [
+                    _c(
+                      "button",
+                      {
+                        staticClass: "btn btn-primary btn-lg",
+                        attrs: { type: "button" },
+                        on: {
+                          click: function($event) {
+                            _vm.changeC(),
+                              _vm.startRest(),
+                              _vm.stop(),
+                              _vm.reset(),
+                              _vm.start(),
+                              _vm.taskOpen(),
+                              _vm.restName(),
+                              _vm.changeSB()
+                          }
+                        }
+                      },
+                      [_vm._v("休入")]
                     ),
                     _vm._v(" "),
                     _c(
                       "button",
                       {
-                        staticClass: "btn btn-primary",
+                        staticClass: "btn btn-primary btn-lg",
                         attrs: { type: "button" },
                         on: {
                           click: function($event) {
-                            return _vm.test()
+                            _vm.changeA(),
+                              _vm.endWork(),
+                              _vm.stop(),
+                              _vm.reset(),
+                              _vm.emptytask(),
+                              _vm.taskOpen()
                           }
                         }
                       },
-                      [_vm._v("テスト")]
+                      [_vm._v("退勤")]
                     )
+                  ]
+                )
+              : _vm._e(),
+            _vm._v(" "),
+            _vm.type === "C"
+              ? _c(
+                  "div",
+                  { staticClass: "col-lg-4 centerButton", attrs: { div: "" } },
+                  [
+                    _c(
+                      "button",
+                      {
+                        staticClass: "btn btn-primary btn-lg",
+                        attrs: { type: "button" },
+                        on: {
+                          click: function($event) {
+                            _vm.changeB(),
+                              _vm.endRest(),
+                              _vm.stop(),
+                              _vm.reset(),
+                              _vm.start(),
+                              _vm.taskOpen(),
+                              _vm.emptytask()
+                          }
+                        }
+                      },
+                      [_vm._v("休出")]
+                    )
+                  ]
+                )
+              : _vm._e(),
+            _vm._v(" "),
+            _c("div", { staticClass: "col-lg-4" }),
+            _vm._v(" "),
+            _c("div", { staticClass: "col-lg-3" }),
+            _vm._v(" "),
+            _c("div", { staticClass: "col-lg-6" }, [
+              _vm.isTask
+                ? _c("div", { staticClass: "row" }, [
+                    _c("div", { staticClass: "col-lg-8 kindOfTask" }, [
+                      _c(
+                        "select",
+                        {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.selected,
+                              expression: "selected"
+                            }
+                          ],
+                          staticClass: "form-select",
+                          attrs: { "aria-label": "Default select example" },
+                          on: {
+                            change: function($event) {
+                              var $$selectedVal = Array.prototype.filter
+                                .call($event.target.options, function(o) {
+                                  return o.selected
+                                })
+                                .map(function(o) {
+                                  var val = "_value" in o ? o._value : o.value
+                                  return val
+                                })
+                              _vm.selected = $event.target.multiple
+                                ? $$selectedVal
+                                : $$selectedVal[0]
+                            }
+                          }
+                        },
+                        [
+                          _c(
+                            "option",
+                            { attrs: { disabled: "", value: "initial" } },
+                            [_vm._v("タスクを選択してください")]
+                          ),
+                          _vm._v(" "),
+                          _vm._l(_vm.tasks, function(task) {
+                            return _c("option", [_vm._v(_vm._s(task))])
+                          })
+                        ],
+                        2
+                      )
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "col-lg-4 taskButton" }, [
+                      _c(
+                        "button",
+                        {
+                          staticClass: "btn btn-primary",
+                          attrs: { type: "button" },
+                          on: {
+                            click: function($event) {
+                              _vm.taskName(),
+                                _vm.stop(),
+                                _vm.reset(),
+                                _vm.start(),
+                                _vm.changeSB()
+                            }
+                          }
+                        },
+                        [_vm._v("タスク切替")]
+                      )
+                    ])
+                  ])
+                : _vm._e()
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "col-lg-3" }),
+            _vm._v(" "),
+            _vm.isTime
+              ? _c("div", { staticClass: "col-lg-12 tasksShow" }, [
+                  _c("div", { staticClass: "taskLabelContainer" }, [
+                    _c("p", { staticClass: "taskLabelshow" }, [
+                      _vm._v(_vm._s(_vm.taskLabel))
+                    ])
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "clock" }, [
+                    _c("p", { staticClass: "timeshow" }, [
+                      _vm._v(_vm._s(_vm.formattedElapsedTime))
+                    ])
                   ])
                 ])
-              : _vm._e()
-          ]),
-          _vm._v(" "),
-          _c("div", { staticClass: "col-lg-3" }),
-          _vm._v(" "),
-          _c("div", { staticClass: "col-lg-4" }),
-          _vm._v(" "),
-          _c("div", { staticClass: "col-lg-4" }, [
-            _c("div", { staticClass: "row" }, [
-              _c("div", { staticClass: "col-lg-2" }),
+              : _vm._e(),
+            _vm._v(" "),
+            _c("div", { staticClass: "col-lg-4" }, [
+              _c(
+                "span",
+                { staticClass: "d-block p-2 bg-primary text-white tableName" },
+                [_vm._v("本日の勤怠状況")]
+              ),
               _vm._v(" "),
-              _c("div", { staticClass: "col-lg-5" }, [
-                _c("p", [_vm._v(_vm._s(_vm.taskLabel))])
-              ]),
+              _c("table", { staticClass: "table" }, [
+                _vm._m(0),
+                _vm._v(" "),
+                _c(
+                  "tbody",
+                  _vm._l(_vm.attendanceRecords, function(attendance) {
+                    return _c("tr", [
+                      _c("td", { attrs: { scope: "row" } }),
+                      _vm._v(" "),
+                      _c("td", [_vm._v(_vm._s(attendance.name))]),
+                      _vm._v(" "),
+                      _c("td", [_vm._v(_vm._s(attendance.time))])
+                    ])
+                  }),
+                  0
+                )
+              ])
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "col-lg-4" }, [
+              _c(
+                "span",
+                {
+                  staticClass: "d-block p-2 bg-secondary text-white tableName"
+                },
+                [_vm._v("本日のタスク履歴")]
+              ),
               _vm._v(" "),
-              _c("div", { staticClass: "col-lg-3" }, [
-                _vm.isTime
-                  ? _c("p", [_vm._v(_vm._s(_vm.formattedElapsedTime))])
-                  : _vm._e()
-              ]),
-              _vm._v(" "),
-              _c("div", { staticClass: "col-lg-2" })
-            ])
-          ]),
-          _vm._v(" "),
-          _c("div", { staticClass: "col-lg-4" })
+              _c("table", { staticClass: "table" }, [
+                _vm._m(1),
+                _vm._v(" "),
+                _c(
+                  "tbody",
+                  _vm._l(_vm.records, function(record) {
+                    return _c("tr", [
+                      _c("td", { attrs: { scope: "row" } }),
+                      _vm._v(" "),
+                      _c("td", [_vm._v(_vm._s(record.name))]),
+                      _vm._v(" "),
+                      _c("td", [_vm._v(_vm._s(record.totalTime))])
+                    ])
+                  }),
+                  0
+                )
+              ])
+            ]),
+            _vm._v(" "),
+            _vm._m(2)
+          ])
         ])
       ]),
       _vm._v(" "),
@@ -1042,11 +1234,6 @@ var render = function() {
         "div",
         { staticClass: "ready" },
         [
-          _c("img", {
-            staticClass: "img-fluid",
-            attrs: { src: "https://picsum.photos/1550/600" }
-          }),
-          _vm._v(" "),
           _c("transition", { attrs: { name: "fade" } }, [
             _vm.isActive
               ? _c("div", { staticClass: "col-lg-1 menu" }, [
@@ -1108,7 +1295,92 @@ var render = function() {
     1
   )
 }
-var staticRenderFns = []
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("thead", [
+      _c("tr", [
+        _c("th", { attrs: { scope: "col" } }),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("勤怠履歴")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("時刻")])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("thead", [
+      _c("tr", [
+        _c("th", { attrs: { scope: "col" } }),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("タスク名")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("合計時間")])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "col-lg-4" }, [
+      _c("span", { staticClass: "d-block p-2 bg-info text-white tableName" }, [
+        _vm._v("全ユーザータスク状況")
+      ]),
+      _vm._v(" "),
+      _c("table", { staticClass: "table" }, [
+        _c("thead", [
+          _c("tr", [
+            _c("th", { attrs: { scope: "col" } }),
+            _vm._v(" "),
+            _c("th", { attrs: { scope: "col" } }, [_vm._v("ユーザー名")]),
+            _vm._v(" "),
+            _c("th", { attrs: { scope: "col" } }, [_vm._v("タスク名")]),
+            _vm._v(" "),
+            _c("th", { attrs: { scope: "col" } }, [_vm._v("経過時間")])
+          ])
+        ]),
+        _vm._v(" "),
+        _c("tbody", [
+          _c("tr", [
+            _c("td", { attrs: { scope: "row" } }),
+            _vm._v(" "),
+            _c("td", [_vm._v("ピカチュウ")]),
+            _vm._v(" "),
+            _c("td", [_vm._v("資料作成")]),
+            _vm._v(" "),
+            _c("td", [_vm._v("00:12:32")])
+          ]),
+          _vm._v(" "),
+          _c("tr", [
+            _c("td", { attrs: { scope: "row" } }),
+            _vm._v(" "),
+            _c("td", [_vm._v("ヒドカゲ")]),
+            _vm._v(" "),
+            _c("td", [_vm._v("動画編集")]),
+            _vm._v(" "),
+            _c("td", [_vm._v("00:35:46")])
+          ]),
+          _vm._v(" "),
+          _c("tr", [
+            _c("td", { attrs: { scope: "row" } }),
+            _vm._v(" "),
+            _c("td", [_vm._v("ゼニガメ")]),
+            _vm._v(" "),
+            _c("td", [_vm._v("会議")]),
+            _vm._v(" "),
+            _c("td", [_vm._v("02:12:03")])
+          ])
+        ])
+      ])
+    ])
+  }
+]
 render._withStripped = true
 
 

@@ -1,16 +1,18 @@
 <template>
   <div id="home">
     <header>
-      <div class="container-fluid">
+      <div class="bg-dark text-white container-fluid">
         <div class="row">
-          <div class="col-lg-12">
-            <h5>会社名：{{ group }}</h5>
+          <div class="col-lg-12 headerLeftTop">
+            <h5>会社名：</h5>
+            <h3>{{ group }}</h3>
           </div>
-          <div class="col-lg-9">
-            <p>ユーザー名：{{ username }}</p>
+          <div class="col-lg-9 headerLeftBottom">
+            <p>ユーザー名：</p>
+            <h5>{{ username }}</h5>
           </div>
           <div class="col-lg-3 login">
-            <a href="#" class="">新規登録</a>
+            <a href="#">新規登録</a>
             <a href="#">ログイン</a>
             <a href="#">ログアウト</a>
             <svg @click="toggle()" width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-list" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
@@ -21,58 +23,123 @@
       </div>
     </header>
 
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-4"></div>
-        <div class="col-lg-4 centerButton" div v-if="type === 'A'">
-          <button @click="changeB(), taskOpen(), start()" type="button" class="btn btn-primary btn-lg">出勤</button>
-        </div>
-        <div class="col-lg-4 centerButton" div v-if="type === 'B'">
-          <button @click="changeC(), stop(), reset(), start(), restName(), taskOpen()" type="button" class="btn btn-primary btn-lg">休入</button>
-          <button @click="changeA(), stop(), reset(), emptytask(), taskOpen()" type="button" class="btn btn-primary btn-lg">退勤</button>
-        </div>
-        <div class="col-lg-4 centerButton" div v-if="type === 'C'">
-          <button @click="changeB(), stop(), reset(), start(), emptytask(), taskOpen()" type="button" class="btn btn-primary btn-lg">休出</button>
-        </div>
-        <div class="col-lg-4"></div>
+    <div class="mainContainer">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-4"></div>
+          <div class="col-lg-4 centerButton" div v-if="type === 'A'">
+            <button @click="changeB(), taskOpen(), start(), startWork()" type="button" class="btn btn-primary btn-lg">出勤</button>
+          </div>
+          <div class="col-lg-4 centerButton" div v-if="type === 'B'">
+            <button @click="changeC(), startRest(), stop(), reset(), start(), taskOpen(), restName(),changeSB()" type="button" class="btn btn-primary btn-lg">休入</button>
+            <button @click="changeA(), endWork(), stop(), reset(), emptytask(), taskOpen()" type="button" class="btn btn-primary btn-lg">退勤</button>
+          </div>
+          <div class="col-lg-4 centerButton" div v-if="type === 'C'">
+            <button @click="changeB(), endRest(), stop(), reset(), start(), taskOpen(), emptytask()" type="button" class="btn btn-primary btn-lg">休出</button>
+          </div>
+          <div class="col-lg-4"></div>
 
-        <div class="col-lg-3"></div>
-        <div class="col-lg-6">
-          <div v-if="isTask" class="row">
-            <div class="col-lg-8">
-              <select id="select-box1" class="form-select" aria-label="Default select example" v-model="selected">
-                <option :value="null" disabled>タスクを選択してください</option>
-                <option v-for="task in tasks">{{ task }}</option>
-              </select>
-            </div>
-            <div class="col-lg-4 centerButton">
-              <button @click="taskName(), stop(), reset(), start(), test()" type="button" class="btn btn-primary">タスク切替</button>
-              <button @click="test()" type="button" class="btn btn-primary">テスト</button>
+          <div class="col-lg-3"></div>
+          <div class="col-lg-6">
+            <div v-if="isTask" class="row">
+              <div class="col-lg-8 kindOfTask">
+                <select v-model="selected" class="form-select" aria-label="Default select example">
+                  <option disabled value="initial">タスクを選択してください</option>
+                  <option v-for="task in tasks">{{ task }}</option>
+                </select>
+              </div>
+              <div class="col-lg-4 taskButton">
+                <button @click="taskName(), stop(), reset(), start(),changeSB()" type="button" class="btn btn-primary">タスク切替</button>
+              </div>
             </div>
           </div>
-        </div>
-        <div class="col-lg-3"></div>
+          <div class="col-lg-3"></div>
 
-        <div class="col-lg-4"></div>
-        <div class="col-lg-4">
-          <div class="row">
-            <div class="col-lg-2"></div>
-            <div class="col-lg-5">
-              <p>{{ taskLabel }}</p>
-            </div>
-            <div class="col-lg-3">
-              <p v-if="isTime">{{formattedElapsedTime}}</p>
-            </div>
-            <div class="col-lg-2"></div>
+          <div v-if="isTime" class="col-lg-12 tasksShow">
+              <div class="taskLabelContainer">
+                <p class="taskLabelshow">{{ taskLabel }}</p>
+              </div>
+              <div class="clock">
+                <p class="timeshow">{{ formattedElapsedTime }}</p>
+              </div>
+          </div>
+
+          <div class="col-lg-4">
+            <span class="d-block p-2 bg-primary text-white tableName">本日の勤怠状況</span>
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col"></th>
+                  <th scope="col">勤怠履歴</th>
+                  <th scope="col">時刻</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="attendance in attendanceRecords">
+                  <td scope="row"></td>
+                  <td>{{ attendance.name }}</td>
+                  <td>{{ attendance.time }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="col-lg-4">
+            <span class="d-block p-2 bg-secondary text-white tableName">本日のタスク履歴</span>
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col"></th>
+                  <th scope="col">タスク名</th>
+                  <th scope="col">合計時間</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="record in records">
+                  <td scope="row"></td>
+                  <td>{{ record.name }}</td>
+                  <td>{{ record.totalTime }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="col-lg-4">
+            <span class="d-block p-2 bg-info text-white tableName">全ユーザータスク状況</span>
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col"></th>
+                  <th scope="col">ユーザー名</th>
+                  <th scope="col">タスク名</th>
+                  <th scope="col">経過時間</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td scope="row"></td>
+                  <td>ピカチュウ</td>
+                  <td>資料作成</td>
+                  <td>00:12:32</td>
+                </tr>
+                <tr>
+                  <td scope="row"></td>
+                  <td>ヒドカゲ</td>
+                  <td>動画編集</td>
+                  <td>00:35:46</td>
+                </tr>
+                <tr>
+                  <td scope="row"></td>
+                  <td>ゼニガメ</td>
+                  <td>会議</td>
+                  <td>02:12:03</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
-        <div class="col-lg-4"></div>
-
       </div>
     </div>
-    
+
     <div class="ready">
-      <img class="img-fluid" src="https://picsum.photos/1550/600">
       <transition name="fade">
         <div v-if="isActive" class="col-lg-1 menu">
           <p @click="goSchedule()">勤務予定表</p>
@@ -106,18 +173,24 @@ export default {
       group: 'YJC',
       isActive: false,
       username: '浅田　剛明',
-      open: false,
-      align: 'right',
       type: 'A',
       isTask: false,
-      selected: null,
+      selected: 'initial',
       tasks: ['メールチェック', '朝礼', '作業', '会議', '研修', '外出', '離席', 'その他'],
-      isTaskButton: true,
-      currentTime: new Date(),
       taskLabel: '',
+      count: 0,
+      currentTime: new Date(),
       elapsedTime: 0,
       timer: undefined,
-      isTime: false
+      isTime: false,
+      open: false,
+      align: 'right',
+      startTime: '00:00:00',
+      startRestTime: '00:00:00',
+      endRestTime: '00:00:00',
+      endTime: '00:00:00',
+      records: [],
+      attendanceRecords: [],
     }
   },
   computed: {
@@ -161,10 +234,23 @@ export default {
     reset() {
       this.elapsedTime = 0;
     },
-    
     taskName() {
-      this.taskLabel = this.selected;
-      this.isTime = true;
+      if (this.count != 0 && this.selected != 'initial') {
+        this.records.push({name: this.taskLabel, totalTime: this.formattedElapsedTime})
+      }
+
+      if (this.count != 0 && this.selected == 'initial'){
+        this.records.push({name: this.taskLabel, totalTime: this.formattedElapsedTime})
+        this.taskLabel = '';
+        this.isTime = false;
+        this.count = 0;
+      } else if (this.selected == 'initial') {
+        return;
+      } else {
+        this.taskLabel = this.selected;
+        this.isTime = true;
+        this.count = 1;
+      }
     },
     restName() {
       this.taskLabel = '休憩';
@@ -173,9 +259,42 @@ export default {
     emptytask() {
       this.taskLabel = '';
       this.isTime = false;
+      this.count = 0;
     },
-    test() {
-      document.getElementById('select-box1').selectedIndex = 0;
+    changeSB() {
+      this.selected = 'initial';
+    },
+    startWork() {
+      this.records = [];
+      var date = new Date();
+      var gmt = date.toString();
+      this.startTime = gmt.substr(gmt.indexOf(":") - 2, 8);
+      this.attendanceRecords.push({name: '出勤', time: this.startTime})
+    },
+    startRest() {
+      if (this.taskLabel != '') {
+        this.records.push({name: this.taskLabel, totalTime: this.formattedElapsedTime})
+      }
+      var date = new Date();
+      var gmt = date.toString();
+      this.startRestTime = gmt.substr(gmt.indexOf(":") - 2, 8);
+      this.attendanceRecords.push({name: '休入', time: this.startRestTime})
+    },
+    endRest() {
+      this.records.push({name: this.taskLabel, totalTime: this.formattedElapsedTime})
+      var date = new Date();
+      var gmt = date.toString();
+      this.endRestTime = gmt.substr(gmt.indexOf(":") - 2, 8);
+      this.attendanceRecords.push({name: '休出', time: this.endRestTime})
+    },
+    endWork() {
+      if (this.taskLabel != '') {
+        this.records.push({name: this.taskLabel, totalTime: this.formattedElapsedTime})
+      }
+      var date = new Date();
+      var gmt = date.toString();
+      this.endTime = gmt.substr(gmt.indexOf(":") - 2, 8);
+      this.attendanceRecords.push({name: '退勤', time: this.endTime})
     },
   }
 };
