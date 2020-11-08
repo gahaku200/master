@@ -1,28 +1,6 @@
 <template>
   <div id="home">
-    <header>
-      <div class="bg-dark text-white container-fluid">
-        <div class="row">
-          <div class="col-lg-12 headerLeftTop">
-            <h5>会社名：</h5>
-            <h3>{{ group }}</h3>
-          </div>
-          <div class="col-lg-9 headerLeftBottom">
-            <p>ユーザー名：</p>
-            <h5>{{ username }}</h5>
-          </div>
-          <div class="col-lg-3 login">
-            <a href="#">新規登録</a>
-            <a href="#">ログイン</a>
-            <a href="#">ログアウト</a>
-            <svg @click="toggle()" width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-list" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-              <path fill-rule="evenodd" d="M2.5 11.5A.5.5 0 0 1 3 11h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4A.5.5 0 0 1 3 7h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4A.5.5 0 0 1 3 3h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/>
-            </svg>
-          </div>
-        </div>
-      </div>
-    </header>
-
+    <router-view :errors="errors" />
     <div class="mainContainer">
       <div class="container">
         <div class="row">
@@ -138,41 +116,20 @@
         </div>
       </div>
     </div>
-
-    <div class="ready">
-      <transition name="fade">
-        <div v-if="isActive" class="col-lg-1 menu">
-          <p @click="goSchedule()">勤務予定表</p>
-          <p>勤務実績表</p>
-          <p>タスク実績表</p>
-          <p>給与計算</p>
-        </div>
-      </transition>
-    </div>
-    <drawer @close="toggle" :align="align" :closeable="true" :mask-closable="true">
-      <div v-if="open">
-        <p @click="goSchedule()">勤務予定表</p>
-        <p>勤務実績表</p>
-        <p>タスク実績表</p>
-        <p>給与計算</p>
-      </div>
-    </drawer>
   </div>
 </template>
 
 <script>
-import Drawer from "vue-simple-drawer";
 import vSelect from 'vue-select';
 
 export default {
-  components: {
-    Drawer
+  props: {
+    errors: {
+      type: Object | Array
+    }
   },
   data() {
     return {
-      group: 'YJC',
-      isActive: false,
-      username: '浅田　剛明',
       type: 'A',
       isTask: false,
       selected: 'initial',
@@ -183,8 +140,6 @@ export default {
       elapsedTime: 0,
       timer: undefined,
       isTime: false,
-      open: false,
-      align: 'right',
       startTime: '00:00:00',
       startRestTime: '00:00:00',
       endRestTime: '00:00:00',
@@ -202,15 +157,6 @@ export default {
     }
   },
   methods: {
-    goSchedule() {
-      this.$router.push("/schedule");
-    },
-    active() {  
-      this.isActive = !this.isActive  
-    },
-    toggle() {
-      this.open = !this.open
-    },
     changeA() {
       this.type = 'A'
     },

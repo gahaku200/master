@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import App from './components/Schedule'
+import App from './components/page/Schedule'
 
 new Vue({
   el: 'app',

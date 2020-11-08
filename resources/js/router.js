@@ -1,8 +1,9 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Home from './components/Home'
-import Schedule from './components/Schedule'
-import Register from './components/Register'
+import Home from './components/page/Home'
+import Schedule from './components/page/Schedule'
+import Register from './components/page/Register'
+import Login from './components/page/Login'
 
 Vue.use(Router)
 
@@ -18,6 +19,11 @@ export default new Router({
       path: '/schedule',
       name: 'schedule',
       component: Schedule
+    },
+    {
+      path: '/login',
+      name: 'login',
+      component: Login
     },
     {
       path: '/register',
