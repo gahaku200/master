@@ -1,7 +1,10 @@
 <template>
   <div id="home">
     <router-view :errors="errors" />
-    <div class="mainContainer">
+    <div v-if="auth.length === 0">
+      <img class="img-fluid" src="https://picsum.photos/1500/610">
+    </div>
+    <div class="mainContainer" v-if="auth.length !== 0">
       <div class="container">
         <div class="row">
           <div class="col-lg-4"></div>
@@ -124,6 +127,9 @@ import vSelect from 'vue-select';
 
 export default {
   props: {
+    auth: {
+      type: Object | Array
+    },
     errors: {
       type: Object | Array
     }

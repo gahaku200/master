@@ -1,7 +1,7 @@
 <template>
   <div>
     <the-header :auth="auth" />
-      <router-view :errors="errors" />
+      <router-view :auth="auth" :errors="errors" />
     <the-footer />
   </div>
 </template>

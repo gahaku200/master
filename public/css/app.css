@@ -156,8 +156,8 @@ main .container .row .panel .panel-body .form-horizontal .form-group-register {
 .login .loginSelected .bi-list {
   font-size: x-large;
   cursor: pointer;
-  -webkit-margin-start: auto;
-          margin-inline-start: auto;
+  border: solid 3px #6091d3;
+  border-radius: 10px;
 }
 
 .login .loginSelected .sideMenu {
