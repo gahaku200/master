@@ -4,10 +4,11 @@ import Home from './components/page/Home'
 import Schedule from './components/page/Schedule'
 import Register from './components/page/Register'
 import Login from './components/page/Login'
+import Group from './components/page/CreateGroup'
 
 Vue.use(Router)
 
-export default new Router({
+const router = new Router({
   mode: 'history', // SPAのURLにはhistoryモード(#ハッシュが付かないタイプを使います)
   routes: [
     {
@@ -30,5 +31,12 @@ export default new Router({
       name: 'register',
       component: Register
     },
+    {
+      path: '/group',
+      name: 'group',
+      component: Group
+    },
   ]
 })
+
+export default router

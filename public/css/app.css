@@ -121,14 +121,13 @@ main .container .row .panel .panel-body .form-horizontal .form-group-register {
   }
 }
 
-.headerLeftTop {
-  align-items: flex-end;
+.userGroupName {
   display: flex;
+  justify-content: flex-end;
 }
 
-.headerLeftBottom {
+.userGroupName h5 {
   align-self: flex-end;
-  display: flex;
 }
 
 .login {

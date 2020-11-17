@@ -1,10 +1,9 @@
-.headerLeftTop {
-  align-items: flex-end;
+.userGroupName {
   display: flex;
-}
-.headerLeftBottom {
-  align-self: flex-end;
-  display: flex;
+  justify-content: flex-end;
+  h5 {
+    align-self: flex-end;
+  }
 }
 .login {
   align-self: center;

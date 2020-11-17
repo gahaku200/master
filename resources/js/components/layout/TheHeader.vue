@@ -2,15 +2,17 @@
   <header>
       <div class="bg-dark text-white container-fluid">
         <div class="row">
-          <div class="col-lg-12 headerLeftTop">
-            <h5>会社名：</h5>
-            <h3>{{ group }}</h3>
-          </div>
-          <div class="col-lg-9 headerLeftBottom">
-            <p>ユーザー名：</p>
-            <h5>{{ username }}</h5>
+          <div class="col-lg-9 headerLeft">
+            <h1>勤怠アプリ</h1>
           </div>
           <div class="col-lg-3 login">
+            <div class="userGroupName">
+              <h5>グループ名：</h5>
+              <h4 v-for="group in groups.filter(e => e.id == auth.group_id)">
+                {{ group.name }}
+              </h4>
+            </div>
+
             <ul class="loginSelected" v-if="auth.length === 0">
               <router-link id="header-nav__register" to="/register" class="registerUser">ユーザー登録</router-link>
               <router-link id="header-nav__login" to="/login" class="userLogin">ログイン</router-link>
@@ -33,6 +35,7 @@
                   <form id="logout-form" action="/logout" method="POST" style="display: none;">
                     <input type="hidden" name="_token" :value="csrf" />
                   </form>
+                  <p @click="goCreateGroup()">グループ作成</p>
                 </ul>
               </drawer>
             </ul>
@@ -65,11 +68,12 @@ export default {
   },
   data() {
     return {
-      group: 'YJC',
+      groupEX: 'YJC',
       isActive: false,
       username: '浅田　剛明',
       open: false,
       align: 'right',
+      groups: [],
       csrf: document
         .querySelector('meta[name="csrf-token"]')
         .getAttribute("content")
@@ -80,9 +84,17 @@ export default {
       type: Object | Array
     }
   },
+  mounted() {
+    axios.get('/groups').then(response => this.groups = response.data) 
+   },
   methods: {
     goSchedule() {
       this.$router.push("/schedule");
+      this.open = !this.open
+    },
+    goCreateGroup() {
+      this.$router.push("/group");
+      this.open = !this.open
     },
     active() {  
       this.isActive = !this.isActive  
