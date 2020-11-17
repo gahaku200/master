@@ -1,5 +1,5 @@
 <template>
-  <div id="home">
+  <div>
     <router-view :errors="errors" />
     <div v-if="auth.length === 0">
       <img class="img-fluid" src="https://picsum.photos/1500/610">
