@@ -36,6 +36,7 @@
                     <input type="hidden" name="_token" :value="csrf" />
                   </form>
                   <p @click="goCreateGroup()">グループ作成</p>
+                  <p @click="goInviteMember()">メンバー招待</p>
                 </ul>
               </drawer>
             </ul>
@@ -94,6 +95,10 @@ export default {
     },
     goCreateGroup() {
       this.$router.push("/group");
+      this.open = !this.open
+    },
+    goInviteMember() {
+      this.$router.push("/inviteMember");
       this.open = !this.open
     },
     active() {  

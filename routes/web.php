@@ -17,6 +17,12 @@ Route::get('/group', function () {
 Route::get('/groups',function(){
 	return App\Group::all();
 });
+Route::get('/inviteMember', function () {
+    return view('index');
+  });
+Route::get('/users',function(){
+    return App\User::all();
+});
 
 Route::post('/register', 'Auth\RegisterController@register');
 Route::post('/login', 'Auth\LoginController@login');

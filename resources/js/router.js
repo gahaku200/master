@@ -5,6 +5,7 @@ import Schedule from './components/page/Schedule'
 import Register from './components/page/Register'
 import Login from './components/page/Login'
 import Group from './components/page/CreateGroup'
+import InviteMember from './components/page/InviteMember'
 
 Vue.use(Router)
 
@@ -35,6 +36,11 @@ const router = new Router({
       path: '/group',
       name: 'group',
       component: Group
+    },
+    {
+      path: '/inviteMember',
+      name: 'inviteMember',
+      component: InviteMember
     },
   ]
 })

@@ -2009,6 +2009,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   components: {
@@ -2044,6 +2045,10 @@ __webpack_require__.r(__webpack_exports__);
     },
     goCreateGroup: function goCreateGroup() {
       this.$router.push("/group");
+      this.open = !this.open;
+    },
+    goInviteMember: function goInviteMember() {
+      this.$router.push("/inviteMember");
       this.open = !this.open;
     },
     active: function active() {
@@ -2450,6 +2455,118 @@ __webpack_require__.r(__webpack_exports__);
         name: '退勤',
         time: this.endTime
       });
+    }
+  }
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/page/InviteMember.vue?vue&type=script&lang=js&":
+/*!****************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/page/InviteMember.vue?vue&type=script&lang=js& ***!
+  \****************************************************************************************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
+
+
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+/* harmony default export */ __webpack_exports__["default"] = ({
+  data: function data() {
+    return {
+      memberEmail: '',
+      button: false,
+      isOK: false,
+      alreadyG: false,
+      users: [],
+      csrf: document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+    };
+  },
+  mounted: function mounted() {
+    var _this = this;
+
+    axios.get('/users').then(function (response) {
+      return _this.users = response.data;
+    });
+  },
+  computed: {
+    isOKmessage: function isOKmessage() {
+      var _this2 = this;
+
+      var targets = this.users.filter(function (e) {
+        return e.email == _this2.memberEmail;
+      });
+      var target = targets.filter(function (e) {
+        return e.group_id == null;
+      });
+
+      if (target.length > 0) {
+        this.button = true;
+        this.isOK = true;
+        this.alreadyG = false;
+      } else if (targets.length > 0) {
+        this.button = false;
+        this.isOK = false;
+        this.alreadyG = true;
+      } else {
+        this.button = false;
+        this.isOK = false;
+        this.alreadyG = false;
+      }
+    }
+  },
+  methods: {
+    goHome: function goHome() {
+      this.$router.push("/");
+    },
+    inviteM: function inviteM() {
+      return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee() {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                document.querySelector("#inviteMember").submit();
+
+              case 1:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, _callee);
+      }))();
     }
   }
 });
@@ -7082,6 +7199,18 @@ var render = function() {
                                 }
                               },
                               [_vm._v("グループ作成")]
+                            ),
+                            _vm._v(" "),
+                            _c(
+                              "p",
+                              {
+                                on: {
+                                  click: function($event) {
+                                    return _vm.goInviteMember()
+                                  }
+                                }
+                              },
+                              [_vm._v("メンバー招待")]
                             )
                           ])
                         : _vm._e()
@@ -7194,7 +7323,7 @@ var render = function() {
                     ),
                     _vm._v(" "),
                     _c("validation-provider", {
-                      attrs: { name: "名前", rules: "required|max:100" },
+                      attrs: { name: "グループ名", rules: "required|max:100" },
                       scopedSlots: _vm._u(
                         [
                           {
@@ -7691,6 +7820,164 @@ var staticRenderFns = [
     ])
   }
 ]
+render._withStripped = true
+
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/page/InviteMember.vue?vue&type=template&id=1a9ff268&":
+/*!********************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/page/InviteMember.vue?vue&type=template&id=1a9ff268& ***!
+  \********************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", [
+    _vm._v("\n  " + _vm._s(_vm.users.name) + "\n  "),
+    _c("p", [_vm._v("InviteMember")]),
+    _vm._v(" "),
+    _c("p", [_vm._v("Hey!!InviteMember!!")]),
+    _vm._v(" "),
+    _c(
+      "form",
+      {
+        ref: "observer",
+        staticClass: "form-group",
+        attrs: {
+          action: "/inviteMember",
+          id: "inviteMember",
+          method: "post",
+          tag: "form"
+        }
+      },
+      [
+        _c("input", {
+          attrs: { type: "hidden", name: "_token" },
+          domProps: { value: _vm.csrf }
+        }),
+        _vm._v(" "),
+        _c("div", { staticClass: "input-group mb-3" }, [
+          _c(
+            "span",
+            {
+              staticClass: "input-group-text",
+              attrs: { id: "inputGroup-sizing-default" }
+            },
+            [_vm._v("招待するユーザーのメールアドレスを入力")]
+          ),
+          _vm._v(" "),
+          _c("div", { attrs: { name: "メンバーアドレス" } }, [
+            _c("input", {
+              directives: [
+                {
+                  name: "model",
+                  rawName: "v-model",
+                  value: _vm.memberEmail,
+                  expression: "memberEmail"
+                }
+              ],
+              staticClass: "form-control",
+              attrs: {
+                name: "memberEmail",
+                type: "text",
+                "aria-label": "Sizing example input",
+                "aria-describedby": "inputGroup-sizing-default"
+              },
+              domProps: { value: _vm.memberEmail },
+              on: {
+                input: function($event) {
+                  if ($event.target.composing) {
+                    return
+                  }
+                  _vm.memberEmail = $event.target.value
+                }
+              }
+            })
+          ])
+        ]),
+        _vm._v(" "),
+        !_vm.button
+          ? _c(
+              "button",
+              {
+                staticClass: "btn btn-primary",
+                attrs: { type: "button", disabled: "" }
+              },
+              [_vm._v("招待")]
+            )
+          : _vm._e(),
+        _vm._v(" "),
+        _vm.button
+          ? _c(
+              "button",
+              {
+                staticClass: "btn btn-primary",
+                attrs: { type: "button" },
+                on: {
+                  click: function($event) {
+                    return _vm.inviteM()
+                  }
+                }
+              },
+              [_vm._v("招待")]
+            )
+          : _vm._e()
+      ]
+    ),
+    _vm._v(" "),
+    _c(
+      "div",
+      {
+        model: {
+          value: _vm.isOKmessage,
+          callback: function($$v) {
+            _vm.isOKmessage = $$v
+          },
+          expression: "isOKmessage"
+        }
+      },
+      [
+        _vm.isOK ? _c("p", [_vm._v("グループに招待出来ます")]) : _vm._e(),
+        _vm._v(" "),
+        _vm.alreadyG
+          ? _c("p", [_vm._v("既にグループに所属しています")])
+          : _vm._e(),
+        _vm._v(" "),
+        !_vm.isOK && _vm.memberEmail.length > 0 && !_vm.alreadyG
+          ? _c("p", [
+              _vm._v(
+                "現在入力しているメールアドレスは登録しているユーザーと一致しません"
+              )
+            ])
+          : _vm._e()
+      ]
+    ),
+    _vm._v(" "),
+    _c(
+      "button",
+      {
+        on: {
+          click: function($event) {
+            $event.stopPropagation()
+            $event.preventDefault()
+            return _vm.goHome()
+          }
+        }
+      },
+      [_vm._v("戻る")]
+    )
+  ])
+}
+var staticRenderFns = []
 render._withStripped = true
 
 
@@ -24045,6 +24332,75 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/js/components/page/InviteMember.vue":
+/*!*******************************************************!*\
+  !*** ./resources/js/components/page/InviteMember.vue ***!
+  \*******************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _InviteMember_vue_vue_type_template_id_1a9ff268___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./InviteMember.vue?vue&type=template&id=1a9ff268& */ "./resources/js/components/page/InviteMember.vue?vue&type=template&id=1a9ff268&");
+/* harmony import */ var _InviteMember_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./InviteMember.vue?vue&type=script&lang=js& */ "./resources/js/components/page/InviteMember.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _InviteMember_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _InviteMember_vue_vue_type_template_id_1a9ff268___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _InviteMember_vue_vue_type_template_id_1a9ff268___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/components/page/InviteMember.vue"
+/* harmony default export */ __webpack_exports__["default"] = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/js/components/page/InviteMember.vue?vue&type=script&lang=js&":
+/*!********************************************************************************!*\
+  !*** ./resources/js/components/page/InviteMember.vue?vue&type=script&lang=js& ***!
+  \********************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_InviteMember_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib??ref--4-0!../../../../node_modules/vue-loader/lib??vue-loader-options!./InviteMember.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/page/InviteMember.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_InviteMember_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/js/components/page/InviteMember.vue?vue&type=template&id=1a9ff268&":
+/*!**************************************************************************************!*\
+  !*** ./resources/js/components/page/InviteMember.vue?vue&type=template&id=1a9ff268& ***!
+  \**************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_InviteMember_vue_vue_type_template_id_1a9ff268___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib??vue-loader-options!./InviteMember.vue?vue&type=template&id=1a9ff268& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/page/InviteMember.vue?vue&type=template&id=1a9ff268&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_InviteMember_vue_vue_type_template_id_1a9ff268___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_InviteMember_vue_vue_type_template_id_1a9ff268___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+
+
+
+/***/ }),
+
 /***/ "./resources/js/components/page/Login.vue":
 /*!************************************************!*\
   !*** ./resources/js/components/page/Login.vue ***!
@@ -24338,6 +24694,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _components_page_Register__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./components/page/Register */ "./resources/js/components/page/Register.vue");
 /* harmony import */ var _components_page_Login__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./components/page/Login */ "./resources/js/components/page/Login.vue");
 /* harmony import */ var _components_page_CreateGroup__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./components/page/CreateGroup */ "./resources/js/components/page/CreateGroup.vue");
+/* harmony import */ var _components_page_InviteMember__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./components/page/InviteMember */ "./resources/js/components/page/InviteMember.vue");
+
 
 
 
@@ -24370,6 +24728,10 @@ var router = new vue_router__WEBPACK_IMPORTED_MODULE_1__["default"]({
     path: '/group',
     name: 'group',
     component: _components_page_CreateGroup__WEBPACK_IMPORTED_MODULE_6__["default"]
+  }, {
+    path: '/inviteMember',
+    name: 'inviteMember',
+    component: _components_page_InviteMember__WEBPACK_IMPORTED_MODULE_7__["default"]
   }]
 });
 /* harmony default export */ __webpack_exports__["default"] = (router);
