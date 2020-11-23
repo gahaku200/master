@@ -23,8 +23,23 @@ Route::get('/inviteMember', function () {
 Route::get('/users',function(){
     return App\User::all();
 });
+Route::get('/successSendEmail', function () {
+    return view('index');
+    });
+Route::get('/alreadyJoinGroup', function () {
+    return view('index');
+  });
+Route::get('/notInviteData', function () {
+return view('index');
+});
+Route::get('/successInvite', function () {
+return view('index');
+});
 
 Route::post('/register', 'Auth\RegisterController@register');
 Route::post('/login', 'Auth\LoginController@login');
 Route::post('/logout', 'Auth\LoginController@logout');
 Route::post('/group', 'Web\GroupController@createGroup');
+Route::post('invite', 'Web\InviteController@process')->name('process');
+
+Route::get('accept/{token}', 'Web\InviteController@accept')->name('accept');

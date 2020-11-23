@@ -6,11 +6,9 @@
             <h1>勤怠アプリ</h1>
           </div>
           <div class="col-lg-3 login">
-            <div class="userGroupName">
+            <div class="userGroupName" v-for="group in groups.filter(e => e.id == auth.group_id)">
               <h5>グループ名：</h5>
-              <h4 v-for="group in groups.filter(e => e.id == auth.group_id)">
-                {{ group.name }}
-              </h4>
+              <h4>{{ group.name }}</h4>
             </div>
 
             <ul class="loginSelected" v-if="auth.length === 0">
