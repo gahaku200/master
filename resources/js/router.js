@@ -5,6 +5,11 @@ import Schedule from './components/page/Schedule'
 import Register from './components/page/Register'
 import Login from './components/page/Login'
 import Group from './components/page/CreateGroup'
+import InviteMember from './components/page/InviteMember'
+import AlreadyJoinGroup from './components/mail/AlreadyJoinGroup'
+import NotInviteData from './components/mail/NotInviteData'
+import SuccessInvite from './components/mail/SuccessInvite'
+import SuccessSendEmail from './components/mail/SuccessSendEmail'
 
 Vue.use(Router)
 
@@ -35,6 +40,31 @@ const router = new Router({
       path: '/group',
       name: 'group',
       component: Group
+    },
+    {
+      path: '/inviteMember',
+      name: 'inviteMember',
+      component: InviteMember
+    },
+    {
+      path: '/successSendEmail',
+      name: 'successSendEmail',
+      component: SuccessSendEmail
+    },
+    {
+      path: '/alreadyJoinGroup',
+      name: 'alreadyJoinGroup',
+      component: AlreadyJoinGroup
+    },
+    {
+      path: '/notInviteData',
+      name: 'notInviteData',
+      component: NotInviteData
+    },
+    {
+      path: '/successInvite',
+      name: 'successInvite',
+      component: SuccessInvite
     },
   ]
 })

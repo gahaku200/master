@@ -7,7 +7,7 @@
       <input type="hidden" name="_token" :value="csrf" />
       <div class="input-group mb-3">
         <span class="input-group-text" id="inputGroup-sizing-default">グループ or 会社名</span>
-        <validation-provider name="名前" rules="required|max:100" v-slot="{ errors }">
+        <validation-provider name="グループ名" rules="required|max:100" v-slot="{ errors }">
           <input v-model="name" name="name" type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" />
           <div class="alert alert-danger" v-show="errors[0]">{{ errors[0] }}</div>
         </validation-provider>
@@ -32,7 +32,7 @@ extend("max", {
 });
 
 export default {
-   components: {
+  components: {
     ValidationProvider,
     ValidationObserver
   },

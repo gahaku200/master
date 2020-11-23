@@ -6,11 +6,9 @@
             <h1>勤怠アプリ</h1>
           </div>
           <div class="col-lg-3 login">
-            <div class="userGroupName">
+            <div class="userGroupName" v-for="group in groups.filter(e => e.id == auth.group_id)">
               <h5>グループ名：</h5>
-              <h4 v-for="group in groups.filter(e => e.id == auth.group_id)">
-                {{ group.name }}
-              </h4>
+              <h4>{{ group.name }}</h4>
             </div>
 
             <ul class="loginSelected" v-if="auth.length === 0">
@@ -36,6 +34,7 @@
                     <input type="hidden" name="_token" :value="csrf" />
                   </form>
                   <p @click="goCreateGroup()">グループ作成</p>
+                  <p @click="goInviteMember()">メンバー招待</p>
                 </ul>
               </drawer>
             </ul>
@@ -94,6 +93,10 @@ export default {
     },
     goCreateGroup() {
       this.$router.push("/group");
+      this.open = !this.open
+    },
+    goInviteMember() {
+      this.$router.push("/inviteMember");
       this.open = !this.open
     },
     active() {  
