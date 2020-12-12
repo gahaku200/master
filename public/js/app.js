@@ -2394,15 +2394,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: {
@@ -2421,24 +2412,61 @@ __webpack_require__.r(__webpack_exports__);
       tasks: ['メールチェック', '朝礼', '作業', '会議', '研修', '外出', '離席', 'その他'],
       taskLabel: '',
       count: 0,
-      currentTime: new Date(),
-      elapsedTime: 0,
-      timer: undefined,
+      //currentTime: new Date(),
+      //elapsedTime: 0,
+      //timer: undefined,
       isTime: false,
-      startTime: '00:00:00',
-      startRestTime: '00:00:00',
-      endRestTime: '00:00:00',
-      endTime: '00:00:00',
+      //startTime: '00:00:00',
+      //startRestTime: '00:00:00',
+      //endRestTime: '00:00:00',
+      //endTime: '00:00:00',
+      doingTime: '',
       records: [],
-      attendanceRecords: []
+      attendanceRecords: [],
+      users: [],
+      csrf: document.querySelector('meta[name="csrf-token"]').getAttribute("content")
     };
   },
+  mounted: function mounted() {
+    var _this = this;
+
+    var authId = document.querySelector("meta[name='user-id']").getAttribute('content');
+    var group_id = document.querySelector("meta[name='group-id']").getAttribute('content');
+
+    if (group_id != '') {
+      setInterval(function () {
+        axios.get('/api/getGroup/' + group_id).then(function (res) {
+          _this.users = [];
+          res.data.forEach(function (user) {
+            if (user.id == authId) {
+              _this.taskLabel = user.now_task;
+              _this.doingTime = _this.passingTime(user.now_task_start);
+            } else {
+              _this.users.push({
+                name: user.name,
+                task: user.now_task,
+                time: _this.passingTime(user.now_task_start)
+              });
+            }
+          });
+        })["catch"](function (error) {
+          console.log(error);
+        });
+      }, 1000);
+    }
+  },
   computed: {
-    formattedElapsedTime: function formattedElapsedTime() {
-      var date = new Date(null);
+    /*formattedElapsedTime() {
+      const date = new Date(null);
       date.setSeconds(this.elapsedTime / 1000);
-      var utc = date.toUTCString();
+      const utc = date.toUTCString();
       return utc.substr(utc.indexOf(":") - 2, 8);
+    },*/
+    groupMember: function groupMember() {
+      var members = this.users.filter(function (e) {
+        return e.group_id == auth.group_id;
+      });
+      return members;
     }
   },
   methods: {
@@ -2454,19 +2482,18 @@ __webpack_require__.r(__webpack_exports__);
     taskOpen: function taskOpen() {
       this.isTask = !this.isTask;
     },
-    start: function start() {
-      var _this = this;
 
-      this.timer = setInterval(function () {
-        _this.elapsedTime += 1000;
+    /*start() {
+      this.timer = setInterval(() => {
+        this.elapsedTime += 1000;
       }, 1000);
     },
-    stop: function stop() {
+    stop() {
       clearInterval(this.timer);
     },
-    reset: function reset() {
+    reset() {
       this.elapsedTime = 0;
-    },
+    },*/
     taskName: function taskName() {
       if (this.count != 0 && this.selected != 'initial') {
         this.records.push({
@@ -2492,16 +2519,19 @@ __webpack_require__.r(__webpack_exports__);
       }
     },
     restName: function restName() {
-      this.taskLabel = '休憩';
-      this.isTime = true;
+      var data = {
+        task: '休憩'
+      };
+      var self = this;
+      var id = document.querySelector("meta[name='user-id']").getAttribute('content');
+      axios.post('/api/taskStart/' + id, data)["catch"](function (error) {
+        console.log(error);
+      });
     },
     emptytask: function emptytask() {
       this.taskLabel = '';
       this.isTime = false;
       this.count = 0;
-    },
-    changeSB: function changeSB() {
-      this.selected = 'initial';
     },
     startWork: function startWork() {
       this.records = [];
@@ -2557,6 +2587,47 @@ __webpack_require__.r(__webpack_exports__);
         name: '退勤',
         time: this.endTime
       });
+    },
+    taskStart: function taskStart() {
+      if (this.selected != 'initial') {
+        var data = {
+          task: this.selected
+        };
+        var id = document.querySelector("meta[name='user-id']").getAttribute('content');
+        axios.post('/api/taskStart/' + id, data)["catch"](function (error) {
+          console.log(error);
+        });
+        this.selected = 'initial';
+      } else {}
+    },
+    passingTime: function passingTime(nowTaskStart) {
+      if (nowTaskStart == null) {
+        return nowTaskStart;
+      }
+
+      var d1 = new Date();
+      var d2 = new Date(nowTaskStart);
+      var diffTime = d1.getTime() - d2.getTime();
+      var diffHour = Math.floor(diffTime / (1000 * 60 * 60));
+
+      if (diffHour < 10) {
+        diffHour = '0' + diffHour;
+      }
+
+      var diffMinites = Math.floor(diffTime / (1000 * 60) % 60);
+
+      if (diffMinites < 10) {
+        diffMinites = '0' + diffMinites;
+      }
+
+      var diffSeconds = Math.floor(diffTime / 1000 % 60);
+
+      if (diffSeconds < 10) {
+        diffSeconds = '0' + diffSeconds;
+      }
+
+      var passTime = diffHour + ':' + diffMinites + ':' + diffSeconds;
+      return passTime;
     }
   }
 });
@@ -7757,10 +7828,7 @@ var render = function() {
                             attrs: { type: "button" },
                             on: {
                               click: function($event) {
-                                _vm.changeB(),
-                                  _vm.taskOpen(),
-                                  _vm.start(),
-                                  _vm.startWork()
+                                _vm.changeB(), _vm.taskOpen(), _vm.startWork()
                               }
                             }
                           },
@@ -7787,12 +7855,8 @@ var render = function() {
                               click: function($event) {
                                 _vm.changeC(),
                                   _vm.startRest(),
-                                  _vm.stop(),
-                                  _vm.reset(),
-                                  _vm.start(),
                                   _vm.taskOpen(),
-                                  _vm.restName(),
-                                  _vm.changeSB()
+                                  _vm.restName()
                               }
                             }
                           },
@@ -7808,8 +7872,6 @@ var render = function() {
                               click: function($event) {
                                 _vm.changeA(),
                                   _vm.endWork(),
-                                  _vm.stop(),
-                                  _vm.reset(),
                                   _vm.emptytask(),
                                   _vm.taskOpen()
                               }
@@ -7838,9 +7900,6 @@ var render = function() {
                               click: function($event) {
                                 _vm.changeB(),
                                   _vm.endRest(),
-                                  _vm.stop(),
-                                  _vm.reset(),
-                                  _vm.start(),
                                   _vm.taskOpen(),
                                   _vm.emptytask()
                               }
@@ -7859,92 +7918,117 @@ var render = function() {
                 _c("div", { staticClass: "col-lg-6" }, [
                   _vm.isTask
                     ? _c("div", { staticClass: "row" }, [
-                        _c("div", { staticClass: "col-lg-8 kindOfTask" }, [
-                          _c(
-                            "select",
-                            {
-                              directives: [
-                                {
-                                  name: "model",
-                                  rawName: "v-model",
-                                  value: _vm.selected,
-                                  expression: "selected"
-                                }
-                              ],
-                              staticClass: "form-select",
-                              attrs: { "aria-label": "Default select example" },
-                              on: {
-                                change: function($event) {
-                                  var $$selectedVal = Array.prototype.filter
-                                    .call($event.target.options, function(o) {
-                                      return o.selected
-                                    })
-                                    .map(function(o) {
-                                      var val =
-                                        "_value" in o ? o._value : o.value
-                                      return val
-                                    })
-                                  _vm.selected = $event.target.multiple
-                                    ? $$selectedVal
-                                    : $$selectedVal[0]
-                                }
-                              }
-                            },
-                            [
+                        _c(
+                          "form",
+                          {
+                            ref: "observer",
+                            staticClass: "form-now-task",
+                            attrs: {
+                              action: "/taskStart",
+                              id: "taskStart",
+                              method: "post",
+                              tag: "form"
+                            }
+                          },
+                          [
+                            _c("input", {
+                              attrs: { type: "hidden", name: "_token" },
+                              domProps: { value: _vm.csrf }
+                            }),
+                            _vm._v(" "),
+                            _c("div", { staticClass: "col-lg-8 kindOfTask" }, [
                               _c(
-                                "option",
-                                { attrs: { disabled: "", value: "initial" } },
-                                [_vm._v("タスクを選択してください")]
-                              ),
-                              _vm._v(" "),
-                              _vm._l(_vm.tasks, function(task) {
-                                return _c("option", [_vm._v(_vm._s(task))])
-                              })
-                            ],
-                            2
-                          )
-                        ]),
-                        _vm._v(" "),
-                        _c("div", { staticClass: "col-lg-4 taskButton" }, [
-                          _c(
-                            "button",
-                            {
-                              staticClass: "btn btn-primary",
-                              attrs: { type: "button" },
-                              on: {
-                                click: function($event) {
-                                  _vm.taskName(),
-                                    _vm.stop(),
-                                    _vm.reset(),
-                                    _vm.start(),
-                                    _vm.changeSB()
-                                }
-                              }
-                            },
-                            [_vm._v("タスク切替")]
-                          )
-                        ])
+                                "select",
+                                {
+                                  directives: [
+                                    {
+                                      name: "model",
+                                      rawName: "v-model",
+                                      value: _vm.selected,
+                                      expression: "selected"
+                                    }
+                                  ],
+                                  staticClass: "form-select",
+                                  attrs: {
+                                    "aria-label": "Default select example",
+                                    name: "task"
+                                  },
+                                  on: {
+                                    change: function($event) {
+                                      var $$selectedVal = Array.prototype.filter
+                                        .call($event.target.options, function(
+                                          o
+                                        ) {
+                                          return o.selected
+                                        })
+                                        .map(function(o) {
+                                          var val =
+                                            "_value" in o ? o._value : o.value
+                                          return val
+                                        })
+                                      _vm.selected = $event.target.multiple
+                                        ? $$selectedVal
+                                        : $$selectedVal[0]
+                                    }
+                                  }
+                                },
+                                [
+                                  _c(
+                                    "option",
+                                    {
+                                      attrs: { disabled: "", value: "initial" }
+                                    },
+                                    [_vm._v("タスクを選択してください")]
+                                  ),
+                                  _vm._v(" "),
+                                  _vm._l(_vm.tasks, function(task) {
+                                    return _c(
+                                      "option",
+                                      { attrs: { name: "task" } },
+                                      [_vm._v(_vm._s(task))]
+                                    )
+                                  })
+                                ],
+                                2
+                              )
+                            ]),
+                            _vm._v(" "),
+                            _c("div", { staticClass: "col-lg-4 taskButton" }, [
+                              _c(
+                                "button",
+                                {
+                                  staticClass: "btn btn-primary",
+                                  attrs: { type: "button" },
+                                  on: {
+                                    click: function($event) {
+                                      return _vm.taskStart()
+                                    }
+                                  }
+                                },
+                                [_vm._v("タスク切替")]
+                              )
+                            ])
+                          ]
+                        )
                       ])
                     : _vm._e()
                 ]),
                 _vm._v(" "),
                 _c("div", { staticClass: "col-lg-3" }),
                 _vm._v(" "),
-                _vm.isTime
-                  ? _c("div", { staticClass: "col-lg-12 tasksShow" }, [
-                      _c("div", { staticClass: "taskLabelContainer" }, [
-                        _c("p", { staticClass: "taskLabelshow" }, [
-                          _vm._v(_vm._s(_vm.taskLabel))
-                        ])
-                      ]),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "clock" }, [
-                        _c("p", { staticClass: "timeshow" }, [
-                          _vm._v(_vm._s(_vm.formattedElapsedTime))
-                        ])
-                      ])
+                _c("div", { staticClass: "col-lg-12 tasksShow" }, [
+                  _c("div", { staticClass: "taskLabelContainer" }, [
+                    _c("p", { staticClass: "taskLabelshow" }, [
+                      _vm._v(_vm._s(_vm.taskLabel))
                     ])
-                  : _vm._e(),
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "clock" }, [
+                    _c("p", { staticClass: "timeshow" }, [
+                      _vm._v(_vm._s(_vm.doingTime))
+                    ])
+                  ])
+                ]),
                 _vm._v(" "),
                 _c("div", { staticClass: "col-lg-4" }, [
                   _c(
@@ -8003,7 +8087,33 @@ var render = function() {
                   ])
                 ]),
                 _vm._v(" "),
-                _vm._m(2)
+                _c("div", { staticClass: "col-lg-4" }, [
+                  _c(
+                    "span",
+                    { staticClass: "d-block p-2 bg-info text-white tableName" },
+                    [_vm._v("全ユーザータスク状況")]
+                  ),
+                  _vm._v(" "),
+                  _c("table", { staticClass: "table" }, [
+                    _vm._m(2),
+                    _vm._v(" "),
+                    _c(
+                      "tbody",
+                      _vm._l(_vm.users, function(user) {
+                        return _c("tr", [
+                          _c("td", { attrs: { scope: "row" } }),
+                          _vm._v(" "),
+                          _c("td", [_vm._v(_vm._s(user.name))]),
+                          _vm._v(" "),
+                          _c("td", [_vm._v(_vm._s(user.task))]),
+                          _vm._v(" "),
+                          _c("td", [_vm._v(_vm._s(user.time))])
+                        ])
+                      }),
+                      0
+                    )
+                  ])
+                ])
               ])
             ])
           ])
@@ -8045,55 +8155,15 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "col-lg-4" }, [
-      _c("span", { staticClass: "d-block p-2 bg-info text-white tableName" }, [
-        _vm._v("全ユーザータスク状況")
-      ]),
-      _vm._v(" "),
-      _c("table", { staticClass: "table" }, [
-        _c("thead", [
-          _c("tr", [
-            _c("th", { attrs: { scope: "col" } }),
-            _vm._v(" "),
-            _c("th", { attrs: { scope: "col" } }, [_vm._v("ユーザー名")]),
-            _vm._v(" "),
-            _c("th", { attrs: { scope: "col" } }, [_vm._v("タスク名")]),
-            _vm._v(" "),
-            _c("th", { attrs: { scope: "col" } }, [_vm._v("経過時間")])
-          ])
-        ]),
+    return _c("thead", [
+      _c("tr", [
+        _c("th", { attrs: { scope: "col" } }),
         _vm._v(" "),
-        _c("tbody", [
-          _c("tr", [
-            _c("td", { attrs: { scope: "row" } }),
-            _vm._v(" "),
-            _c("td", [_vm._v("ピカチュウ")]),
-            _vm._v(" "),
-            _c("td", [_vm._v("資料作成")]),
-            _vm._v(" "),
-            _c("td", [_vm._v("00:12:32")])
-          ]),
-          _vm._v(" "),
-          _c("tr", [
-            _c("td", { attrs: { scope: "row" } }),
-            _vm._v(" "),
-            _c("td", [_vm._v("ヒドカゲ")]),
-            _vm._v(" "),
-            _c("td", [_vm._v("動画編集")]),
-            _vm._v(" "),
-            _c("td", [_vm._v("00:35:46")])
-          ]),
-          _vm._v(" "),
-          _c("tr", [
-            _c("td", { attrs: { scope: "row" } }),
-            _vm._v(" "),
-            _c("td", [_vm._v("ゼニガメ")]),
-            _vm._v(" "),
-            _c("td", [_vm._v("会議")]),
-            _vm._v(" "),
-            _c("td", [_vm._v("02:12:03")])
-          ])
-        ])
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("ユーザー名")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("タスク名")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("経過時間")])
       ])
     ])
   }

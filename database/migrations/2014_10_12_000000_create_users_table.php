@@ -19,11 +19,12 @@ class CreateUsersTable extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-
-            $table->bigIncrements('group_id');
-
             $table->rememberToken();
             $table->timestamps();
+            $table->boolean('is_admin')->default(false);
+            $table->integer('group_id')->nullable()->default(null);
+            $table->string('now_task')->nullable();
+            $table->date('now_task_start')->nullable();
         });
     }
 
