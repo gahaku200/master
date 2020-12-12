@@ -9,39 +9,42 @@
         <div class="row">
           <div class="col-lg-4"></div>
           <div class="col-lg-4 centerButton" div v-if="type === 'A'">
-            <button @click="changeB(), taskOpen(), start(), startWork()" type="button" class="btn btn-primary btn-lg">出勤</button>
+            <button @click="changeB(), taskOpen(),startWork()" type="button" class="btn btn-primary btn-lg">出勤</button>
           </div>
           <div class="col-lg-4 centerButton" div v-if="type === 'B'">
-            <button @click="changeC(), startRest(), stop(), reset(), start(), taskOpen(), restName(),changeSB()" type="button" class="btn btn-primary btn-lg">休入</button>
-            <button @click="changeA(), endWork(), stop(), reset(), emptytask(), taskOpen()" type="button" class="btn btn-primary btn-lg">退勤</button>
+            <button @click="changeC(), startRest(), taskOpen(), restName()" type="button" class="btn btn-primary btn-lg">休入</button>
+            <button @click="changeA(), endWork(), emptytask(), taskOpen()" type="button" class="btn btn-primary btn-lg">退勤</button>
           </div>
           <div class="col-lg-4 centerButton" div v-if="type === 'C'">
-            <button @click="changeB(), endRest(), stop(), reset(), start(), taskOpen(), emptytask()" type="button" class="btn btn-primary btn-lg">休出</button>
+            <button @click="changeB(), endRest(), taskOpen(), emptytask()" type="button" class="btn btn-primary btn-lg">休出</button>
           </div>
           <div class="col-lg-4"></div>
 
           <div class="col-lg-3"></div>
           <div class="col-lg-6">
             <div v-if="isTask" class="row">
-              <div class="col-lg-8 kindOfTask">
-                <select v-model="selected" class="form-select" aria-label="Default select example">
-                  <option disabled value="initial">タスクを選択してください</option>
-                  <option v-for="task in tasks">{{ task }}</option>
-                </select>
-              </div>
-              <div class="col-lg-4 taskButton">
-                <button @click="taskName(), stop(), reset(), start(),changeSB()" type="button" class="btn btn-primary">タスク切替</button>
-              </div>
+              <form　class="form-now-task" ref="observer" action="/taskStart" id="taskStart" method="post" tag="form">
+                <input type="hidden" name="_token" :value="csrf" />
+                <div class="col-lg-8 kindOfTask">
+                  <select v-model="selected" class="form-select" aria-label="Default select example" name="task">
+                    <option disabled value="initial">タスクを選択してください</option>
+                    <option v-for="task in tasks" name="task">{{ task }}</option>
+                  </select>
+                </div>
+                <div class="col-lg-4 taskButton">
+                  <button @click="taskStart()" type="button" class="btn btn-primary">タスク切替</button>
+                </div>
+              </form>
             </div>
           </div>
           <div class="col-lg-3"></div>
 
-          <div v-if="isTime" class="col-lg-12 tasksShow">
+          <div class="col-lg-12 tasksShow">
               <div class="taskLabelContainer">
                 <p class="taskLabelshow">{{ taskLabel }}</p>
               </div>
               <div class="clock">
-                <p class="timeshow">{{ formattedElapsedTime }}</p>
+                <p class="timeshow">{{ doingTime }}</p>
               </div>
           </div>
 
@@ -95,23 +98,11 @@
                 </tr>
               </thead>
               <tbody>
-                <tr>
+                <tr v-for="user in users">
                   <td scope="row"></td>
-                  <td>ピカチュウ</td>
-                  <td>資料作成</td>
-                  <td>00:12:32</td>
-                </tr>
-                <tr>
-                  <td scope="row"></td>
-                  <td>ヒドカゲ</td>
-                  <td>動画編集</td>
-                  <td>00:35:46</td>
-                </tr>
-                <tr>
-                  <td scope="row"></td>
-                  <td>ゼニガメ</td>
-                  <td>会議</td>
-                  <td>02:12:03</td>
+                  <td>{{ user.name }}</td>
+                  <td>{{ user.task }}</td>
+                  <td>{{ user.time }}</td>
                 </tr>
               </tbody>
             </table>
@@ -142,25 +133,56 @@ export default {
       tasks: ['メールチェック', '朝礼', '作業', '会議', '研修', '外出', '離席', 'その他'],
       taskLabel: '',
       count: 0,
-      currentTime: new Date(),
-      elapsedTime: 0,
-      timer: undefined,
+      //currentTime: new Date(),
+      //elapsedTime: 0,
+      //timer: undefined,
       isTime: false,
-      startTime: '00:00:00',
-      startRestTime: '00:00:00',
-      endRestTime: '00:00:00',
-      endTime: '00:00:00',
+      //startTime: '00:00:00',
+      //startRestTime: '00:00:00',
+      //endRestTime: '00:00:00',
+      //endTime: '00:00:00',
+      doingTime: '',
       records: [],
       attendanceRecords: [],
+      users: [],
+      csrf: document
+        .querySelector('meta[name="csrf-token"]')
+        .getAttribute("content"),
     }
   },
+  mounted() {
+    var authId = document.querySelector("meta[name='user-id']").getAttribute('content');
+    var group_id = document.querySelector("meta[name='group-id']").getAttribute('content');
+
+    if (group_id != '') {
+      setInterval(() => {
+      axios.get('/api/getGroup/' + group_id)
+        .then(res =>  {
+          this.users = [];
+          res.data.forEach((user) => {
+            if (user.id == authId) {
+              this.taskLabel = user.now_task;
+              this.doingTime = this.passingTime(user.now_task_start);
+            } else {
+              this.users.push({name: user.name, task: user.now_task, time: this.passingTime(user.now_task_start)});
+            }
+          })
+        }).catch( error => { console.log(error); })
+      }, 1000);
+    }
+   },
   computed: {
-    formattedElapsedTime() {
+    /*formattedElapsedTime() {
       const date = new Date(null);
       date.setSeconds(this.elapsedTime / 1000);
       const utc = date.toUTCString();
       return utc.substr(utc.indexOf(":") - 2, 8);
-    }
+    },*/
+    groupMember() {
+      var members = this.users.filter(e => e.group_id == auth.group_id);
+      return members;
+    },
+    
   },
   methods: {
     changeA() {
@@ -175,7 +197,7 @@ export default {
     taskOpen() {
       this.isTask = !this.isTask
     },
-    start() {
+    /*start() {
       this.timer = setInterval(() => {
         this.elapsedTime += 1000;
       }, 1000);
@@ -185,7 +207,7 @@ export default {
     },
     reset() {
       this.elapsedTime = 0;
-    },
+    },*/
     taskName() {
       if (this.count != 0 && this.selected != 'initial') {
         this.records.push({name: this.taskLabel, totalTime: this.formattedElapsedTime})
@@ -205,16 +227,18 @@ export default {
       }
     },
     restName() {
-      this.taskLabel = '休憩';
-      this.isTime = true;
+      const data = {
+        task: '休憩'
+      }
+      var self = this;
+      var id = document.querySelector("meta[name='user-id']").getAttribute('content');
+      axios.post('/api/taskStart/' + id, data)
+      .catch( error => { console.log(error); });
     },
     emptytask() {
       this.taskLabel = '';
       this.isTime = false;
       this.count = 0;
-    },
-    changeSB() {
-      this.selected = 'initial';
     },
     startWork() {
       this.records = [];
@@ -248,6 +272,44 @@ export default {
       this.endTime = gmt.substr(gmt.indexOf(":") - 2, 8);
       this.attendanceRecords.push({name: '退勤', time: this.endTime})
     },
+    taskStart() {
+      if (this.selected != 'initial') {
+        const data = {
+        task: this.selected
+        }
+        var id = document.querySelector("meta[name='user-id']").getAttribute('content');
+        axios.post('/api/taskStart/' + id, data)
+        .catch( error => { console.log(error); });
+        
+        this.selected = 'initial';
+      } else {
+      }
+    },
+    passingTime(nowTaskStart) {
+      if (nowTaskStart == null) {
+        return nowTaskStart;
+      }
+      var d1 = new Date();
+      var d2 = new Date(nowTaskStart);
+
+      var diffTime = d1.getTime() - d2.getTime();
+
+      var diffHour = Math.floor(diffTime / (1000 * 60 * 60));
+      if(diffHour < 10) {
+        diffHour = '0' + diffHour;
+      }
+      var diffMinites = Math.floor(diffTime / (1000 * 60) % 60);
+      if(diffMinites < 10) {
+        diffMinites = '0' + diffMinites;
+      }
+      var diffSeconds = Math.floor(diffTime / 1000 % 60);
+      if(diffSeconds < 10) {
+        diffSeconds = '0' + diffSeconds;
+      }
+
+      var passTime = diffHour + ':' + diffMinites + ':' + diffSeconds;
+      return passTime;
+    }
   }
 };
 </script>
