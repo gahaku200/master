@@ -33,8 +33,9 @@
                   <form id="logout-form" action="/logout" method="POST" style="display: none;">
                     <input type="hidden" name="_token" :value="csrf" />
                   </form>
-                  <p @click="goCreateGroup()">グループ作成</p>
-                  <p @click="goInviteMember()">メンバー招待</p>
+                  <p v-if="auth.group_id === null" @click="goCreateGroup()">グループ作成</p>
+                  <p v-if="auth.is_admin === '1'" @click="goInviteMember()">メンバー招待</p>
+                  <p v-if="auth.is_admin === '1'" @click="goGroupMember()">メンバー情報</p>
                 </ul>
               </drawer>
             </ul>
@@ -97,6 +98,10 @@ export default {
     },
     goInviteMember() {
       this.$router.push("/inviteMember");
+      this.open = !this.open
+    },
+    goGroupMember() {
+      this.$router.push("/groupMember");
       this.open = !this.open
     },
     active() {  

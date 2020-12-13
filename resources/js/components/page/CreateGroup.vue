@@ -44,6 +44,12 @@ export default {
         .getAttribute("content"),
     };
   },
+  mounted() {
+    var group_id = document.querySelector("meta[name='group-id']").getAttribute('content');
+    if (group_id > 0) {
+      this.goHome();
+    }
+   },
   methods: {
     goHome() {
       this.$router.push("/");

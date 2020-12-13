@@ -59,7 +59,11 @@ export default {
     };
   },
   mounted() {
-    axios.get('/users').then(response => this.users = response.data) 
+    var isAdmin = document.querySelector("meta[name='is-admin']").getAttribute('content');
+    if (isAdmin != '1') {
+      this.goHome();
+    }
+    axios.get('/users').then(response => this.users = response.data);
    },
   computed: {
     isOKmessage() {

@@ -29,5 +29,9 @@ Route::group(['middleware' => 'api'],function(){
         $user->now_task_start = now();
         $user->save();
     });
-
+    Route::post('/banishMember/{id}',function($id){
+        $user = App\User::where('id',$id)->first();
+        $user->group_id = null;
+        $user->save();
+    });
 });
