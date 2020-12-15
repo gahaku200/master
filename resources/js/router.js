@@ -10,6 +10,7 @@ import AlreadyJoinGroup from './components/mail/AlreadyJoinGroup'
 import NotInviteData from './components/mail/NotInviteData'
 import SuccessInvite from './components/mail/SuccessInvite'
 import SuccessSendEmail from './components/mail/SuccessSendEmail'
+import GroupMember from './components/page/GroupMember'
 
 Vue.use(Router)
 
@@ -65,6 +66,11 @@ const router = new Router({
       path: '/successInvite',
       name: 'successInvite',
       component: SuccessInvite
+    },
+    {
+      path: '/groupMember',
+      name: 'groupMember',
+      component: GroupMember
     },
   ]
 })

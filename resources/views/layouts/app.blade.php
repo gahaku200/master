@@ -8,6 +8,7 @@
     @if (Auth::check())
       <meta name="user-id" content="{{ Auth::user()->id }}">
       <meta name="group-id" content="{{ Auth::user()->group_id }}">
+      <meta name="is-admin" content="{{ Auth::user()->is_admin }}">
     @endif
 
     <link href="/css/app.css" rel="stylesheet">
