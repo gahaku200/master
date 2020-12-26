@@ -39,6 +39,14 @@ class User extends Authenticatable
 
     public function group()
     {
-        return $this->belongsTo('App\Group');
+      return $this->belongsTo('App\Group');
+    }
+    public function attendance()
+    {
+      return $this->hasMany('App\Attendance', 'user_id', 'id');
+    }
+    public function task()
+    {
+      return $this->hasMany('App\Task', 'task_user_id', 'id');
     }
 }

@@ -20,11 +20,6 @@ class GroupController extends Controller
     $this->group = $group;
   }
 
-  /**
-   *
-   * クイズ終了ボタンクリック時アクション
-   * 
-   */
   public function createGroup(Request $request)
   {
     if (Auth::check()) {

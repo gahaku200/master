@@ -2009,6 +2009,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   components: {
@@ -2052,6 +2053,10 @@ __webpack_require__.r(__webpack_exports__);
     },
     goGroupMember: function goGroupMember() {
       this.$router.push("/groupMember");
+      this.open = !this.open;
+    },
+    goKindOfTasks: function goKindOfTasks() {
+      this.$router.push("/kindOfTasks");
       this.open = !this.open;
     },
     active: function active() {
@@ -2545,24 +2550,17 @@ __webpack_require__.r(__webpack_exports__);
   },
   data: function data() {
     return {
-      type: 'A',
+      type: '',
       isTask: false,
       selected: 'initial',
-      tasks: ['メールチェック', '朝礼', '作業', '会議', '研修', '外出', '離席', 'その他'],
-      taskLabel: 'タスク状況',
-      count: 0,
-      //currentTime: new Date(),
-      //elapsedTime: 0,
-      //timer: undefined,
-      isTime: false,
-      //startTime: '00:00:00',
-      //startRestTime: '00:00:00',
-      //endRestTime: '00:00:00',
-      //endTime: '00:00:00',
-      doingTime: '00:00:00',
-      records: [],
+      tasks: [],
+      taskLabel: null,
+      doingTime: '',
+      taskTime: 0,
+      taskRecords: [],
       attendanceRecords: [],
       users: [],
+      on_duty: '',
       csrf: document.querySelector('meta[name="csrf-token"]').getAttribute("content")
     };
   },
@@ -2571,6 +2569,44 @@ __webpack_require__.r(__webpack_exports__);
 
     var authId = document.querySelector("meta[name='user-id']").getAttribute('content');
     var group_id = document.querySelector("meta[name='group-id']").getAttribute('content');
+    axios.get('/api/task/' + authId).then(function (res) {
+      _this.taskRecords = [];
+      res.data.forEach(function (task) {
+        _this.taskRecords.push({
+          task_name: task.task_name,
+          task_time: _this.convertTime(task.task_time)
+        });
+      });
+    })["catch"](function (error) {
+      console.log(error);
+    });
+    axios.get('/api/attendance/' + authId).then(function (res) {
+      _this.attendanceRecords = res.data;
+      var duty = res.data[res.data.length - 1].on_duty;
+
+      if (duty == '退勤') {
+        _this.type = 'A';
+        _this.isTask = false;
+      } else if (duty == '休入') {
+        _this.type = 'B';
+        _this.isTask = false;
+      } else {
+        _this.type = 'C';
+        _this.isTask = true;
+      }
+    })["catch"](function (error) {
+      console.log(error);
+    });
+    axios.get('/api/getKindOfTasks/' + group_id).then(function (res) {
+      _this.tasks = [];
+      res.data.forEach(function (task) {
+        _this.tasks.push({
+          taskName: task.taskName
+        });
+      });
+    })["catch"](function (error) {
+      console.log(error);
+    });
 
     if (group_id != '') {
       setInterval(function () {
@@ -2580,6 +2616,8 @@ __webpack_require__.r(__webpack_exports__);
             if (user.id == authId) {
               _this.taskLabel = user.now_task;
               _this.doingTime = _this.passingTime(user.now_task_start);
+
+              _this.passingTask(user.now_task_start);
             } else {
               _this.users.push({
                 name: user.name,
@@ -2609,54 +2647,6 @@ __webpack_require__.r(__webpack_exports__);
     }
   },
   methods: {
-    changeA: function changeA() {
-      this.type = 'A';
-    },
-    changeB: function changeB() {
-      this.type = 'B';
-    },
-    changeC: function changeC() {
-      this.type = 'C';
-    },
-    taskOpen: function taskOpen() {
-      this.isTask = !this.isTask;
-    },
-
-    /*start() {
-      this.timer = setInterval(() => {
-        this.elapsedTime += 1000;
-      }, 1000);
-    },
-    stop() {
-      clearInterval(this.timer);
-    },
-    reset() {
-      this.elapsedTime = 0;
-    },*/
-    taskName: function taskName() {
-      if (this.count != 0 && this.selected != 'initial') {
-        this.records.push({
-          name: this.taskLabel,
-          totalTime: this.formattedElapsedTime
-        });
-      }
-
-      if (this.count != 0 && this.selected == 'initial') {
-        this.records.push({
-          name: this.taskLabel,
-          totalTime: this.formattedElapsedTime
-        });
-        this.taskLabel = '';
-        this.isTime = false;
-        this.count = 0;
-      } else if (this.selected == 'initial') {
-        return;
-      } else {
-        this.taskLabel = this.selected;
-        this.isTime = true;
-        this.count = 1;
-      }
-    },
     restName: function restName() {
       var data = {
         task: '休憩'
@@ -2667,66 +2657,41 @@ __webpack_require__.r(__webpack_exports__);
         console.log(error);
       });
     },
-    emptytask: function emptytask() {
-      this.taskLabel = '';
-      this.isTime = false;
-      this.count = 0;
-    },
-    startWork: function startWork() {
+
+    /*
+    startWork() {
       this.records = [];
       var date = new Date();
       var gmt = date.toString();
       this.startTime = gmt.substr(gmt.indexOf(":") - 2, 8);
-      this.attendanceRecords.push({
-        name: '出勤',
-        time: this.startTime
-      });
+      this.attendanceRecords.push({name: '出勤', time: this.startTime})
     },
-    startRest: function startRest() {
+    startRest() {
       if (this.taskLabel != '') {
-        this.records.push({
-          name: this.taskLabel,
-          totalTime: this.formattedElapsedTime
-        });
+        this.records.push({name: this.taskLabel, totalTime: this.formattedElapsedTime})
       }
-
       var date = new Date();
       var gmt = date.toString();
       this.startRestTime = gmt.substr(gmt.indexOf(":") - 2, 8);
-      this.attendanceRecords.push({
-        name: '休入',
-        time: this.startRestTime
-      });
+      this.attendanceRecords.push({name: '休入', time: this.startRestTime})
     },
-    endRest: function endRest() {
-      this.records.push({
-        name: this.taskLabel,
-        totalTime: this.formattedElapsedTime
-      });
+    endRest() {
+      this.records.push({name: this.taskLabel, totalTime: this.formattedElapsedTime})
       var date = new Date();
       var gmt = date.toString();
       this.endRestTime = gmt.substr(gmt.indexOf(":") - 2, 8);
-      this.attendanceRecords.push({
-        name: '休出',
-        time: this.endRestTime
-      });
+      this.attendanceRecords.push({name: '休出', time: this.endRestTime})
     },
-    endWork: function endWork() {
+    endWork() {
       if (this.taskLabel != '') {
-        this.records.push({
-          name: this.taskLabel,
-          totalTime: this.formattedElapsedTime
-        });
+        this.records.push({name: this.taskLabel, totalTime: this.formattedElapsedTime})
       }
-
       var date = new Date();
       var gmt = date.toString();
       this.endTime = gmt.substr(gmt.indexOf(":") - 2, 8);
-      this.attendanceRecords.push({
-        name: '退勤',
-        time: this.endTime
-      });
+      this.attendanceRecords.push({name: '退勤', time: this.endTime})
     },
+    */
     taskStart: function taskStart() {
       if (this.selected != 'initial') {
         var data = {
@@ -2736,8 +2701,30 @@ __webpack_require__.r(__webpack_exports__);
         axios.post('/api/taskStart/' + id, data)["catch"](function (error) {
           console.log(error);
         });
+      }
+    },
+    preserveTaskTime: function preserveTaskTime() {
+      var _this2 = this;
+
+      if (this.taskLabel != '' && this.selected != 'initial') {
+        var data = {
+          task_name: this.taskLabel,
+          task_time: this.taskTime
+        };
+        var id = document.querySelector("meta[name='user-id']").getAttribute('content');
+        axios.post('/api/task/' + id, data).then(function (res) {
+          _this2.taskRecords = [];
+          res.data.forEach(function (task) {
+            _this2.taskRecords.push({
+              task_name: task.task_name,
+              task_time: _this2.convertTime(task.task_time)
+            });
+          });
+        })["catch"](function (error) {
+          console.log(error);
+        });
         this.selected = 'initial';
-      } else {}
+      }
     },
     passingTime: function passingTime(nowTaskStart) {
       if (nowTaskStart == null) {
@@ -2747,19 +2734,75 @@ __webpack_require__.r(__webpack_exports__);
       var d1 = new Date();
       var d2 = new Date(nowTaskStart);
       var diffTime = d1.getTime() - d2.getTime();
-      var diffHour = Math.floor(diffTime / (1000 * 60 * 60));
+      return this.convertTime(Math.floor(diffTime / 1000));
+    },
+    passingTask: function passingTask(nowTaskStart) {
+      if (nowTaskStart == null) {
+        return nowTaskStart;
+      }
+
+      var d1 = new Date();
+      var d2 = new Date(nowTaskStart);
+      var diffTime = d1.getTime() - d2.getTime();
+      this.taskTime = Math.floor(diffTime / 1000);
+    },
+    attendance: function attendance() {
+      var _this3 = this;
+
+      var data = {
+        on_duty: this.on_duty
+      };
+      var id = document.querySelector("meta[name='user-id']").getAttribute('content');
+      axios.post('/api/attendance/' + id, data).then(function (res) {
+        _this3.attendanceRecords = res.data;
+        var duty = res.data[res.data.length - 1].on_duty;
+
+        if (duty == '退勤') {
+          _this3.type = 'A';
+          _this3.isTask = false;
+        } else if (duty == '休入') {
+          _this3.type = 'B';
+          _this3.isTask = false;
+        } else {
+          _this3.type = 'C';
+          _this3.isTask = true;
+        }
+      })["catch"](function (error) {
+        console.log(error);
+      });
+    },
+    startWork: function startWork() {
+      this.on_duty = '出勤';
+    },
+    startRest: function startRest() {
+      this.on_duty = '休入';
+    },
+    endRest: function endRest() {
+      this.on_duty = '休出';
+    },
+    endWork: function endWork() {
+      this.on_duty = '退勤';
+    },
+    taskEnd: function taskEnd() {
+      var id = document.querySelector("meta[name='user-id']").getAttribute('content');
+      axios.post('/api/taskEnd/' + id)["catch"](function (error) {
+        console.log(error);
+      });
+    },
+    convertTime: function convertTime(diffTime) {
+      var diffHour = Math.floor(diffTime / (60 * 60));
 
       if (diffHour < 10) {
         diffHour = '0' + diffHour;
       }
 
-      var diffMinites = Math.floor(diffTime / (1000 * 60) % 60);
+      var diffMinites = Math.floor(diffTime / 60 % 60);
 
       if (diffMinites < 10) {
         diffMinites = '0' + diffMinites;
       }
 
-      var diffSeconds = Math.floor(diffTime / 1000 % 60);
+      var diffSeconds = Math.floor(diffTime % 60);
 
       if (diffSeconds < 10) {
         diffSeconds = '0' + diffSeconds;
@@ -2905,6 +2948,229 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           }
         }, _callee);
       }))();
+    }
+  }
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/page/KindOfTasks.vue?vue&type=script&lang=js&":
+/*!***************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/page/KindOfTasks.vue?vue&type=script&lang=js& ***!
+  \***************************************************************************************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
+
+
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+/* harmony default export */ __webpack_exports__["default"] = ({
+  data: function data() {
+    return {
+      tasks: [],
+      taskName: '',
+      updateName: '',
+      editName: '',
+      taskId: 0,
+      csrf: document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+    };
+  },
+  mounted: function mounted() {
+    var _this = this;
+
+    var isAdmin = document.querySelector("meta[name='is-admin']").getAttribute('content');
+
+    if (isAdmin != '1') {
+      this.goHome();
+    }
+
+    var group_id = document.querySelector("meta[name='group-id']").getAttribute('content');
+    axios.get('/api/getKindOfTasks/' + group_id).then(function (res) {
+      _this.tasks = [];
+      res.data.forEach(function (task) {
+        _this.tasks.push({
+          id: task.id,
+          orderNum: task.orderNum,
+          taskName: task.taskName
+        });
+      });
+    })["catch"](function (error) {
+      console.log(error);
+    });
+  },
+  methods: {
+    goHome: function goHome() {
+      this.$router.push("/");
+    },
+    createTask: function createTask() {
+      return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee() {
+        var group_id;
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                group_id = document.querySelector("meta[name='group-id']").getAttribute('content');
+                document.querySelector("#kindOfTask").submit();
+
+              case 2:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, _callee);
+      }))();
+    },
+    edit: function edit(id, name) {
+      this.taskId = id;
+      this.updateName = name;
+    },
+    update: function update() {
+      var data = {
+        name: this.updateName
+      };
+      axios.post('/api/kindOfTask/update/' + this.taskId, data);
+      this.$router.go({
+        path: this.$router.currentRoute.path,
+        force: true
+      });
+    },
+    deleteT: function deleteT(id, name) {
+      this.taskId = id;
+      this.editName = name;
+    },
+    deleteTask: function deleteTask() {
+      var _this2 = this;
+
+      axios.post('/api/kindOfTask/delete/' + this.taskId).then(function (res) {
+        _this2.tasks = [];
+        res.data.forEach(function (task) {
+          _this2.tasks.push({
+            id: task.id,
+            orderNum: task.orderNum,
+            taskName: task.taskName
+          });
+        });
+      })["catch"](function (error) {
+        console.log(error);
+      }); //this.$router.go({path: this.$router.currentRoute.path, force: true})
+    },
+    up: function up(id) {
+      var _this3 = this;
+
+      this.taskId = id;
+      axios.post('/api/kindOfTask/up/' + this.taskId).then(function (res) {
+        _this3.tasks = [];
+        res.data.forEach(function (task) {
+          _this3.tasks.push({
+            id: task.id,
+            orderNum: task.orderNum,
+            taskName: task.taskName
+          });
+        });
+      })["catch"](function (error) {
+        console.log(error);
+      });
+    },
+    down: function down(id) {
+      var _this4 = this;
+
+      this.taskId = id;
+      axios.post('/api/kindOfTask/down/' + this.taskId).then(function (res) {
+        _this4.tasks = [];
+        res.data.forEach(function (task) {
+          _this4.tasks.push({
+            id: task.id,
+            orderNum: task.orderNum,
+            taskName: task.taskName
+          });
+        });
+      })["catch"](function (error) {
+        console.log(error);
+      });
     }
   }
 });
@@ -7561,6 +7827,20 @@ var render = function() {
                                     },
                                     [_vm._v("メンバー情報")]
                                   )
+                                : _vm._e(),
+                              _vm._v(" "),
+                              _vm.auth.is_admin === "1"
+                                ? _c(
+                                    "p",
+                                    {
+                                      on: {
+                                        click: function($event) {
+                                          return _vm.goKindOfTasks()
+                                        }
+                                      }
+                                    },
+                                    [_vm._v("タスク種類")]
+                                  )
                                 : _vm._e()
                             ])
                           : _vm._e()
@@ -8133,128 +8413,104 @@ var render = function() {
                 _c("div", { staticClass: "col-lg-4" }),
                 _vm._v(" "),
                 _vm.type === "A"
-                  ? _c(
-                      "div",
-                      {
-                        staticClass: "col-lg-4 centerButton",
-                        attrs: { div: "" }
-                      },
-                      [
-                        _c(
-                          "button",
-                          {
-                            staticClass: "btn btn-primary btn-lg",
-                            attrs: { type: "button" },
-                            on: {
-                              click: function($event) {
-                                _vm.changeB(), _vm.taskOpen(), _vm.startWork()
-                              }
+                  ? _c("div", { staticClass: "col-lg-4 centerButton" }, [
+                      _c(
+                        "button",
+                        {
+                          staticClass: "btn btn-primary btn-lg",
+                          attrs: { type: "button" },
+                          on: {
+                            click: function($event) {
+                              _vm.startWork(), _vm.attendance()
                             }
-                          },
-                          [_vm._v("出勤")]
-                        )
-                      ]
-                    )
-                  : _vm._e(),
-                _vm._v(" "),
-                _vm.type === "B"
-                  ? _c(
-                      "div",
-                      {
-                        staticClass: "col-lg-4 centerButton",
-                        attrs: { div: "" }
-                      },
-                      [
-                        _c(
-                          "button",
-                          {
-                            staticClass: "btn btn-primary btn-lg",
-                            attrs: { type: "button" },
-                            on: {
-                              click: function($event) {
-                                _vm.changeC(),
-                                  _vm.startRest(),
-                                  _vm.taskOpen(),
-                                  _vm.restName()
-                              }
-                            }
-                          },
-                          [_vm._v("休入")]
-                        ),
-                        _vm._v(" "),
-                        _c(
-                          "button",
-                          {
-                            staticClass: "btn btn-primary btn-lg",
-                            attrs: { type: "button" },
-                            on: {
-                              click: function($event) {
-                                _vm.changeA(),
-                                  _vm.endWork(),
-                                  _vm.emptytask(),
-                                  _vm.taskOpen()
-                              }
-                            }
-                          },
-                          [_vm._v("退勤")]
-                        )
-                      ]
-                    )
+                          }
+                        },
+                        [_vm._v("出勤")]
+                      )
+                    ])
                   : _vm._e(),
                 _vm._v(" "),
                 _vm.type === "C"
-                  ? _c(
-                      "div",
-                      {
-                        staticClass: "col-lg-4 centerButton",
-                        attrs: { div: "" }
-                      },
-                      [
-                        _c(
-                          "button",
-                          {
-                            staticClass: "btn btn-primary btn-lg",
-                            attrs: { type: "button" },
-                            on: {
-                              click: function($event) {
-                                _vm.changeB(),
-                                  _vm.endRest(),
-                                  _vm.taskOpen(),
-                                  _vm.emptytask()
-                              }
+                  ? _c("div", { staticClass: "col-lg-4 centerButton" }, [
+                      _c(
+                        "button",
+                        {
+                          staticClass: "btn btn-primary btn-lg",
+                          attrs: { type: "button" },
+                          on: {
+                            click: function($event) {
+                              _vm.preserveTaskTime(),
+                                _vm.startRest(),
+                                _vm.restName(),
+                                _vm.attendance()
                             }
-                          },
-                          [_vm._v("休出")]
-                        )
-                      ]
-                    )
+                          }
+                        },
+                        [_vm._v("休入")]
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "button",
+                        {
+                          staticClass: "btn btn-primary btn-lg",
+                          attrs: { type: "button" },
+                          on: {
+                            click: function($event) {
+                              _vm.preserveTaskTime(),
+                                _vm.endWork(),
+                                _vm.taskEnd(),
+                                _vm.attendance()
+                            }
+                          }
+                        },
+                        [_vm._v("退勤")]
+                      )
+                    ])
+                  : _vm._e(),
+                _vm._v(" "),
+                _vm.type === "B"
+                  ? _c("div", { staticClass: "col-lg-4 centerButton" }, [
+                      _c(
+                        "button",
+                        {
+                          staticClass: "btn btn-primary btn-lg",
+                          attrs: { type: "button" },
+                          on: {
+                            click: function($event) {
+                              _vm.endRest(), _vm.taskEnd(), _vm.attendance()
+                            }
+                          }
+                        },
+                        [_vm._v("休出")]
+                      )
+                    ])
                   : _vm._e(),
                 _vm._v(" "),
                 _c("div", { staticClass: "col-lg-4" }),
                 _vm._v(" "),
                 _c("div", { staticClass: "col-lg-3" }),
                 _vm._v(" "),
-                _c("div", { staticClass: "col-lg-6" }, [
-                  _vm.isTask
-                    ? _c("div", { staticClass: "row" }, [
-                        _c(
-                          "form",
-                          {
-                            ref: "observer",
-                            staticClass: "form-now-task",
-                            attrs: {
-                              action: "/taskStart",
-                              id: "taskStart",
-                              method: "post",
-                              tag: "form"
-                            }
-                          },
-                          [
-                            _c("input", {
-                              attrs: { type: "hidden", name: "_token" },
-                              domProps: { value: _vm.csrf }
-                            }),
-                            _vm._v(" "),
+                _vm.isTask
+                  ? _c("div", { staticClass: "col-lg-6" }, [
+                      _c(
+                        "form",
+                        {
+                          ref: "observer",
+                          staticClass: "form-now-task",
+                          attrs: {
+                            action: "/taskStart",
+                            id: "taskStart",
+                            method: "post",
+                            tag: "form"
+                          }
+                        },
+                        [
+                          _c("input", {
+                            attrs: { type: "hidden", name: "_token" },
+                            domProps: { value: _vm.csrf }
+                          }),
+                          _vm._v(" "),
+                          _c("div", { staticClass: "row" }, [
                             _c("div", { staticClass: "col-lg-8 kindOfTask" }, [
                               _c(
                                 "select",
@@ -8304,7 +8560,7 @@ var render = function() {
                                     return _c(
                                       "option",
                                       { attrs: { name: "task" } },
-                                      [_vm._v(_vm._s(task))]
+                                      [_vm._v(_vm._s(task.taskName))]
                                     )
                                   })
                                 ],
@@ -8320,26 +8576,28 @@ var render = function() {
                                   attrs: { type: "button" },
                                   on: {
                                     click: function($event) {
-                                      return _vm.taskStart()
+                                      _vm.taskStart(), _vm.preserveTaskTime()
                                     }
                                   }
                                 },
                                 [_vm._v("タスク切替")]
                               )
                             ])
-                          ]
-                        )
-                      ])
-                    : _vm._e()
-                ]),
+                          ])
+                        ]
+                      )
+                    ])
+                  : _vm._e(),
                 _vm._v(" "),
                 _c("div", { staticClass: "col-lg-3" }),
                 _vm._v(" "),
                 _c("div", { staticClass: "col-lg-12 tasksShow" }, [
                   _c("div", { staticClass: "taskLabelContainer" }, [
-                    _c("p", { staticClass: "taskLabelshow" }, [
-                      _vm._v(_vm._s(_vm.taskLabel))
-                    ])
+                    _vm.taskLabel !== null
+                      ? _c("p", { staticClass: "taskLabelshow" }, [
+                          _vm._v(_vm._s(_vm.taskLabel))
+                        ])
+                      : _vm._e()
                   ]),
                   _vm._v(" "),
                   _c("div", { staticClass: "clock" }, [
@@ -8355,7 +8613,7 @@ var render = function() {
                     {
                       staticClass: "d-block p-2 bg-primary text-white tableName"
                     },
-                    [_vm._v("本日の勤怠状況")]
+                    [_vm._v("勤怠状況")]
                   ),
                   _vm._v(" "),
                   _c("table", { staticClass: "table" }, [
@@ -8367,7 +8625,11 @@ var render = function() {
                         return _c("tr", [
                           _c("td", { attrs: { scope: "row" } }),
                           _vm._v(" "),
-                          _c("td", [_vm._v(_vm._s(attendance.name))]),
+                          _c(
+                            "td",
+                            { staticStyle: { "padding-left": "24px" } },
+                            [_vm._v(_vm._s(attendance.on_duty))]
+                          ),
                           _vm._v(" "),
                           _c("td", [_vm._v(_vm._s(attendance.time))])
                         ])
@@ -8384,7 +8646,7 @@ var render = function() {
                       staticClass:
                         "d-block p-2 bg-secondary text-white tableName"
                     },
-                    [_vm._v("本日のタスク履歴")]
+                    [_vm._v("タスク履歴")]
                   ),
                   _vm._v(" "),
                   _c("table", { staticClass: "table" }, [
@@ -8392,13 +8654,13 @@ var render = function() {
                     _vm._v(" "),
                     _c(
                       "tbody",
-                      _vm._l(_vm.records, function(record) {
+                      _vm._l(_vm.taskRecords, function(record) {
                         return _c("tr", [
                           _c("td", { attrs: { scope: "row" } }),
                           _vm._v(" "),
-                          _c("td", [_vm._v(_vm._s(record.name))]),
+                          _c("td", [_vm._v(_vm._s(record.task_name))]),
                           _vm._v(" "),
-                          _c("td", [_vm._v(_vm._s(record.totalTime))])
+                          _c("td", [_vm._v(_vm._s(record.task_time))])
                         ])
                       }),
                       0
@@ -8452,7 +8714,7 @@ var staticRenderFns = [
         _vm._v(" "),
         _c("th", { attrs: { scope: "col" } }, [_vm._v("勤怠履歴")]),
         _vm._v(" "),
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("時刻")])
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("日時")])
       ])
     ])
   },
@@ -8542,7 +8804,7 @@ var render = function() {
             [_vm._v("招待するユーザーのメールアドレスを入力")]
           ),
           _vm._v(" "),
-          _c("div", { attrs: { name: "メンバーアドレス" } }, [
+          _c("div", { attrs: { name: "memberAddress" } }, [
             _c("input", {
               directives: [
                 {
@@ -8704,6 +8966,394 @@ var staticRenderFns = [
         "h5",
         { staticClass: "modal-title", attrs: { id: "exampleModalLabel" } },
         [_vm._v("グループに招待")]
+      ),
+      _vm._v(" "),
+      _c(
+        "button",
+        {
+          staticClass: "close",
+          attrs: {
+            type: "button",
+            "data-dismiss": "modal",
+            "aria-label": "Close"
+          }
+        },
+        [_c("span", { attrs: { "aria-hidden": "true" } }, [_vm._v("×")])]
+      )
+    ])
+  }
+]
+render._withStripped = true
+
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/page/KindOfTasks.vue?vue&type=template&id=0d3816ee&":
+/*!*******************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/page/KindOfTasks.vue?vue&type=template&id=0d3816ee& ***!
+  \*******************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", [
+    _c("p", [_vm._v("KindOfTasks")]),
+    _vm._v(" "),
+    _c(
+      "form",
+      {
+        ref: "observer",
+        staticClass: "form-group",
+        attrs: {
+          action: "/kindOfTask",
+          id: "kindOfTask",
+          method: "post",
+          tag: "form"
+        }
+      },
+      [
+        _c("input", {
+          attrs: { type: "hidden", name: "_token" },
+          domProps: { value: _vm.csrf }
+        }),
+        _vm._v(" "),
+        _c("div", { staticClass: "input-group mb-3" }, [
+          _c(
+            "span",
+            {
+              staticClass: "input-group-text",
+              attrs: { id: "inputGroup-sizing-default" }
+            },
+            [_vm._v("追加するタスクの名前")]
+          ),
+          _vm._v(" "),
+          _c("div", { attrs: { name: "kindOfTask" } }, [
+            _c("input", {
+              directives: [
+                {
+                  name: "model",
+                  rawName: "v-model",
+                  value: _vm.taskName,
+                  expression: "taskName"
+                }
+              ],
+              staticClass: "form-control",
+              attrs: {
+                name: "task",
+                type: "task",
+                "aria-label": "Sizing example input",
+                "aria-describedby": "inputGroup-sizing-default"
+              },
+              domProps: { value: _vm.taskName },
+              on: {
+                input: function($event) {
+                  if ($event.target.composing) {
+                    return
+                  }
+                  _vm.taskName = $event.target.value
+                }
+              }
+            })
+          ]),
+          _vm._v(" "),
+          _c(
+            "button",
+            {
+              staticClass: "btn btn-primary",
+              attrs: { type: "button" },
+              on: {
+                click: function($event) {
+                  return _vm.createTask()
+                }
+              }
+            },
+            [_vm._v("+")]
+          )
+        ])
+      ]
+    ),
+    _vm._v(" "),
+    _c("div", { staticClass: "row" }, [
+      _c("div", { staticClass: "col-lg-3" }),
+      _vm._v(" "),
+      _c("div", { staticClass: "col-lg-6" }, [
+        _c(
+          "ul",
+          { staticClass: "list-group" },
+          _vm._l(_vm.tasks, function(task) {
+            return _c(
+              "li",
+              {
+                staticClass:
+                  "list-group-item d-flex justify-content-between align-items-center"
+              },
+              [
+                _c("td", [_vm._v(_vm._s(task.taskName))]),
+                _vm._v(" "),
+                _c("td", [
+                  task.orderNum != _vm.tasks.length
+                    ? _c(
+                        "button",
+                        {
+                          staticClass: "btn btn-outline-primary",
+                          attrs: { type: "button" },
+                          on: {
+                            click: function($event) {
+                              return _vm.up(task.id)
+                            }
+                          }
+                        },
+                        [_vm._v("↓")]
+                      )
+                    : _vm._e(),
+                  _vm._v(" "),
+                  task.orderNum != 1
+                    ? _c(
+                        "button",
+                        {
+                          staticClass: "btn btn-outline-primary",
+                          attrs: { type: "button" },
+                          on: {
+                            click: function($event) {
+                              return _vm.down(task.id)
+                            }
+                          }
+                        },
+                        [_vm._v("↑")]
+                      )
+                    : _vm._e(),
+                  _vm._v(" "),
+                  _c(
+                    "button",
+                    {
+                      staticClass: "btn btn-outline-primary",
+                      attrs: {
+                        type: "button",
+                        "data-toggle": "modal",
+                        "data-target": "#exampleModal"
+                      },
+                      on: {
+                        click: function($event) {
+                          return _vm.edit(task.id, task.taskName)
+                        }
+                      }
+                    },
+                    [_vm._v("編集する")]
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "button",
+                    {
+                      staticClass: "btn btn-outline-primary",
+                      attrs: {
+                        type: "button",
+                        "data-toggle": "modal",
+                        "data-target": "#exampleModal2"
+                      },
+                      on: {
+                        click: function($event) {
+                          return _vm.deleteT(task.id, task.taskName)
+                        }
+                      }
+                    },
+                    [_vm._v("削除する")]
+                  )
+                ])
+              ]
+            )
+          }),
+          0
+        ),
+        _vm._v(" "),
+        _c(
+          "div",
+          {
+            staticClass: "modal fade",
+            attrs: {
+              id: "exampleModal",
+              tabindex: "-1",
+              "aria-labelledby": "exampleModalLabel",
+              "aria-hidden": "true"
+            }
+          },
+          [
+            _c("div", { staticClass: "modal-dialog" }, [
+              _c("div", { staticClass: "modal-content" }, [
+                _vm._m(0),
+                _vm._v(" "),
+                _c("div", { staticClass: "modal-body" }, [
+                  _c("input", {
+                    directives: [
+                      {
+                        name: "model",
+                        rawName: "v-model",
+                        value: _vm.updateName,
+                        expression: "updateName"
+                      }
+                    ],
+                    staticClass: "form-control",
+                    attrs: {
+                      name: "task",
+                      type: "task",
+                      "aria-label": "Sizing example input",
+                      "aria-describedby": "inputGroup-sizing-default"
+                    },
+                    domProps: { value: _vm.updateName },
+                    on: {
+                      input: function($event) {
+                        if ($event.target.composing) {
+                          return
+                        }
+                        _vm.updateName = $event.target.value
+                      }
+                    }
+                  })
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "modal-footer" }, [
+                  _c(
+                    "button",
+                    {
+                      staticClass: "btn btn-secondary",
+                      attrs: { type: "button", "data-dismiss": "modal" }
+                    },
+                    [_vm._v("キャンセル")]
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "button",
+                    {
+                      staticClass: "btn btn-primary",
+                      attrs: { type: "button" },
+                      on: {
+                        click: function($event) {
+                          return _vm.update()
+                        }
+                      }
+                    },
+                    [_vm._v("編集する")]
+                  )
+                ])
+              ])
+            ])
+          ]
+        ),
+        _vm._v(" "),
+        _c(
+          "div",
+          {
+            staticClass: "modal fade",
+            attrs: {
+              id: "exampleModal2",
+              tabindex: "-1",
+              "aria-labelledby": "exampleModalLabel",
+              "aria-hidden": "true"
+            }
+          },
+          [
+            _c("div", { staticClass: "modal-dialog" }, [
+              _c("div", { staticClass: "modal-content" }, [
+                _vm._m(1),
+                _vm._v(" "),
+                _c("div", { staticClass: "modal-body" }, [
+                  _vm._v(
+                    "\n              「" +
+                      _vm._s(_vm.editName) +
+                      "」を本当に削除しますか？\n            "
+                  )
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "modal-footer" }, [
+                  _c(
+                    "button",
+                    {
+                      staticClass: "btn btn-secondary",
+                      attrs: { type: "button", "data-dismiss": "modal" }
+                    },
+                    [_vm._v("キャンセル")]
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "button",
+                    {
+                      staticClass: "btn btn-primary",
+                      attrs: { type: "button", "data-dismiss": "modal" },
+                      on: {
+                        click: function($event) {
+                          return _vm.deleteTask()
+                        }
+                      }
+                    },
+                    [_vm._v("削除する")]
+                  )
+                ])
+              ])
+            ])
+          ]
+        )
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "col-lg-3" })
+    ]),
+    _vm._v(" "),
+    _c(
+      "button",
+      {
+        on: {
+          click: function($event) {
+            $event.stopPropagation()
+            $event.preventDefault()
+            return _vm.goHome()
+          }
+        }
+      },
+      [_vm._v("戻る")]
+    )
+  ])
+}
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "modal-header" }, [
+      _c(
+        "h5",
+        { staticClass: "modal-title", attrs: { id: "exampleModalLabel" } },
+        [_vm._v("タスクを編集する")]
+      ),
+      _vm._v(" "),
+      _c(
+        "button",
+        {
+          staticClass: "close",
+          attrs: {
+            type: "button",
+            "data-dismiss": "modal",
+            "aria-label": "Close"
+          }
+        },
+        [_c("span", { attrs: { "aria-hidden": "true" } }, [_vm._v("×")])]
+      )
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "modal-header" }, [
+      _c(
+        "h5",
+        { staticClass: "modal-title", attrs: { id: "exampleModalLabel" } },
+        [_vm._v("タスクを削除する")]
       ),
       _vm._v(" "),
       _c(
@@ -25489,6 +26139,75 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/js/components/page/KindOfTasks.vue":
+/*!******************************************************!*\
+  !*** ./resources/js/components/page/KindOfTasks.vue ***!
+  \******************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _KindOfTasks_vue_vue_type_template_id_0d3816ee___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./KindOfTasks.vue?vue&type=template&id=0d3816ee& */ "./resources/js/components/page/KindOfTasks.vue?vue&type=template&id=0d3816ee&");
+/* harmony import */ var _KindOfTasks_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./KindOfTasks.vue?vue&type=script&lang=js& */ "./resources/js/components/page/KindOfTasks.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _KindOfTasks_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _KindOfTasks_vue_vue_type_template_id_0d3816ee___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _KindOfTasks_vue_vue_type_template_id_0d3816ee___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/components/page/KindOfTasks.vue"
+/* harmony default export */ __webpack_exports__["default"] = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/js/components/page/KindOfTasks.vue?vue&type=script&lang=js&":
+/*!*******************************************************************************!*\
+  !*** ./resources/js/components/page/KindOfTasks.vue?vue&type=script&lang=js& ***!
+  \*******************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_KindOfTasks_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib??ref--4-0!../../../../node_modules/vue-loader/lib??vue-loader-options!./KindOfTasks.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/page/KindOfTasks.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_KindOfTasks_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/js/components/page/KindOfTasks.vue?vue&type=template&id=0d3816ee&":
+/*!*************************************************************************************!*\
+  !*** ./resources/js/components/page/KindOfTasks.vue?vue&type=template&id=0d3816ee& ***!
+  \*************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_KindOfTasks_vue_vue_type_template_id_0d3816ee___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib??vue-loader-options!./KindOfTasks.vue?vue&type=template&id=0d3816ee& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/page/KindOfTasks.vue?vue&type=template&id=0d3816ee&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_KindOfTasks_vue_vue_type_template_id_0d3816ee___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_KindOfTasks_vue_vue_type_template_id_0d3816ee___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+
+
+
+/***/ }),
+
 /***/ "./resources/js/components/page/Login.vue":
 /*!************************************************!*\
   !*** ./resources/js/components/page/Login.vue ***!
@@ -25787,7 +26506,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _components_mail_NotInviteData__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./components/mail/NotInviteData */ "./resources/js/components/mail/NotInviteData.vue");
 /* harmony import */ var _components_mail_SuccessInvite__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./components/mail/SuccessInvite */ "./resources/js/components/mail/SuccessInvite.vue");
 /* harmony import */ var _components_mail_SuccessSendEmail__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./components/mail/SuccessSendEmail */ "./resources/js/components/mail/SuccessSendEmail.vue");
-/* harmony import */ var _components_page_GroupMember__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./components/page/GroupMember */ "./resources/js/components/page/GroupMember.vue");
+/* harmony import */ var _components_page_GroupMember__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./components/page/GroupMember */ "./resources/js/components/page/GroupMember.vue");
+/* harmony import */ var _components_page_KindOfTasks__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./components/page/KindOfTasks */ "./resources/js/components/page/KindOfTasks.vue");
+
 
 
 
@@ -25849,7 +26570,11 @@ var router = new vue_router__WEBPACK_IMPORTED_MODULE_1__["default"]({
   }, {
     path: '/groupMember',
     name: 'groupMember',
-    component: _components_page_GroupMember__WEBPACK_IMPORTED_MODULE_13__["default"]
+    component: _components_page_GroupMember__WEBPACK_IMPORTED_MODULE_12__["default"]
+  }, {
+    path: '/kindOfTasks',
+    name: 'kindOfTasks',
+    component: _components_page_KindOfTasks__WEBPACK_IMPORTED_MODULE_13__["default"]
   }]
 });
 /* harmony default export */ __webpack_exports__["default"] = (router);

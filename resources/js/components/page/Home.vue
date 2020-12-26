@@ -8,40 +8,40 @@
       <div class="container">
         <div class="row">
           <div class="col-lg-4"></div>
-          <div class="col-lg-4 centerButton" div v-if="type === 'A'">
-            <button @click="changeB(), taskOpen(),startWork()" type="button" class="btn btn-primary btn-lg">出勤</button>
+          <div class="col-lg-4 centerButton" v-if="type === 'A'">
+            <button @click="startWork(), attendance()" type="button" class="btn btn-primary btn-lg">出勤</button>
           </div>
-          <div class="col-lg-4 centerButton" div v-if="type === 'B'">
-            <button @click="changeC(), startRest(), taskOpen(), restName()" type="button" class="btn btn-primary btn-lg">休入</button>
-            <button @click="changeA(), endWork(), emptytask(), taskOpen()" type="button" class="btn btn-primary btn-lg">退勤</button>
+          <div class="col-lg-4 centerButton" v-if="type === 'C'">
+            <button @click="preserveTaskTime(), startRest(), restName(), attendance()" type="button" class="btn btn-primary btn-lg">休入</button>
+            <button @click="preserveTaskTime(), endWork(), taskEnd(), attendance()" type="button" class="btn btn-primary btn-lg">退勤</button>
           </div>
-          <div class="col-lg-4 centerButton" div v-if="type === 'C'">
-            <button @click="changeB(), endRest(), taskOpen(), emptytask()" type="button" class="btn btn-primary btn-lg">休出</button>
+          <div class="col-lg-4 centerButton" v-if="type === 'B'">
+            <button @click="endRest(), taskEnd(), attendance()" type="button" class="btn btn-primary btn-lg">休出</button>
           </div>
           <div class="col-lg-4"></div>
 
           <div class="col-lg-3"></div>
-          <div class="col-lg-6">
-            <div v-if="isTask" class="row">
-              <form　class="form-now-task" ref="observer" action="/taskStart" id="taskStart" method="post" tag="form">
-                <input type="hidden" name="_token" :value="csrf" />
+          <div class="col-lg-6" v-if="isTask">
+            <form　class="form-now-task" ref="observer" action="/taskStart" id="taskStart" method="post" tag="form">
+              <input type="hidden" name="_token" :value="csrf" />
+              <div class="row">
                 <div class="col-lg-8 kindOfTask">
                   <select v-model="selected" class="form-select" aria-label="Default select example" name="task">
                     <option disabled value="initial">タスクを選択してください</option>
-                    <option v-for="task in tasks" name="task">{{ task }}</option>
+                    <option v-for="task in tasks" name="task">{{ task.taskName }}</option>
                   </select>
                 </div>
                 <div class="col-lg-4 taskButton">
-                  <button @click="taskStart()" type="button" class="btn btn-primary">タスク切替</button>
+                  <button @click="taskStart(), preserveTaskTime()" type="button" class="btn btn-primary">タスク切替</button>
                 </div>
-              </form>
-            </div>
+              </div>
+            </form>
           </div>
           <div class="col-lg-3"></div>
 
           <div class="col-lg-12 tasksShow">
               <div class="taskLabelContainer">
-                <p class="taskLabelshow">{{ taskLabel }}</p>
+                <p v-if="taskLabel !== null" class="taskLabelshow">{{ taskLabel }}</p>
               </div>
               <div class="clock">
                 <p class="timeshow">{{ doingTime }}</p>
@@ -49,26 +49,26 @@
           </div>
 
           <div class="col-lg-4">
-            <span class="d-block p-2 bg-primary text-white tableName">本日の勤怠状況</span>
+            <span class="d-block p-2 bg-primary text-white tableName">勤怠状況</span>
             <table class="table">
               <thead>
                 <tr>
                   <th scope="col"></th>
                   <th scope="col">勤怠履歴</th>
-                  <th scope="col">時刻</th>
+                  <th scope="col">日時</th>
                 </tr>
               </thead>
               <tbody>
                 <tr v-for="attendance in attendanceRecords">
                   <td scope="row"></td>
-                  <td>{{ attendance.name }}</td>
+                  <td style="padding-left: 24px">{{ attendance.on_duty }}</td>
                   <td>{{ attendance.time }}</td>
                 </tr>
               </tbody>
             </table>
           </div>
           <div class="col-lg-4">
-            <span class="d-block p-2 bg-secondary text-white tableName">本日のタスク履歴</span>
+            <span class="d-block p-2 bg-secondary text-white tableName">タスク履歴</span>
             <table class="table">
               <thead>
                 <tr>
@@ -78,10 +78,10 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="record in records">
+                <tr v-for="record in taskRecords">
                   <td scope="row"></td>
-                  <td>{{ record.name }}</td>
-                  <td>{{ record.totalTime }}</td>
+                  <td>{{ record.task_name }}</td>
+                  <td>{{ record.task_time }}</td>
                 </tr>
               </tbody>
             </table>
@@ -127,24 +127,17 @@ export default {
   },
   data() {
     return {
-      type: 'A',
+      type: '',
       isTask: false,
       selected: 'initial',
-      tasks: ['メールチェック', '朝礼', '作業', '会議', '研修', '外出', '離席', 'その他'],
-      taskLabel: 'タスク状況',
-      count: 0,
-      //currentTime: new Date(),
-      //elapsedTime: 0,
-      //timer: undefined,
-      isTime: false,
-      //startTime: '00:00:00',
-      //startRestTime: '00:00:00',
-      //endRestTime: '00:00:00',
-      //endTime: '00:00:00',
-      doingTime: '00:00:00',
-      records: [],
+      tasks: [],
+      taskLabel: null,
+      doingTime: '',
+      taskTime: 0,
+      taskRecords: [],
       attendanceRecords: [],
       users: [],
+      on_duty: '',
       csrf: document
         .querySelector('meta[name="csrf-token"]')
         .getAttribute("content"),
@@ -153,6 +146,38 @@ export default {
   mounted() {
     var authId = document.querySelector("meta[name='user-id']").getAttribute('content');
     var group_id = document.querySelector("meta[name='group-id']").getAttribute('content');
+    
+    axios.get('/api/task/' + authId)
+      .then(res =>  {
+        this.taskRecords = [];
+        res.data.forEach((task) => {
+          this.taskRecords.push({task_name: task.task_name, task_time: this.convertTime(task.task_time)});
+        })
+      }).catch( error => { console.log(error); })
+
+    axios.get('/api/attendance/' + authId)
+      .then(res =>  {
+        this.attendanceRecords = res.data;
+        var duty = res.data[res.data.length - 1].on_duty;
+        if (duty == '退勤') {
+          this.type = 'A';
+          this.isTask = false;
+        } else if (duty == '休入') {
+          this.type = 'B';
+          this.isTask = false;
+        } else {
+          this.type = 'C';
+          this.isTask = true;
+        }
+      }).catch( error => { console.log(error); })
+
+    axios.get('/api/getKindOfTasks/' + group_id)
+      .then(res =>  {
+        this.tasks = [];
+        res.data.forEach((task) => {
+          this.tasks.push({taskName: task.taskName});
+        })
+      }).catch( error => { console.log(error); })
 
     if (group_id != '') {
       setInterval(() => {
@@ -163,6 +188,7 @@ export default {
             if (user.id == authId) {
               this.taskLabel = user.now_task;
               this.doingTime = this.passingTime(user.now_task_start);
+              this.passingTask(user.now_task_start);
             } else {
               this.users.push({name: user.name, task: user.now_task, time: this.passingTime(user.now_task_start)});
             }
@@ -182,50 +208,8 @@ export default {
       var members = this.users.filter(e => e.group_id == auth.group_id);
       return members;
     },
-    
   },
   methods: {
-    changeA() {
-      this.type = 'A'
-    },
-    changeB() {
-      this.type = 'B'
-    },
-    changeC() {
-      this.type = 'C'
-    },
-    taskOpen() {
-      this.isTask = !this.isTask
-    },
-    /*start() {
-      this.timer = setInterval(() => {
-        this.elapsedTime += 1000;
-      }, 1000);
-    },
-    stop() {
-      clearInterval(this.timer);
-    },
-    reset() {
-      this.elapsedTime = 0;
-    },*/
-    taskName() {
-      if (this.count != 0 && this.selected != 'initial') {
-        this.records.push({name: this.taskLabel, totalTime: this.formattedElapsedTime})
-      }
-
-      if (this.count != 0 && this.selected == 'initial'){
-        this.records.push({name: this.taskLabel, totalTime: this.formattedElapsedTime})
-        this.taskLabel = '';
-        this.isTime = false;
-        this.count = 0;
-      } else if (this.selected == 'initial') {
-        return;
-      } else {
-        this.taskLabel = this.selected;
-        this.isTime = true;
-        this.count = 1;
-      }
-    },
     restName() {
       const data = {
         task: '休憩'
@@ -235,11 +219,7 @@ export default {
       axios.post('/api/taskStart/' + id, data)
       .catch( error => { console.log(error); });
     },
-    emptytask() {
-      this.taskLabel = '';
-      this.isTime = false;
-      this.count = 0;
-    },
+    /*
     startWork() {
       this.records = [];
       var date = new Date();
@@ -272,17 +252,32 @@ export default {
       this.endTime = gmt.substr(gmt.indexOf(":") - 2, 8);
       this.attendanceRecords.push({name: '退勤', time: this.endTime})
     },
+    */
     taskStart() {
       if (this.selected != 'initial') {
         const data = {
         task: this.selected
         }
         var id = document.querySelector("meta[name='user-id']").getAttribute('content');
-        axios.post('/api/taskStart/' + id, data)
+        axios.post('/api/taskStart/' + id, data).catch( error => { console.log(error); });
+      }
+    },
+    preserveTaskTime() {
+      if (this.taskLabel != '' && this.selected != 'initial') {
+        const data = {
+        task_name: this.taskLabel,
+        task_time: this.taskTime
+        }
+        var id = document.querySelector("meta[name='user-id']").getAttribute('content');
+        axios.post('/api/task/' + id, data)
+        .then(res =>  {
+          this.taskRecords = [];
+          res.data.forEach((task) => {
+            this.taskRecords.push({task_name: task.task_name, task_time: this.convertTime(task.task_time)});
+          })
+        })
         .catch( error => { console.log(error); });
-        
         this.selected = 'initial';
-      } else {
       }
     },
     passingTime(nowTaskStart) {
@@ -294,22 +289,73 @@ export default {
 
       var diffTime = d1.getTime() - d2.getTime();
 
-      var diffHour = Math.floor(diffTime / (1000 * 60 * 60));
+      return this.convertTime(Math.floor(diffTime / 1000));
+    },
+    passingTask(nowTaskStart) {
+      if (nowTaskStart == null) {
+        return nowTaskStart;
+      }
+      var d1 = new Date();
+      var d2 = new Date(nowTaskStart);
+
+      var diffTime = d1.getTime() - d2.getTime();
+      this.taskTime = Math.floor(diffTime / 1000);
+    },
+    attendance() {
+      const data = {
+      on_duty: this.on_duty
+      }
+      var id = document.querySelector("meta[name='user-id']").getAttribute('content');
+      axios.post('/api/attendance/' + id, data)
+      .then(res =>  {
+        this.attendanceRecords = res.data;
+        var duty = res.data[res.data.length - 1].on_duty;
+        if (duty == '退勤') {
+          this.type = 'A';
+          this.isTask = false;
+        } else if (duty == '休入') {
+          this.type = 'B';
+          this.isTask = false;
+        } else {
+          this.type = 'C';
+          this.isTask = true;
+        }
+      })
+      .catch( error => { console.log(error); });
+    },
+    startWork() {
+      this.on_duty = '出勤'
+    },
+    startRest() {
+      this.on_duty = '休入'
+    },
+    endRest() {
+      this.on_duty = '休出'
+    },
+    endWork() {
+      this.on_duty = '退勤'
+    },
+    taskEnd() {
+      var id = document.querySelector("meta[name='user-id']").getAttribute('content');
+      axios.post('/api/taskEnd/' + id)
+      .catch( error => { console.log(error); });
+    },
+    convertTime(diffTime) {
+      var diffHour = Math.floor(diffTime / (60 * 60));
       if(diffHour < 10) {
         diffHour = '0' + diffHour;
       }
-      var diffMinites = Math.floor(diffTime / (1000 * 60) % 60);
+      var diffMinites = Math.floor(diffTime / 60 % 60);
       if(diffMinites < 10) {
         diffMinites = '0' + diffMinites;
       }
-      var diffSeconds = Math.floor(diffTime / 1000 % 60);
+      var diffSeconds = Math.floor(diffTime % 60);
       if(diffSeconds < 10) {
         diffSeconds = '0' + diffSeconds;
       }
-
       var passTime = diffHour + ':' + diffMinites + ':' + diffSeconds;
       return passTime;
-    }
+    },
   }
 };
 </script>
