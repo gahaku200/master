@@ -1,6 +1,10 @@
 <?php
 
 use Illuminate\Http\Request;
+use App\Attendance;
+use App\Task;
+use App\KindOfTask;
+use App\User;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,6 +27,14 @@ Route::group(['middleware' => 'api'],function(){
         ->where('group_id',$group_id)->get();
         return $user;
     });
+    Route::get('/attendance/{id}', 'Api\AttendanceController@confirm');
+    Route::get('/task/{id}', 'Api\TaskController@confirm');
+    Route::get('/getKindOfTasks/{group_id}',function($group_id){
+        $KindOfTask = App\KindOfTask::where('groupId',$group_id)
+        ->orderBy('orderNum', 'asc')->get();
+        return $KindOfTask;
+    });
+
     Route::post('/taskStart/{id}',function($id){
         $user = App\User::where('id',$id)->first();
         $user->now_task = request('task');
@@ -33,5 +45,93 @@ Route::group(['middleware' => 'api'],function(){
         $user = App\User::where('id',$id)->first();
         $user->group_id = null;
         $user->save();
+    });
+    Route::post('/attendance/{id}',function($id){
+        $attendance = new Attendance();
+        $attendance->on_duty = request('on_duty');
+        $attendance->time = now();
+        $attendance->user_id = $id;
+        $attendance->save();
+
+        $query = App\User::find($id)->attendance()
+            ->latest('time')
+            ->where(function($que){
+                $que->where('on_duty', '出勤');
+            })->first()->time;
+
+        $getAttendance = App\User::find($id)->attendance()
+        ->where('time', '>=', $query)->get();
+
+        return $getAttendance;
+    });
+    Route::post('/taskEnd/{id}',function($id){
+        $user = App\User::where('id', $id)->first();
+        $user->now_task = null;
+        $user->now_task_start = null;
+        $user->save();
+    });
+    Route::post('/task/{id}',function($id){
+        $task = new Task();
+        $task->task_name = request('task_name');
+        $task->task_time = request('task_time');
+        $task->task_user_id = $id;
+        $task->save();
+
+        $query = App\User::find($id)->attendance()
+            ->latest('time')
+            ->where(function($que){
+                $que->where('on_duty', '出勤');
+            })->first()->time;
+
+        $getTask = User::find($id)->task()
+        ->where('created_at', '>=', $query)->get();
+
+        return $getTask;
+    });
+    Route::post('/kindOfTask/update/{id}',function($id){
+        $kindOfTask = App\KindOfTask::where('id', $id)->first();
+        $kindOfTask->taskName = request('name');
+        $kindOfTask->save();
+    });
+    Route::post('/kindOfTask/delete/{id}',function($id){
+        $kindOfTaskStart = App\KindOfTask::where('id', $id)->first();
+        $KindOfTaskEnd = App\KindOfTask::where('groupId',$kindOfTaskStart->groupId)
+        ->get()->count();
+        $i = $kindOfTaskStart->orderNum + 1;
+        while($i <= $KindOfTaskEnd) {
+          $kindOfTaskDown = App\KindOfTask::where('orderNum', $i)->first();
+          $kindOfTaskDown->orderNum--;
+          $kindOfTaskDown->save();
+          $i++;
+        }
+        $kindOfTask = App\KindOfTask::destroy($id);
+
+        $KindOfTask = App\KindOfTask::where('groupId',$kindOfTaskStart->groupId)
+        ->orderBy('orderNum', 'asc')->get();
+        return $KindOfTask;
+    });
+    Route::post('/kindOfTask/up/{id}',function($id){
+        $kindOfTaskUp = App\KindOfTask::where('id', $id)->first();
+        $kindOfTaskDown = App\KindOfTask::where('orderNum', $kindOfTaskUp->orderNum + 1)->first();
+        $kindOfTaskUp->orderNum++;
+        $kindOfTaskDown->orderNum--;
+        $kindOfTaskUp->save();
+        $kindOfTaskDown->save();
+
+        $KindOfTask = App\KindOfTask::where('groupId',$kindOfTaskUp->groupId)
+        ->orderBy('orderNum', 'asc')->get();
+        return $KindOfTask;
+    });
+    Route::post('/kindOfTask/down/{id}',function($id){
+        $kindOfTaskDown = App\KindOfTask::where('id', $id)->first();
+        $kindOfTaskUp = App\KindOfTask::where('orderNum', $kindOfTaskDown->orderNum - 1)->first();
+        $kindOfTaskDown->orderNum--;
+        $kindOfTaskUp->orderNum++;
+        $kindOfTaskDown->save();
+        $kindOfTaskUp->save();
+
+        $KindOfTask = App\KindOfTask::where('groupId',$kindOfTaskDown->groupId)
+        ->orderBy('orderNum', 'asc')->get();
+        return $KindOfTask;
     });
 });

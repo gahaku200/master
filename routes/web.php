@@ -38,6 +38,9 @@ return view('index');
 Route::get('/groupMember', function () {
 return view('index');
 });
+Route::get('/kindOfTasks', function () {
+  return view('index');
+  });
 
 Route::post('/register', 'Auth\RegisterController@register');
 Route::post('/login', 'Auth\LoginController@login');
@@ -45,3 +48,6 @@ Route::post('/logout', 'Auth\LoginController@logout');
 Route::post('/group', 'Web\GroupController@createGroup');
 Route::post('invite', 'Web\InviteController@process')->name('process');
 Route::get('accept/{token}', 'Web\InviteController@accept')->name('accept');
+Route::post('/kindOfTask', 'Web\KindOfTaskController@createTask');
+//Route::post('/kindOfTask/update/{id}', 'Web\KindOfTaskController@update');
+//Route::post('/kindOfTask/delete', 'Web\KindOfTaskController@delete');

@@ -8,7 +8,7 @@
       <input type="hidden" name="_token" :value="csrf" />
       <div class="input-group mb-3">
         <span class="input-group-text" id="inputGroup-sizing-default">招待するユーザーのメールアドレスを入力</span>
-        <div name="メンバーアドレス">
+        <div name="memberAddress">
           <input v-model="memberEmail" name="memberEmail" type="email" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" />
         </div>
       </div>

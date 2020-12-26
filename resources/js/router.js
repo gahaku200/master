@@ -11,6 +11,7 @@ import NotInviteData from './components/mail/NotInviteData'
 import SuccessInvite from './components/mail/SuccessInvite'
 import SuccessSendEmail from './components/mail/SuccessSendEmail'
 import GroupMember from './components/page/GroupMember'
+import KindOfTasks from './components/page/KindOfTasks'
 
 Vue.use(Router)
 
@@ -71,6 +72,11 @@ const router = new Router({
       path: '/groupMember',
       name: 'groupMember',
       component: GroupMember
+    },
+    {
+      path: '/kindOfTasks',
+      name: 'kindOfTasks',
+      component: KindOfTasks
     },
   ]
 })

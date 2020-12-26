@@ -36,6 +36,7 @@
                   <p v-if="auth.group_id === null" @click="goCreateGroup()">グループ作成</p>
                   <p v-if="auth.is_admin === '1'" @click="goInviteMember()">メンバー招待</p>
                   <p v-if="auth.is_admin === '1'" @click="goGroupMember()">メンバー情報</p>
+                  <p v-if="auth.is_admin === '1'" @click="goKindOfTasks()">タスク種類</p>
                 </ul>
               </drawer>
             </ul>
@@ -102,6 +103,10 @@ export default {
     },
     goGroupMember() {
       this.$router.push("/groupMember");
+      this.open = !this.open
+    },
+    goKindOfTasks() {
+      this.$router.push("/kindOfTasks");
       this.open = !this.open
     },
     active() {  
