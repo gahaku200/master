@@ -1,10 +1,10 @@
 <template>
   <div>
     <router-view :errors="errors" />
-    <div v-if="auth.length === 0">
+    <div v-if="groupId === null">
       <img class="img-fluid" src="https://picsum.photos/1500/610">
     </div>
-    <div class="mainContainer" v-if="auth.length !== 0">
+    <div class="mainContainer" v-if="groupId > 0">
       <div class="container">
         <div class="row">
           <div class="col-lg-4"></div>
@@ -13,7 +13,7 @@
           </div>
           <div class="col-lg-4 centerButton" v-if="type === 'C'">
             <button @click="preserveTaskTime(), startRest(), restName(), attendance()" type="button" class="btn btn-primary btn-lg">休入</button>
-            <button @click="preserveTaskTime(), endWork(), taskEnd(), attendance()" type="button" class="btn btn-primary btn-lg">退勤</button>
+            <button @click="endWork(), taskEnd(), attendance()" type="button" class="btn btn-primary btn-lg">退勤</button>
           </div>
           <div class="col-lg-4 centerButton" v-if="type === 'B'">
             <button @click="endRest(), taskEnd(), attendance()" type="button" class="btn btn-primary btn-lg">休出</button>
@@ -127,7 +127,8 @@ export default {
   },
   data() {
     return {
-      type: '',
+      groupId: null,
+      type: 'A',
       isTask: false,
       selected: 'initial',
       tasks: [],
@@ -146,6 +147,9 @@ export default {
   mounted() {
     var authId = document.querySelector("meta[name='user-id']").getAttribute('content');
     var group_id = document.querySelector("meta[name='group-id']").getAttribute('content');
+    if(group_id > 0) {
+      this.groupId = group_id;
+    }
     
     axios.get('/api/task/' + authId)
       .then(res =>  {
@@ -180,79 +184,42 @@ export default {
       }).catch( error => { console.log(error); })
 
     if (group_id != '') {
+      //this.getGroupInfo(authId, group_id);
       setInterval(() => {
+      this.getGroupInfo(authId, group_id);
+      }, 5000);
+    }
+   },
+  methods: {
+    getGroupInfo(authId, group_id) {
       axios.get('/api/getGroup/' + group_id)
         .then(res =>  {
           this.users = [];
           res.data.forEach((user) => {
+            if (user.now_task_start == null) {
+              var d2 = 0;
+            } else {
+              var d2 = new Date(user.now_task_start).getTime();
+            }
+
             if (user.id == authId) {
               this.taskLabel = user.now_task;
-              this.doingTime = this.passingTime(user.now_task_start);
-              this.passingTask(user.now_task_start);
+              this.doingTime = this.passingTime(d2);
+              this.passingTask(d2);
             } else {
-              this.users.push({name: user.name, task: user.now_task, time: this.passingTime(user.now_task_start)});
+              this.users.push({name: user.name, task: user.now_task, time: this.passingTime(d2)});
             }
           })
         }).catch( error => { console.log(error); })
-      }, 1000);
-    }
-   },
-  computed: {
-    /*formattedElapsedTime() {
-      const date = new Date(null);
-      date.setSeconds(this.elapsedTime / 1000);
-      const utc = date.toUTCString();
-      return utc.substr(utc.indexOf(":") - 2, 8);
-    },*/
-    groupMember() {
-      var members = this.users.filter(e => e.group_id == auth.group_id);
-      return members;
     },
-  },
-  methods: {
     restName() {
       const data = {
         task: '休憩'
       }
-      var self = this;
       var id = document.querySelector("meta[name='user-id']").getAttribute('content');
       axios.post('/api/taskStart/' + id, data)
       .catch( error => { console.log(error); });
     },
-    /*
-    startWork() {
-      this.records = [];
-      var date = new Date();
-      var gmt = date.toString();
-      this.startTime = gmt.substr(gmt.indexOf(":") - 2, 8);
-      this.attendanceRecords.push({name: '出勤', time: this.startTime})
-    },
-    startRest() {
-      if (this.taskLabel != '') {
-        this.records.push({name: this.taskLabel, totalTime: this.formattedElapsedTime})
-      }
-      var date = new Date();
-      var gmt = date.toString();
-      this.startRestTime = gmt.substr(gmt.indexOf(":") - 2, 8);
-      this.attendanceRecords.push({name: '休入', time: this.startRestTime})
-    },
-    endRest() {
-      this.records.push({name: this.taskLabel, totalTime: this.formattedElapsedTime})
-      var date = new Date();
-      var gmt = date.toString();
-      this.endRestTime = gmt.substr(gmt.indexOf(":") - 2, 8);
-      this.attendanceRecords.push({name: '休出', time: this.endRestTime})
-    },
-    endWork() {
-      if (this.taskLabel != '') {
-        this.records.push({name: this.taskLabel, totalTime: this.formattedElapsedTime})
-      }
-      var date = new Date();
-      var gmt = date.toString();
-      this.endTime = gmt.substr(gmt.indexOf(":") - 2, 8);
-      this.attendanceRecords.push({name: '退勤', time: this.endTime})
-    },
-    */
     taskStart() {
       if (this.selected != 'initial') {
         const data = {
@@ -280,25 +247,20 @@ export default {
         this.selected = 'initial';
       }
     },
-    passingTime(nowTaskStart) {
-      if (nowTaskStart == null) {
-        return nowTaskStart;
+    passingTime(d2) {
+      if (d2 == 0) {
+        return null;
       }
       var d1 = new Date();
-      var d2 = new Date(nowTaskStart);
-
-      var diffTime = d1.getTime() - d2.getTime();
-
+      var diffTime = d1.getTime() - d2;
       return this.convertTime(Math.floor(diffTime / 1000));
     },
-    passingTask(nowTaskStart) {
-      if (nowTaskStart == null) {
-        return nowTaskStart;
+    passingTask(d2) {
+      if (d2 == 0) {
+        return null;
       }
       var d1 = new Date();
-      var d2 = new Date(nowTaskStart);
-
-      var diffTime = d1.getTime() - d2.getTime();
+      var diffTime = d1.getTime() - d2;
       this.taskTime = Math.floor(diffTime / 1000);
     },
     attendance() {
@@ -324,15 +286,46 @@ export default {
       .catch( error => { console.log(error); });
     },
     startWork() {
-      this.on_duty = '出勤'
+      this.on_duty = '出勤';
+      this.taskRecords = [];
     },
     startRest() {
-      this.on_duty = '休入'
+      this.on_duty = '休入';
+      const data = {
+      task_name: this.taskLabel,
+      task_time: this.taskTime
+      }
+      var id = document.querySelector("meta[name='user-id']").getAttribute('content');
+      axios.post('/api/task/' + id, data)
+      .then(res =>  {
+        this.taskRecords = [];
+        res.data.forEach((task) => {
+          this.taskRecords.push({task_name: task.task_name, task_time: this.convertTime(task.task_time)});
+        })
+      })
+      .catch( error => { console.log(error); });
+      this.selected = 'initial';
     },
     endRest() {
-      this.on_duty = '休出'
+      this.on_duty = '休出';
     },
     endWork() {
+      if (this.taskLabel != '') {
+        const data = {
+        task_name: this.taskLabel,
+        task_time: this.taskTime
+        }
+        var id = document.querySelector("meta[name='user-id']").getAttribute('content');
+        axios.post('/api/task/' + id, data)
+        .then(res =>  {
+          this.taskRecords = [];
+          res.data.forEach((task) => {
+            this.taskRecords.push({task_name: task.task_name, task_time: this.convertTime(task.task_time)});
+          })
+        })
+        .catch( error => { console.log(error); });
+        this.selected = 'initial';
+      }
       this.on_duty = '退勤'
     },
     taskEnd() {

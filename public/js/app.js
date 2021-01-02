@@ -2010,6 +2010,8 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   components: {
@@ -2039,8 +2041,12 @@ __webpack_require__.r(__webpack_exports__);
     });
   },
   methods: {
-    goSchedule: function goSchedule() {
-      this.$router.push("/schedule");
+    goResultOfAttendance: function goResultOfAttendance() {
+      this.$router.push("/resultOfAttendance");
+      this.open = !this.open;
+    },
+    showUser: function showUser() {
+      this.$router.push("/showUser");
       this.open = !this.open;
     },
     goCreateGroup: function goCreateGroup() {
@@ -2550,7 +2556,8 @@ __webpack_require__.r(__webpack_exports__);
   },
   data: function data() {
     return {
-      type: '',
+      groupId: null,
+      type: 'A',
       isTask: false,
       selected: 'initial',
       tasks: [],
@@ -2569,6 +2576,11 @@ __webpack_require__.r(__webpack_exports__);
 
     var authId = document.querySelector("meta[name='user-id']").getAttribute('content');
     var group_id = document.querySelector("meta[name='group-id']").getAttribute('content');
+
+    if (group_id > 0) {
+      this.groupId = group_id;
+    }
+
     axios.get('/api/task/' + authId).then(function (res) {
       _this.taskRecords = [];
       res.data.forEach(function (task) {
@@ -2609,89 +2621,51 @@ __webpack_require__.r(__webpack_exports__);
     });
 
     if (group_id != '') {
+      //this.getGroupInfo(authId, group_id);
       setInterval(function () {
-        axios.get('/api/getGroup/' + group_id).then(function (res) {
-          _this.users = [];
-          res.data.forEach(function (user) {
-            if (user.id == authId) {
-              _this.taskLabel = user.now_task;
-              _this.doingTime = _this.passingTime(user.now_task_start);
-
-              _this.passingTask(user.now_task_start);
-            } else {
-              _this.users.push({
-                name: user.name,
-                task: user.now_task,
-                time: _this.passingTime(user.now_task_start)
-              });
-            }
-          });
-        })["catch"](function (error) {
-          console.log(error);
-        });
-      }, 1000);
-    }
-  },
-  computed: {
-    /*formattedElapsedTime() {
-      const date = new Date(null);
-      date.setSeconds(this.elapsedTime / 1000);
-      const utc = date.toUTCString();
-      return utc.substr(utc.indexOf(":") - 2, 8);
-    },*/
-    groupMember: function groupMember() {
-      var members = this.users.filter(function (e) {
-        return e.group_id == auth.group_id;
-      });
-      return members;
+        _this.getGroupInfo(authId, group_id);
+      }, 5000);
     }
   },
   methods: {
+    getGroupInfo: function getGroupInfo(authId, group_id) {
+      var _this2 = this;
+
+      axios.get('/api/getGroup/' + group_id).then(function (res) {
+        _this2.users = [];
+        res.data.forEach(function (user) {
+          if (user.now_task_start == null) {
+            var d2 = 0;
+          } else {
+            var d2 = new Date(user.now_task_start).getTime();
+          }
+
+          if (user.id == authId) {
+            _this2.taskLabel = user.now_task;
+            _this2.doingTime = _this2.passingTime(d2);
+
+            _this2.passingTask(d2);
+          } else {
+            _this2.users.push({
+              name: user.name,
+              task: user.now_task,
+              time: _this2.passingTime(d2)
+            });
+          }
+        });
+      })["catch"](function (error) {
+        console.log(error);
+      });
+    },
     restName: function restName() {
       var data = {
         task: '休憩'
       };
-      var self = this;
       var id = document.querySelector("meta[name='user-id']").getAttribute('content');
       axios.post('/api/taskStart/' + id, data)["catch"](function (error) {
         console.log(error);
       });
     },
-
-    /*
-    startWork() {
-      this.records = [];
-      var date = new Date();
-      var gmt = date.toString();
-      this.startTime = gmt.substr(gmt.indexOf(":") - 2, 8);
-      this.attendanceRecords.push({name: '出勤', time: this.startTime})
-    },
-    startRest() {
-      if (this.taskLabel != '') {
-        this.records.push({name: this.taskLabel, totalTime: this.formattedElapsedTime})
-      }
-      var date = new Date();
-      var gmt = date.toString();
-      this.startRestTime = gmt.substr(gmt.indexOf(":") - 2, 8);
-      this.attendanceRecords.push({name: '休入', time: this.startRestTime})
-    },
-    endRest() {
-      this.records.push({name: this.taskLabel, totalTime: this.formattedElapsedTime})
-      var date = new Date();
-      var gmt = date.toString();
-      this.endRestTime = gmt.substr(gmt.indexOf(":") - 2, 8);
-      this.attendanceRecords.push({name: '休出', time: this.endRestTime})
-    },
-    endWork() {
-      if (this.taskLabel != '') {
-        this.records.push({name: this.taskLabel, totalTime: this.formattedElapsedTime})
-      }
-      var date = new Date();
-      var gmt = date.toString();
-      this.endTime = gmt.substr(gmt.indexOf(":") - 2, 8);
-      this.attendanceRecords.push({name: '退勤', time: this.endTime})
-    },
-    */
     taskStart: function taskStart() {
       if (this.selected != 'initial') {
         var data = {
@@ -2704,7 +2678,7 @@ __webpack_require__.r(__webpack_exports__);
       }
     },
     preserveTaskTime: function preserveTaskTime() {
-      var _this2 = this;
+      var _this3 = this;
 
       if (this.taskLabel != '' && this.selected != 'initial') {
         var data = {
@@ -2713,11 +2687,11 @@ __webpack_require__.r(__webpack_exports__);
         };
         var id = document.querySelector("meta[name='user-id']").getAttribute('content');
         axios.post('/api/task/' + id, data).then(function (res) {
-          _this2.taskRecords = [];
+          _this3.taskRecords = [];
           res.data.forEach(function (task) {
-            _this2.taskRecords.push({
+            _this3.taskRecords.push({
               task_name: task.task_name,
-              task_time: _this2.convertTime(task.task_time)
+              task_time: _this3.convertTime(task.task_time)
             });
           });
         })["catch"](function (error) {
@@ -2726,46 +2700,44 @@ __webpack_require__.r(__webpack_exports__);
         this.selected = 'initial';
       }
     },
-    passingTime: function passingTime(nowTaskStart) {
-      if (nowTaskStart == null) {
-        return nowTaskStart;
+    passingTime: function passingTime(d2) {
+      if (d2 == 0) {
+        return null;
       }
 
       var d1 = new Date();
-      var d2 = new Date(nowTaskStart);
-      var diffTime = d1.getTime() - d2.getTime();
+      var diffTime = d1.getTime() - d2;
       return this.convertTime(Math.floor(diffTime / 1000));
     },
-    passingTask: function passingTask(nowTaskStart) {
-      if (nowTaskStart == null) {
-        return nowTaskStart;
+    passingTask: function passingTask(d2) {
+      if (d2 == 0) {
+        return null;
       }
 
       var d1 = new Date();
-      var d2 = new Date(nowTaskStart);
-      var diffTime = d1.getTime() - d2.getTime();
+      var diffTime = d1.getTime() - d2;
       this.taskTime = Math.floor(diffTime / 1000);
     },
     attendance: function attendance() {
-      var _this3 = this;
+      var _this4 = this;
 
       var data = {
         on_duty: this.on_duty
       };
       var id = document.querySelector("meta[name='user-id']").getAttribute('content');
       axios.post('/api/attendance/' + id, data).then(function (res) {
-        _this3.attendanceRecords = res.data;
+        _this4.attendanceRecords = res.data;
         var duty = res.data[res.data.length - 1].on_duty;
 
         if (duty == '退勤') {
-          _this3.type = 'A';
-          _this3.isTask = false;
+          _this4.type = 'A';
+          _this4.isTask = false;
         } else if (duty == '休入') {
-          _this3.type = 'B';
-          _this3.isTask = false;
+          _this4.type = 'B';
+          _this4.isTask = false;
         } else {
-          _this3.type = 'C';
-          _this3.isTask = true;
+          _this4.type = 'C';
+          _this4.isTask = true;
         }
       })["catch"](function (error) {
         console.log(error);
@@ -2773,14 +2745,56 @@ __webpack_require__.r(__webpack_exports__);
     },
     startWork: function startWork() {
       this.on_duty = '出勤';
+      this.taskRecords = [];
     },
     startRest: function startRest() {
+      var _this5 = this;
+
       this.on_duty = '休入';
+      var data = {
+        task_name: this.taskLabel,
+        task_time: this.taskTime
+      };
+      var id = document.querySelector("meta[name='user-id']").getAttribute('content');
+      axios.post('/api/task/' + id, data).then(function (res) {
+        _this5.taskRecords = [];
+        res.data.forEach(function (task) {
+          _this5.taskRecords.push({
+            task_name: task.task_name,
+            task_time: _this5.convertTime(task.task_time)
+          });
+        });
+      })["catch"](function (error) {
+        console.log(error);
+      });
+      this.selected = 'initial';
     },
     endRest: function endRest() {
       this.on_duty = '休出';
     },
     endWork: function endWork() {
+      var _this6 = this;
+
+      if (this.taskLabel != '') {
+        var data = {
+          task_name: this.taskLabel,
+          task_time: this.taskTime
+        };
+        var id = document.querySelector("meta[name='user-id']").getAttribute('content');
+        axios.post('/api/task/' + id, data).then(function (res) {
+          _this6.taskRecords = [];
+          res.data.forEach(function (task) {
+            _this6.taskRecords.push({
+              task_name: task.task_name,
+              task_time: _this6.convertTime(task.task_time)
+            });
+          });
+        })["catch"](function (error) {
+          console.log(error);
+        });
+        this.selected = 'initial';
+      }
+
       this.on_duty = '退勤';
     },
     taskEnd: function taskEnd() {
@@ -3297,6 +3311,13 @@ Object(vee_validate__WEBPACK_IMPORTED_MODULE_1__["extend"])("email", _objectSpre
       type: Array | Object
     }
   },
+  mounted: function mounted() {
+    var id = document.querySelector("meta[name='user-id']").getAttribute('content');
+
+    if (id <= 0) {
+      this.$router.push("/");
+    }
+  },
   methods: {
     login: function login() {
       var _this = this;
@@ -3543,15 +3564,60 @@ Object(vee_validate__WEBPACK_IMPORTED_MODULE_1__["extend"])("confirmed", _object
 
 /***/ }),
 
-/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/page/Schedule.vue?vue&type=script&lang=js&":
-/*!************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/page/Schedule.vue?vue&type=script&lang=js& ***!
-  \************************************************************************************************************************************************************************/
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/page/ResultOfAttendance.vue?vue&type=script&lang=js&":
+/*!**********************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/page/ResultOfAttendance.vue?vue&type=script&lang=js& ***!
+  \**********************************************************************************************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -3561,9 +3627,760 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 /* harmony default export */ __webpack_exports__["default"] = ({
+  data: function data() {
+    return {
+      today: "",
+      selectedDay: "",
+      currentYear: 0,
+      currentMonth: 0,
+      currentDate: 0,
+      weeks: ["日", "月", "火", "水", "木", "金", "土"],
+      calendar: [],
+      performances: [],
+      holidays: [],
+      lastArray: ''
+    };
+  },
+  created: function created() {
+    var date = new Date();
+    var _ref = [date.getFullYear(), date.getMonth() + 1, date.getDate()];
+    this.currentYear = _ref[0];
+    this.currentMonth = _ref[1];
+    this.currentDate = _ref[2];
+    this.today = this.selectedDay = "".concat(this.currentYear, "-").concat(('0' + this.currentMonth).slice(-2), "-").concat(this.currentDate);
+  },
+  mounted: function mounted() {
+    var id = document.querySelector("meta[name='user-id']").getAttribute('content');
+
+    if (id <= 0) {
+      this.$router.push("/");
+    }
+
+    this.calendarMaker();
+  },
+  methods: {
+    chekcSelectedDay: function chekcSelectedDay(day) {
+      return {
+        'selectedDay': "".concat(this.currentYear, "-").concat(('0' + this.currentMonth).slice(-2), "-").concat(('0' + day).slice(-2)) == this.selectedDay
+      };
+    },
+    movePrevMonth: function movePrevMonth() {
+      this.currentMonth = this.currentMonth != 1 ? this.currentMonth - 1 : 12;
+      this.currentYear = this.currentMonth != 12 ? this.currentYear : this.currentYear - 1;
+      this.calendarMaker();
+    },
+    moveNextMonth: function moveNextMonth() {
+      this.currentMonth = this.currentMonth != 12 ? this.currentMonth + 1 : 1;
+      this.currentYear = this.currentMonth != 1 ? this.currentYear : this.currentYear + 1;
+      this.calendarMaker();
+    },
+    goHome: function goHome() {
+      this.$router.push("/");
+    },
+    calendarMaker: function calendarMaker() {
+      var _this = this;
+
+      var authId = document.querySelector("meta[name='user-id']").getAttribute('content');
+      var theDay = new Date(this.currentYear, this.currentMonth - 1, 1);
+      var toDay = new Date(this.currentYear, this.currentMonth, 1);
+      this.performances = [];
+      var data = {
+        day: theDay,
+        to_day: toDay
+      };
+      axios.post('/api/userAttendance/' + authId, data).then(function (res) {
+        //console.log(res.data);
+        if (res.data != 'noData') {
+          res.data.forEach(function (attendance) {
+            _this.performances.push({
+              on_duty: attendance.on_duty,
+              time: attendance.time
+            });
+          });
+        }
+
+        _this.calendar = [];
+        var lastdate = new Date(_this.currentYear, _this.currentMonth, 0).getDate();
+
+        var _loop = function _loop(i) {
+          var today = new Date(_this.currentYear, _this.currentMonth - 1, i);
+          var nextDay = new Date(_this.currentYear, _this.currentMonth - 1, i + 1);
+          var date = today.getDate();
+
+          if (date < 10) {
+            date = '0' + date;
+          }
+
+          var day = _this.weeks[today.getDay()];
+
+          array = [];
+
+          _this.performances.forEach(function (performance) {
+            if (array.length == 0 && performance.on_duty == '出勤' && Date.parse(performance.time) >= today && Date.parse(performance.time) < nextDay) {
+              array.push(performance);
+              _this.lastArray = performance.on_duty;
+            } else if (array.length != 0 && Date.parse(performance.time) >= today && Date.parse(performance.time) < nextDay) {
+              array.push(performance);
+              _this.lastArray = performance.on_duty;
+            } else if (array.length != 0 && _this.lastArray == '退勤' && Date.parse(performance.time) >= nextDay) {
+              return true;
+            } else if (array.length != 0 && _this.lastArray != '退勤' && Date.parse(performance.time) >= nextDay) {
+              array.push(performance);
+              _this.lastArray = performance.on_duty;
+            }
+          });
+
+          console.log(i);
+
+          if (array.length != 0) {
+            timetime = Date.parse(array[0].time); //console.log(array[0].time);
+          }
+
+          console.log(array);
+          /*
+          ☆一日のデータの時間抽出
+          ・出勤→休入、退勤
+          ・休入→休出
+          ・休出→休入、退勤
+          ・退勤→出勤
+          □変数
+          ・time
+          ・overtime
+          ・midnightTime
+          ・midnightOvertime
+          ・restTime
+          ・X(AM5:00) am5.getTime()
+          ・Y(PM22:00) pm10.getTime()
+          ・past(前のデータ) array[x - 1].time 比較 Date.parse(array[x - 1].time)
+          ・now(今のデータ) array[x].time 比較 Date.parse(array[x].time)
+          */
+          //const am5 = new Date(this.currentYear, this.currentMonth - 1, i, 5).getTime();
+          //const pm10 = new Date(this.currentYear, this.currentMonth - 1, i, 22).getTime();
+          //console.log(am5);
+          //console.log(pm10);
+
+          time = 0;
+          overtime = 0;
+          midnightTime = 0;
+          midnightOvertime = 0;
+          restTime = 0;
+          var hours8 = 28800000;
+          var hours24 = 86400000;
+
+          if (array.length != 0) {
+            for (var x = 1; x < array.length; x++) {
+              pastData = Date.parse(array[x - 1].time);
+              nowData = Date.parse(array[x].time);
+              am5 = new Date(_this.currentYear, _this.currentMonth - 1, i, 5).getTime();
+              pm10 = new Date(_this.currentYear, _this.currentMonth - 1, i, 22).getTime();
+              loopTime = Math.floor((nowData - today.getTime()) / (24 * 60 * 60 * 1000)); //console.log(loopTime);
+              //console.log(pastData - hours8);
+              //console.log(array[x].time.getDate());
+
+              if (array[x - 1].on_duty == '出勤' || array[x - 1].on_duty == '休出') {
+                if (pastData <= am5) {
+                  if (nowData <= am5) {
+                    if (time + midnightTime < hours8) {
+                      midnightTime += nowData - pastData; //console.log(midnightTime);
+
+                      if (time + midnightTime >= hours8) {
+                        midnightOvertime += time + midnightTime - hours8;
+                        midnightTime -= time + midnightTime - hours8; //console.log(9090);
+                      }
+                    } else {
+                      midnightOvertime += nowData - pastData; //console.log(9090);
+                    }
+                  } else if (nowData > am5 && nowData <= pm10) {
+                    if (time + midnightTime < hours8) {
+                      midnightTime += am5 - pastData;
+
+                      if (time + midnightTime >= hours8) {
+                        midnightOvertime += time + midnightTime - hours8;
+                        midnightTime -= time + midnightTime - hours8; //console.log(9090);
+                      }
+
+                      time += nowData - am5;
+
+                      if (time + midnightTime >= hours8) {
+                        overtime += time + midnightTime - hours8;
+                        time -= time + midnightTime - hours8;
+                      }
+                    } else {
+                      midnightOvertime += am5 - pastData;
+                      overtime += nowData - am5;
+                    }
+                  } else {
+                    if (loopTime == 0) {
+                      if (time + midnightTime < hours8) {
+                        midnightTime += am5 - pastData;
+
+                        if (time + midnightTime > hours8) {
+                          midnightOvertime += time + midnightTime - hours8;
+                          midnightTime -= time + midnightTime - hours8; //console.log(9090);
+                        }
+
+                        time += 61200000;
+
+                        if (time + midnightTime >= hours8) {
+                          overtime += time + midnightTime - hours8;
+                          time -= time + midnightTime - hours8;
+                        }
+
+                        midnightOvertime += nowData - pm10;
+                      } else {
+                        midnightOvertime += am5 - pastData;
+                        overtime += 61200000;
+                        midnightOvertime += nowData - pm10;
+                      }
+                    } else {
+                      for (var y = 1; y <= loopTime; y++) {
+                        am5 += hours24;
+                        pm10 += hours24;
+
+                        if (y == loopTime) {
+                          if (nowData <= am5) {
+                            midnightOvertime += nowData - today.getTime() - hours24 * y;
+                          } else if (nowData > am5 && nowData <= pm10) {
+                            midnightOvertime += 18000000;
+                            overtime += nowData - am5;
+                          } else {
+                            midnightOvertime += 18000000;
+                            overtime += 61200000;
+                            midnightOvertime += nowData - pm10;
+                          }
+                        } else {
+                          midnightOvertime += 18000000;
+                          overtime += 61200000;
+                          midnightOvertime += 7200000;
+                        }
+                      }
+                    }
+                  }
+                } else if (pastData > pm10) {
+                  if (nowData < today + hours24) {
+                    if (time + midnightTime < hours8) {
+                      midnightTime += nowData - pastData;
+
+                      if (time + midnightTime >= hours8) {
+                        midnightOvertime += time + midnightTime - hours8;
+                        midnightTime -= time + midnightTime - hours8;
+                      }
+                    } else {
+                      midnightOvertime += nowData - pastData;
+                    }
+                  } else {
+                    midnightTime += 7200000;
+
+                    if (time + midnightTime >= hours8) {
+                      midnightOvertime += time + midnightTime - hours8;
+                      midnightTime -= time + midnightTime - hours8;
+                    }
+
+                    for (var _y = 1; _y <= loopTime; _y++) {
+                      am5 += hours24;
+                      pm10 += hours24;
+
+                      if (_y == loopTime) {
+                        if (nowData <= am5) {
+                          midnightTime += nowData - today.getTime() - hours24 * _y;
+
+                          if (time + midnightTime >= hours8) {
+                            midnightOvertime += time + midnightTime - hours8;
+                            midnightTime -= time + midnightTime - hours8;
+                          }
+                        } else if (nowData > am5 && nowData <= pm10) {
+                          midnightTime += 18000000;
+
+                          if (time + midnightTime >= hours8) {
+                            midnightOvertime += time + midnightTime - hours8;
+                            midnightTime -= time + midnightTime - hours8;
+                          }
+
+                          time += nowData - am5;
+
+                          if (time + midnightTime >= hours8) {
+                            overtime += time + midnightTime - hours8;
+                            time -= time + midnightTime - hours8;
+                          }
+                        } else {
+                          midnightTime += 18000000;
+
+                          if (time + midnightTime >= hours8) {
+                            midnightOvertime += time + midnightTime - hours8;
+                            midnightTime -= time + midnightTime - hours8;
+                          }
+
+                          time += 61200000;
+
+                          if (time + midnightTime >= hours8) {
+                            overtime += time + midnightTime - hours8;
+                            time -= time + midnightTime - hours8;
+                          }
+
+                          midnightOvertime += nowData - pm10;
+                        }
+                      } else {
+                        midnightTime += 18000000;
+
+                        if (time + midnightTime >= hours8) {
+                          midnightOvertime += time + midnightTime - hours8;
+                          midnightTime -= time + midnightTime - hours8;
+                        }
+
+                        time += 61200000;
+
+                        if (time + midnightTime >= hours8) {
+                          overtime += time + midnightTime - hours8;
+                          time -= time + midnightTime - hours8;
+                        }
+
+                        midnightOvertime += 7200000;
+                      }
+                    }
+                  }
+                } else {
+                  if (nowData <= pm10) {
+                    time += nowData - pastData;
+
+                    if (time + midnightTime >= hours8) {
+                      overtime += time + midnightTime - hours8;
+                      time -= time + midnightTime - hours8;
+                    }
+                  } else {
+                    time += pm10 - pastData;
+
+                    if (time + midnightTime >= hours8) {
+                      overtime += time + midnightTime - hours8;
+                      time -= time + midnightTime - hours8;
+                    }
+
+                    midnightTime += 7200000;
+
+                    if (time + midnightTime >= hours8) {
+                      midnightOvertime += time + midnightTime - hours8;
+                      midnightTime -= time + midnightTime - hours8;
+                    }
+
+                    for (var _y2 = 1; _y2 <= loopTime; _y2++) {
+                      am5 += hours24;
+                      pm10 += hours24;
+
+                      if (_y2 == loopTime) {
+                        if (nowData <= am5) {
+                          midnightTime += nowData - today.getTime() - hours24 * _y2;
+
+                          if (time + midnightTime >= hours8) {
+                            midnightOvertime += time + midnightTime - hours8;
+                            midnightTime -= time + midnightTime - hours8;
+                          }
+                        } else if (nowData > am5 && nowData <= pm10) {
+                          midnightTime += 18000000;
+
+                          if (time + midnightTime >= hours8) {
+                            midnightOvertime += time + midnightTime - hours8;
+                            midnightTime -= time + midnightTime - hours8;
+                          }
+
+                          time += nowData - am5;
+
+                          if (time + midnightTime >= hours8) {
+                            overtime += time + midnightTime - hours8;
+                            time -= time + midnightTime - hours8;
+                          }
+                        } else {
+                          midnightTime += 18000000;
+
+                          if (time + midnightTime >= hours8) {
+                            midnightOvertime += time + midnightTime - hours8;
+                            midnightTime -= time + midnightTime - hours8;
+                          }
+
+                          time += 61200000;
+
+                          if (time + midnightTime >= hours8) {
+                            overtime += time + midnightTime - hours8;
+                            time -= time + midnightTime - hours8;
+                          }
+
+                          midnightOvertime += nowData - pm10;
+                        }
+                      } else {
+                        midnightTime += 18000000;
+
+                        if (time + midnightTime >= hours8) {
+                          midnightOvertime += time + midnightTime - hours8;
+                          midnightTime -= time + midnightTime - hours8;
+                        }
+
+                        time += 61200000;
+
+                        if (time + midnightTime >= hours8) {
+                          overtime += time + midnightTime - hours8;
+                          time -= time + midnightTime - hours8;
+                        }
+
+                        midnightOvertime += 7200000;
+                      }
+                    }
+                  }
+                }
+              } else if (array[x - 1].on_duty == '休入') {
+                restTime += nowData - pastData;
+              }
+            }
+          }
+
+          _this.calendar.push({
+            date: date,
+            day: day,
+            time: _this.convertTime(Math.floor(time / 1000)),
+            overtime: _this.convertTime(Math.floor(overtime / 1000)),
+            midnightTime: _this.convertTime(Math.floor(midnightTime / 1000)),
+            midnightOvertime: _this.convertTime(Math.floor(midnightOvertime / 1000)),
+            restTime: _this.convertTime(Math.floor(restTime / 1000))
+          });
+        };
+
+        for (var i = 1; i <= lastdate; i++) {
+          var array;
+          var timetime;
+          var time;
+          var overtime;
+          var midnightTime;
+          var midnightOvertime;
+          var restTime;
+          var pastData;
+          var nowData;
+          var am5;
+          var pm10;
+          var loopTime;
+
+          _loop(i);
+        }
+      })["catch"](function (error) {
+        console.log(error);
+      });
+    },
+    convertTime: function convertTime(diffTime) {
+      if (diffTime == 0) {
+        return '-';
+      }
+
+      var diffHour = Math.floor(diffTime / (60 * 60));
+
+      if (diffHour < 10) {
+        diffHour = '0' + diffHour;
+      }
+
+      var diffMinites = Math.floor(diffTime / 60 % 60);
+
+      if (diffMinites < 10) {
+        diffMinites = '0' + diffMinites;
+      }
+
+      var diffSeconds = Math.floor(diffTime % 60);
+
+      if (diffSeconds < 10) {
+        diffSeconds = '0' + diffSeconds;
+      }
+
+      var passTime = diffHour + ':' + diffMinites + ':' + diffSeconds;
+      return passTime;
+    }
+  },
+  computed: {
+    calendarMake: function calendarMake() {
+      var firstday = new Date(this.currentYear, this.currentMonth - 1, 1).getDay();
+      var lastdate = new Date(this.currentYear, this.currentMonth, 0).getDate();
+      var necessarySpace = firstday == 0 ? 6 : firstday - 1;
+      var list = [_toConsumableArray(Array(necessarySpace)).map(function (i) {
+        return " ";
+      }), _toConsumableArray(Array(lastdate)).map(function (_, i) {
+        return i + 1;
+      })];
+      var week = list.reduce(function (pre, current) {
+        pre.push.apply(pre, _toConsumableArray(current));
+        return pre;
+      }, []);
+      return week;
+    }
+  }
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/page/ShowUser.vue?vue&type=script&lang=js&":
+/*!************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/page/ShowUser.vue?vue&type=script&lang=js& ***!
+  \************************************************************************************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var vee_validate__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vee-validate */ "./node_modules/vee-validate/dist/vee-validate.esm.js");
+/* harmony import */ var vee_validate_dist_rules__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! vee-validate/dist/rules */ "./node_modules/vee-validate/dist/rules.js");
+
+
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+Object(vee_validate__WEBPACK_IMPORTED_MODULE_1__["extend"])("required", _objectSpread(_objectSpread({}, vee_validate_dist_rules__WEBPACK_IMPORTED_MODULE_2__["required"]), {}, {
+  message: "{_field_}は必須です"
+}));
+Object(vee_validate__WEBPACK_IMPORTED_MODULE_1__["extend"])("min", _objectSpread(_objectSpread({}, vee_validate_dist_rules__WEBPACK_IMPORTED_MODULE_2__["min"]), {}, {
+  message: "{_field_}は最低でも{length}文字入力してください"
+}));
+Object(vee_validate__WEBPACK_IMPORTED_MODULE_1__["extend"])("confirmed", _objectSpread(_objectSpread({}, vee_validate_dist_rules__WEBPACK_IMPORTED_MODULE_2__["confirmed"]), {}, {
+  message: "新しい再確認パスワードと入力が一致していません"
+}));
+/* harmony default export */ __webpack_exports__["default"] = ({
+  components: {
+    ValidationProvider: vee_validate__WEBPACK_IMPORTED_MODULE_1__["ValidationProvider"],
+    ValidationObserver: vee_validate__WEBPACK_IMPORTED_MODULE_1__["ValidationObserver"]
+  },
+  data: function data() {
+    return {
+      userId: 0,
+      userName: '',
+      editName: '',
+      userEmail: '',
+      editEmail: '',
+      isEditName: false,
+      isEditEmail: false,
+      isEditPassword: false,
+      oldpassword: '',
+      newpassword: '',
+      newpassword_confirmation: '',
+      error: '',
+      csrf: document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+    };
+  },
+  mounted: function mounted() {
+    var _this = this;
+
+    var id = document.querySelector("meta[name='user-id']").getAttribute('content');
+    axios.get('/api/getUserInfo/' + id).then(function (res) {
+      _this.userId = res.data.id;
+      _this.userName = res.data.name;
+      _this.editName = res.data.name;
+      _this.userEmail = res.data.email;
+      _this.editEmail = res.data.email;
+    })["catch"](function (error) {
+      console.log(error);
+    });
+  },
   methods: {
     goHome: function goHome() {
       this.$router.push("/");
+    },
+    nameEdit: function nameEdit() {
+      if (this.isEditName == true) {
+        this.isEditName = false;
+      } else {
+        this.isEditName = true;
+      }
+    },
+    postEditName: function postEditName() {
+      var _this2 = this;
+
+      var data = {
+        name: this.editName
+      };
+      var id = document.querySelector("meta[name='user-id']").getAttribute('content');
+      axios.post('/api/editUserName/' + id, data).then(function (res) {
+        _this2.userName = res.data.name;
+        _this2.editName = res.data.name;
+      })["catch"](function (error) {
+        console.log(error);
+      });
+      this.isEditName = false;
+    },
+    emailEdit: function emailEdit() {
+      if (this.isEditEmail == true) {
+        this.isEditEmail = false;
+      } else {
+        this.isEditEmail = true;
+      }
+    },
+    postEditEmail: function postEditEmail() {
+      var _this3 = this;
+
+      var data = {
+        email: this.editEmail
+      };
+      var id = document.querySelector("meta[name='user-id']").getAttribute('content');
+      axios.post('/api/editUserEmail/' + id, data).then(function (res) {
+        _this3.userEmail = res.data.email;
+        _this3.editEmail = res.data.email;
+      })["catch"](function (error) {
+        console.log(error);
+      });
+      this.isEditEmail = false;
+    },
+    passwordEdit: function passwordEdit() {
+      if (this.isEditPassword == true) {
+        this.isEditPassword = false;
+      } else {
+        this.isEditPassword = true;
+      }
+    },
+    register: function register() {
+      var _this4 = this;
+
+      return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee() {
+        var isValid, data, id;
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                _context.next = 2;
+                return _this4.$refs.observer.validate();
+
+              case 2:
+                isValid = _context.sent;
+
+                if (isValid) {
+                  data = {
+                    oldpassword: _this4.oldpassword,
+                    newpassword: _this4.newpassword
+                  };
+                  id = document.querySelector("meta[name='user-id']").getAttribute('content');
+                  axios.post('/api/updatePassword/' + id, data).then(function (res) {
+                    _this4.error = res.data;
+
+                    if (res.data == 'パスワードが正しく変更されました') {
+                      _this4.isEditPassword = false;
+                    }
+                  })["catch"](function (error) {
+                    console.log(error);
+                  });
+                  _this4.oldpassword = '';
+                  _this4.newpassword = '';
+                  _this4.newpassword_confirmation = '';
+                }
+
+              case 4:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, _callee);
+      }))();
     }
   }
 });
@@ -7742,33 +8559,44 @@ var render = function() {
                                 {
                                   on: {
                                     click: function($event) {
-                                      return _vm.goSchedule()
+                                      return _vm.showUser()
                                     }
                                   }
                                 },
-                                [_vm._v("勤務予定表")]
+                                [_vm._v("ユーザー情報")]
                               ),
                               _vm._v(" "),
-                              _c("p", [_vm._v("勤務実績表")]),
+                              _c(
+                                "p",
+                                {
+                                  on: {
+                                    click: function($event) {
+                                      return _vm.goResultOfAttendance()
+                                    }
+                                  }
+                                },
+                                [_vm._v("勤務実績表")]
+                              ),
                               _vm._v(" "),
                               _c("p", [_vm._v("タスク実績表")]),
                               _vm._v(" "),
                               _c("p", [_vm._v("給与計算")]),
                               _vm._v(" "),
-                              _c(
-                                "a",
-                                {
-                                  staticClass: "logout",
-                                  attrs: { id: "header-nav__logout" },
-                                  on: {
-                                    click: function($event) {
-                                      return _vm.logout()
+                              _c("p", [
+                                _c(
+                                  "a",
+                                  {
+                                    staticClass: "logout",
+                                    attrs: { id: "header-nav__logout" },
+                                    on: {
+                                      click: function($event) {
+                                        return _vm.logout()
+                                      }
                                     }
-                                  }
-                                },
-                                [_vm._v("ログアウト")]
-                              ),
-                              _vm._v(" "),
+                                  },
+                                  [_vm._v("ログアウト")]
+                                )
+                              ]),
                               _c(
                                 "form",
                                 {
@@ -7786,6 +8614,8 @@ var render = function() {
                                   })
                                 ]
                               ),
+                              _vm._v(" "),
+                              _c("p"),
                               _vm._v(" "),
                               _vm.auth.group_id === null
                                 ? _c(
@@ -8397,7 +9227,7 @@ var render = function() {
     [
       _c("router-view", { attrs: { errors: _vm.errors } }),
       _vm._v(" "),
-      _vm.auth.length === 0
+      _vm.groupId === null
         ? _c("div", [
             _c("img", {
               staticClass: "img-fluid",
@@ -8406,7 +9236,7 @@ var render = function() {
           ])
         : _vm._e(),
       _vm._v(" "),
-      _vm.auth.length !== 0
+      _vm.groupId > 0
         ? _c("div", { staticClass: "mainContainer" }, [
             _c("div", { staticClass: "container" }, [
               _c("div", { staticClass: "row" }, [
@@ -8456,10 +9286,7 @@ var render = function() {
                           attrs: { type: "button" },
                           on: {
                             click: function($event) {
-                              _vm.preserveTaskTime(),
-                                _vm.endWork(),
-                                _vm.taskEnd(),
-                                _vm.attendance()
+                              _vm.endWork(), _vm.taskEnd(), _vm.attendance()
                             }
                           }
                         },
@@ -9649,17 +10476,6 @@ var render = function() {
                                   [_vm._v("ログイン")]
                                 )
                               ])
-                            ]),
-                            _vm._v(" "),
-                            _c("div", { staticClass: "forgetPass" }, [
-                              _c(
-                                "a",
-                                {
-                                  staticClass: "btn btn-link",
-                                  attrs: { href: "" }
-                                },
-                                [_vm._v("パスワードをお忘れですか?")]
-                              )
                             ])
                           ]
                         }
@@ -10173,10 +10989,10 @@ render._withStripped = true
 
 /***/ }),
 
-/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/page/Schedule.vue?vue&type=template&id=25634e7c&":
-/*!****************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/page/Schedule.vue?vue&type=template&id=25634e7c& ***!
-  \****************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/page/ResultOfAttendance.vue?vue&type=template&id=5b3ed182&":
+/*!**************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/page/ResultOfAttendance.vue?vue&type=template&id=5b3ed182& ***!
+  \**************************************************************************************************************************************************************************************************************************/
 /*! exports provided: render, staticRenderFns */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -10192,6 +11008,742 @@ var render = function() {
     _c("p", [_vm._v("Schedule")]),
     _vm._v(" "),
     _c("p", [_vm._v("goodGuys!!")]),
+    _vm._v(" "),
+    _c("span", {
+      staticClass: "btn-modal-close",
+      on: {
+        click: function($event) {
+          return _vm.close($event)
+        }
+      }
+    }),
+    _vm._v(" "),
+    _c("div", { staticClass: "calendar-title" }, [
+      _c(
+        "span",
+        {
+          staticClass: "btn-monthMove prev fa fa-angle-left",
+          on: {
+            click: function($event) {
+              return _vm.movePrevMonth()
+            }
+          }
+        },
+        [_vm._v("＜")]
+      ),
+      _vm._v(
+        "\n    " + _vm._s(_vm.currentYear + "/" + _vm.currentMonth) + "\n    "
+      ),
+      _c(
+        "span",
+        {
+          staticClass: "btn-monthMove next fa fa-angle-right",
+          on: {
+            click: function($event) {
+              return _vm.moveNextMonth()
+            }
+          }
+        },
+        [_vm._v("＞")]
+      )
+    ]),
+    _vm._v(" "),
+    _c("table", { staticClass: "table" }, [
+      _vm._m(0),
+      _vm._v(" "),
+      _c(
+        "tbody",
+        _vm._l(_vm.calendar, function(record) {
+          return _c("tr", [
+            record.day !== "土" && record.day !== "日"
+              ? _c("th", { attrs: { scope: "row" } }, [
+                  _vm._v(_vm._s(record.date) + "(" + _vm._s(record.day) + ")")
+                ])
+              : _vm._e(),
+            _vm._v(" "),
+            record.day === "土"
+              ? _c(
+                  "th",
+                  { staticStyle: { color: "blue" }, attrs: { scope: "row" } },
+                  [_vm._v(_vm._s(record.date) + "(" + _vm._s(record.day) + ")")]
+                )
+              : _vm._e(),
+            _vm._v(" "),
+            record.day === "日"
+              ? _c(
+                  "th",
+                  { staticStyle: { color: "red" }, attrs: { scope: "row" } },
+                  [_vm._v(_vm._s(record.date) + "(" + _vm._s(record.day) + ")")]
+                )
+              : _vm._e(),
+            _vm._v(" "),
+            _c("td", [_vm._v(_vm._s(record.time))]),
+            _vm._v(" "),
+            _c("td", [_vm._v(_vm._s(record.overtime))]),
+            _vm._v(" "),
+            _c("td", [_vm._v(_vm._s(record.midnightTime))]),
+            _vm._v(" "),
+            _c("td", [_vm._v(_vm._s(record.midnightOvertime))]),
+            _vm._v(" "),
+            _c("td", [_vm._v(_vm._s(record.restTime))])
+          ])
+        }),
+        0
+      )
+    ]),
+    _vm._v(" "),
+    _c(
+      "button",
+      {
+        on: {
+          click: function($event) {
+            $event.stopPropagation()
+            $event.preventDefault()
+            return _vm.goHome()
+          }
+        }
+      },
+      [_vm._v("戻る")]
+    )
+  ])
+}
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("thead", [
+      _c("tr", [
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("日付")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("通常勤務時間")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("時間外")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("深夜時間")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("深夜時間外")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("休憩時間")])
+      ])
+    ])
+  }
+]
+render._withStripped = true
+
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/page/ShowUser.vue?vue&type=template&id=c5184066&":
+/*!****************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/page/ShowUser.vue?vue&type=template&id=c5184066& ***!
+  \****************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", [
+    _c("p", [_vm._v("showUser")]),
+    _vm._v(" "),
+    _c("div", { staticClass: "row" }, [
+      _c("div", { staticClass: "col-lg-3" }),
+      _vm._v(" "),
+      _c("div", { staticClass: "col-lg-6" }, [
+        _vm.error !== ""
+          ? _c("div", { staticClass: "form-group has-error" }, [
+              _c("div", { staticClass: "alert alert-danger text-center" }, [
+                _c("div", [_vm._v(_vm._s(_vm.error))])
+              ])
+            ])
+          : _vm._e(),
+        _vm._v(" "),
+        _c("ul", { staticClass: "list-group" }, [
+          _c(
+            "li",
+            {
+              staticClass:
+                "list-group-item d-flex justify-content-between align-items-center"
+            },
+            [
+              _c("td", [_vm._v("ユーザー名：" + _vm._s(_vm.userName))]),
+              _vm._v(" "),
+              _c("td", [
+                !_vm.isEditName
+                  ? _c(
+                      "button",
+                      {
+                        staticClass: "btn btn-outline-primary",
+                        attrs: { type: "button" },
+                        on: {
+                          click: function($event) {
+                            return _vm.nameEdit()
+                          }
+                        }
+                      },
+                      [_vm._v("編集する")]
+                    )
+                  : _vm._e(),
+                _vm._v(" "),
+                _vm.isEditName
+                  ? _c(
+                      "button",
+                      {
+                        staticClass: "btn btn-outline-primary",
+                        attrs: { type: "button" },
+                        on: {
+                          click: function($event) {
+                            return _vm.nameEdit()
+                          }
+                        }
+                      },
+                      [_vm._v("　×　")]
+                    )
+                  : _vm._e()
+              ])
+            ]
+          ),
+          _vm._v(" "),
+          _vm.isEditName
+            ? _c(
+                "li",
+                {
+                  staticClass:
+                    "list-group-item d-flex justify-content-between align-items-center"
+                },
+                [
+                  _c("td", [
+                    _c("input", {
+                      directives: [
+                        {
+                          name: "model",
+                          rawName: "v-model",
+                          value: _vm.editName,
+                          expression: "editName"
+                        }
+                      ],
+                      staticClass: "form-control",
+                      attrs: {
+                        name: "editName",
+                        type: "editName",
+                        "aria-label": "Sizing example input",
+                        "aria-describedby": "inputGroup-sizing-default"
+                      },
+                      domProps: { value: _vm.editName },
+                      on: {
+                        input: function($event) {
+                          if ($event.target.composing) {
+                            return
+                          }
+                          _vm.editName = $event.target.value
+                        }
+                      }
+                    })
+                  ]),
+                  _vm._v(" "),
+                  _c("td", [
+                    _c(
+                      "button",
+                      {
+                        staticClass: "btn btn-outline-primary",
+                        attrs: { type: "button" },
+                        on: {
+                          click: function($event) {
+                            return _vm.postEditName()
+                          }
+                        }
+                      },
+                      [_vm._v("更新する")]
+                    )
+                  ])
+                ]
+              )
+            : _vm._e(),
+          _vm._v(" "),
+          _c(
+            "li",
+            {
+              staticClass:
+                "list-group-item d-flex justify-content-between align-items-center"
+            },
+            [
+              _c("td", [_vm._v("ユーザーアドレス：" + _vm._s(_vm.userEmail))]),
+              _vm._v(" "),
+              _c("td", [
+                !_vm.isEditEmail
+                  ? _c(
+                      "button",
+                      {
+                        staticClass: "btn btn-outline-primary",
+                        attrs: { type: "button" },
+                        on: {
+                          click: function($event) {
+                            return _vm.emailEdit()
+                          }
+                        }
+                      },
+                      [_vm._v("編集する")]
+                    )
+                  : _vm._e(),
+                _vm._v(" "),
+                _vm.isEditEmail
+                  ? _c(
+                      "button",
+                      {
+                        staticClass: "btn btn-outline-primary",
+                        attrs: { type: "button" },
+                        on: {
+                          click: function($event) {
+                            return _vm.emailEdit()
+                          }
+                        }
+                      },
+                      [_vm._v("　×　")]
+                    )
+                  : _vm._e()
+              ])
+            ]
+          ),
+          _vm._v(" "),
+          _vm.isEditEmail
+            ? _c(
+                "li",
+                {
+                  staticClass:
+                    "list-group-item d-flex justify-content-between align-items-center"
+                },
+                [
+                  _c("td", [
+                    _c("input", {
+                      directives: [
+                        {
+                          name: "model",
+                          rawName: "v-model",
+                          value: _vm.editEmail,
+                          expression: "editEmail"
+                        }
+                      ],
+                      staticClass: "form-control",
+                      attrs: {
+                        name: "editEmail",
+                        type: "editEmail",
+                        "aria-label": "Sizing example input",
+                        "aria-describedby": "inputGroup-sizing-default"
+                      },
+                      domProps: { value: _vm.editEmail },
+                      on: {
+                        input: function($event) {
+                          if ($event.target.composing) {
+                            return
+                          }
+                          _vm.editEmail = $event.target.value
+                        }
+                      }
+                    })
+                  ]),
+                  _vm._v(" "),
+                  _c("td", [
+                    _c(
+                      "button",
+                      {
+                        staticClass: "btn btn-outline-primary",
+                        attrs: {
+                          type: "button",
+                          "data-toggle": "modal",
+                          "data-target": "#exampleModal"
+                        },
+                        on: {
+                          click: function($event) {
+                            return _vm.postEditEmail()
+                          }
+                        }
+                      },
+                      [_vm._v("更新する")]
+                    )
+                  ])
+                ]
+              )
+            : _vm._e(),
+          _vm._v(" "),
+          _c(
+            "li",
+            {
+              staticClass:
+                "list-group-item d-flex justify-content-between align-items-center"
+            },
+            [
+              _c("td", [_vm._v("パスワード")]),
+              _vm._v(" "),
+              _c("td", [
+                !_vm.isEditPassword
+                  ? _c(
+                      "button",
+                      {
+                        staticClass: "btn btn-outline-primary",
+                        attrs: { type: "button" },
+                        on: {
+                          click: function($event) {
+                            return _vm.passwordEdit()
+                          }
+                        }
+                      },
+                      [_vm._v("編集する")]
+                    )
+                  : _vm._e(),
+                _vm._v(" "),
+                _vm.isEditPassword
+                  ? _c(
+                      "button",
+                      {
+                        staticClass: "btn btn-outline-primary",
+                        attrs: { type: "button" },
+                        on: {
+                          click: function($event) {
+                            return _vm.passwordEdit()
+                          }
+                        }
+                      },
+                      [_vm._v("　×　")]
+                    )
+                  : _vm._e()
+              ])
+            ]
+          ),
+          _vm._v(" "),
+          _vm.isEditPassword
+            ? _c(
+                "li",
+                {
+                  staticClass:
+                    "list-group-item d-flex justify-content-between align-items-center"
+                },
+                [
+                  _c("ValidationObserver", {
+                    ref: "observer",
+                    staticClass: "form-horizontal",
+                    staticStyle: { width: "-webkit-fill-available" },
+                    attrs: { tag: "form" },
+                    on: {
+                      submit: function($event) {
+                        $event.preventDefault()
+                        return _vm.register()
+                      }
+                    },
+                    scopedSlots: _vm._u(
+                      [
+                        {
+                          key: "default",
+                          fn: function(ref) {
+                            var invalid = ref.invalid
+                            return [
+                              _c("input", {
+                                attrs: { type: "hidden", name: "_token" },
+                                domProps: { value: _vm.csrf }
+                              }),
+                              _vm._v(" "),
+                              _c("div", { staticClass: "form-group" }, [
+                                _c(
+                                  "label",
+                                  {
+                                    staticClass: "col-md-4 control-label",
+                                    attrs: { for: "oldpassword-confirm" }
+                                  },
+                                  [_vm._v("現在のパスワード")]
+                                ),
+                                _vm._v(" "),
+                                _c(
+                                  "div",
+                                  { staticClass: "col-md-6" },
+                                  [
+                                    _c("validation-provider", {
+                                      attrs: {
+                                        name: "今のパスワード",
+                                        rules: "required|min:8"
+                                      },
+                                      scopedSlots: _vm._u(
+                                        [
+                                          {
+                                            key: "default",
+                                            fn: function(ref) {
+                                              var errors = ref.errors
+                                              return [
+                                                _c("input", {
+                                                  directives: [
+                                                    {
+                                                      name: "model",
+                                                      rawName: "v-model",
+                                                      value: _vm.oldpassword,
+                                                      expression: "oldpassword"
+                                                    }
+                                                  ],
+                                                  staticClass: "form-control",
+                                                  attrs: {
+                                                    name: "oldpassword",
+                                                    type: "password"
+                                                  },
+                                                  domProps: {
+                                                    value: _vm.oldpassword
+                                                  },
+                                                  on: {
+                                                    input: function($event) {
+                                                      if (
+                                                        $event.target.composing
+                                                      ) {
+                                                        return
+                                                      }
+                                                      _vm.oldpassword =
+                                                        $event.target.value
+                                                    }
+                                                  }
+                                                }),
+                                                _vm._v(" "),
+                                                _c(
+                                                  "div",
+                                                  {
+                                                    directives: [
+                                                      {
+                                                        name: "show",
+                                                        rawName: "v-show",
+                                                        value: errors[0],
+                                                        expression: "errors[0]"
+                                                      }
+                                                    ],
+                                                    staticClass:
+                                                      "alert alert-danger"
+                                                  },
+                                                  [_vm._v(_vm._s(errors[0]))]
+                                                )
+                                              ]
+                                            }
+                                          }
+                                        ],
+                                        null,
+                                        true
+                                      )
+                                    })
+                                  ],
+                                  1
+                                )
+                              ]),
+                              _vm._v(" "),
+                              _c("div", { staticClass: "form-group" }, [
+                                _c(
+                                  "label",
+                                  {
+                                    staticClass: "col-md-4 control-label",
+                                    attrs: { for: "newpassword" }
+                                  },
+                                  [_vm._v("新しいパスワード")]
+                                ),
+                                _vm._v(" "),
+                                _c(
+                                  "div",
+                                  { staticClass: "col-md-6" },
+                                  [
+                                    _c("validation-provider", {
+                                      attrs: {
+                                        name: "新しいパスワード",
+                                        rules:
+                                          "required|min:8|confirmed:password_confirmation"
+                                      },
+                                      scopedSlots: _vm._u(
+                                        [
+                                          {
+                                            key: "default",
+                                            fn: function(ref) {
+                                              var errors = ref.errors
+                                              return [
+                                                _c("input", {
+                                                  directives: [
+                                                    {
+                                                      name: "model",
+                                                      rawName: "v-model",
+                                                      value: _vm.newpassword,
+                                                      expression: "newpassword"
+                                                    }
+                                                  ],
+                                                  staticClass: "form-control",
+                                                  attrs: {
+                                                    name: "newpassword",
+                                                    type: "password"
+                                                  },
+                                                  domProps: {
+                                                    value: _vm.newpassword
+                                                  },
+                                                  on: {
+                                                    input: function($event) {
+                                                      if (
+                                                        $event.target.composing
+                                                      ) {
+                                                        return
+                                                      }
+                                                      _vm.newpassword =
+                                                        $event.target.value
+                                                    }
+                                                  }
+                                                }),
+                                                _vm._v(" "),
+                                                _c(
+                                                  "div",
+                                                  {
+                                                    directives: [
+                                                      {
+                                                        name: "show",
+                                                        rawName: "v-show",
+                                                        value: errors[0],
+                                                        expression: "errors[0]"
+                                                      }
+                                                    ],
+                                                    staticClass:
+                                                      "alert alert-danger"
+                                                  },
+                                                  [_vm._v(_vm._s(errors[0]))]
+                                                )
+                                              ]
+                                            }
+                                          }
+                                        ],
+                                        null,
+                                        true
+                                      )
+                                    })
+                                  ],
+                                  1
+                                )
+                              ]),
+                              _vm._v(" "),
+                              _c("div", { staticClass: "form-group" }, [
+                                _c(
+                                  "label",
+                                  {
+                                    staticClass: "col-md-4 control-label",
+                                    attrs: { for: "newpassword-confirm" }
+                                  },
+                                  [_vm._v("新しいパスワード再確認")]
+                                ),
+                                _vm._v(" "),
+                                _c(
+                                  "div",
+                                  { staticClass: "col-md-6" },
+                                  [
+                                    _c("validation-provider", {
+                                      attrs: {
+                                        name: "新しいパスワード再確認",
+                                        rules: "required|min:8",
+                                        vid: "password_confirmation"
+                                      },
+                                      scopedSlots: _vm._u(
+                                        [
+                                          {
+                                            key: "default",
+                                            fn: function(ref) {
+                                              var errors = ref.errors
+                                              return [
+                                                _c("input", {
+                                                  directives: [
+                                                    {
+                                                      name: "model",
+                                                      rawName: "v-model",
+                                                      value:
+                                                        _vm.newpassword_confirmation,
+                                                      expression:
+                                                        "newpassword_confirmation"
+                                                    }
+                                                  ],
+                                                  staticClass: "form-control",
+                                                  attrs: {
+                                                    name:
+                                                      "newpassword_confirmation",
+                                                    type: "password"
+                                                  },
+                                                  domProps: {
+                                                    value:
+                                                      _vm.newpassword_confirmation
+                                                  },
+                                                  on: {
+                                                    input: function($event) {
+                                                      if (
+                                                        $event.target.composing
+                                                      ) {
+                                                        return
+                                                      }
+                                                      _vm.newpassword_confirmation =
+                                                        $event.target.value
+                                                    }
+                                                  }
+                                                }),
+                                                _vm._v(" "),
+                                                _c(
+                                                  "div",
+                                                  {
+                                                    directives: [
+                                                      {
+                                                        name: "show",
+                                                        rawName: "v-show",
+                                                        value: errors[0],
+                                                        expression: "errors[0]"
+                                                      }
+                                                    ],
+                                                    staticClass:
+                                                      "alert alert-danger"
+                                                  },
+                                                  [_vm._v(_vm._s(errors[0]))]
+                                                )
+                                              ]
+                                            }
+                                          }
+                                        ],
+                                        null,
+                                        true
+                                      )
+                                    })
+                                  ],
+                                  1
+                                )
+                              ]),
+                              _vm._v(" "),
+                              _c(
+                                "div",
+                                { staticClass: "form-group-register" },
+                                [
+                                  _c("div", [
+                                    _c(
+                                      "button",
+                                      {
+                                        staticClass: "btn btn-outline-primary",
+                                        staticStyle: { float: "right" },
+                                        attrs: { type: "submit" }
+                                      },
+                                      [_vm._v("更新する")]
+                                    )
+                                  ])
+                                ]
+                              )
+                            ]
+                          }
+                        }
+                      ],
+                      null,
+                      false,
+                      4076157314
+                    )
+                  })
+                ],
+                1
+              )
+            : _vm._e()
+        ])
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "col-lg-3" })
+    ]),
     _vm._v(" "),
     _c(
       "button",
@@ -26415,17 +27967,17 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./resources/js/components/page/Schedule.vue":
-/*!***************************************************!*\
-  !*** ./resources/js/components/page/Schedule.vue ***!
-  \***************************************************/
+/***/ "./resources/js/components/page/ResultOfAttendance.vue":
+/*!*************************************************************!*\
+  !*** ./resources/js/components/page/ResultOfAttendance.vue ***!
+  \*************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _Schedule_vue_vue_type_template_id_25634e7c___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Schedule.vue?vue&type=template&id=25634e7c& */ "./resources/js/components/page/Schedule.vue?vue&type=template&id=25634e7c&");
-/* harmony import */ var _Schedule_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Schedule.vue?vue&type=script&lang=js& */ "./resources/js/components/page/Schedule.vue?vue&type=script&lang=js&");
+/* harmony import */ var _ResultOfAttendance_vue_vue_type_template_id_5b3ed182___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ResultOfAttendance.vue?vue&type=template&id=5b3ed182& */ "./resources/js/components/page/ResultOfAttendance.vue?vue&type=template&id=5b3ed182&");
+/* harmony import */ var _ResultOfAttendance_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ResultOfAttendance.vue?vue&type=script&lang=js& */ "./resources/js/components/page/ResultOfAttendance.vue?vue&type=script&lang=js&");
 /* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
 
@@ -26435,9 +27987,9 @@ __webpack_require__.r(__webpack_exports__);
 /* normalize component */
 
 var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
-  _Schedule_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
-  _Schedule_vue_vue_type_template_id_25634e7c___WEBPACK_IMPORTED_MODULE_0__["render"],
-  _Schedule_vue_vue_type_template_id_25634e7c___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  _ResultOfAttendance_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _ResultOfAttendance_vue_vue_type_template_id_5b3ed182___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _ResultOfAttendance_vue_vue_type_template_id_5b3ed182___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
   false,
   null,
   null,
@@ -26447,38 +27999,107 @@ var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_
 
 /* hot reload */
 if (false) { var api; }
-component.options.__file = "resources/js/components/page/Schedule.vue"
+component.options.__file = "resources/js/components/page/ResultOfAttendance.vue"
 /* harmony default export */ __webpack_exports__["default"] = (component.exports);
 
 /***/ }),
 
-/***/ "./resources/js/components/page/Schedule.vue?vue&type=script&lang=js&":
+/***/ "./resources/js/components/page/ResultOfAttendance.vue?vue&type=script&lang=js&":
+/*!**************************************************************************************!*\
+  !*** ./resources/js/components/page/ResultOfAttendance.vue?vue&type=script&lang=js& ***!
+  \**************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_ResultOfAttendance_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib??ref--4-0!../../../../node_modules/vue-loader/lib??vue-loader-options!./ResultOfAttendance.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/page/ResultOfAttendance.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_ResultOfAttendance_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/js/components/page/ResultOfAttendance.vue?vue&type=template&id=5b3ed182&":
+/*!********************************************************************************************!*\
+  !*** ./resources/js/components/page/ResultOfAttendance.vue?vue&type=template&id=5b3ed182& ***!
+  \********************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_ResultOfAttendance_vue_vue_type_template_id_5b3ed182___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib??vue-loader-options!./ResultOfAttendance.vue?vue&type=template&id=5b3ed182& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/page/ResultOfAttendance.vue?vue&type=template&id=5b3ed182&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_ResultOfAttendance_vue_vue_type_template_id_5b3ed182___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_ResultOfAttendance_vue_vue_type_template_id_5b3ed182___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+
+
+
+/***/ }),
+
+/***/ "./resources/js/components/page/ShowUser.vue":
+/*!***************************************************!*\
+  !*** ./resources/js/components/page/ShowUser.vue ***!
+  \***************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _ShowUser_vue_vue_type_template_id_c5184066___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ShowUser.vue?vue&type=template&id=c5184066& */ "./resources/js/components/page/ShowUser.vue?vue&type=template&id=c5184066&");
+/* harmony import */ var _ShowUser_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ShowUser.vue?vue&type=script&lang=js& */ "./resources/js/components/page/ShowUser.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _ShowUser_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _ShowUser_vue_vue_type_template_id_c5184066___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _ShowUser_vue_vue_type_template_id_c5184066___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/components/page/ShowUser.vue"
+/* harmony default export */ __webpack_exports__["default"] = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/js/components/page/ShowUser.vue?vue&type=script&lang=js&":
 /*!****************************************************************************!*\
-  !*** ./resources/js/components/page/Schedule.vue?vue&type=script&lang=js& ***!
+  !*** ./resources/js/components/page/ShowUser.vue?vue&type=script&lang=js& ***!
   \****************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_Schedule_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib??ref--4-0!../../../../node_modules/vue-loader/lib??vue-loader-options!./Schedule.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/page/Schedule.vue?vue&type=script&lang=js&");
-/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_Schedule_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_ShowUser_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib??ref--4-0!../../../../node_modules/vue-loader/lib??vue-loader-options!./ShowUser.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/page/ShowUser.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_ShowUser_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
 
 /***/ }),
 
-/***/ "./resources/js/components/page/Schedule.vue?vue&type=template&id=25634e7c&":
+/***/ "./resources/js/components/page/ShowUser.vue?vue&type=template&id=c5184066&":
 /*!**********************************************************************************!*\
-  !*** ./resources/js/components/page/Schedule.vue?vue&type=template&id=25634e7c& ***!
+  !*** ./resources/js/components/page/ShowUser.vue?vue&type=template&id=c5184066& ***!
   \**********************************************************************************/
 /*! exports provided: render, staticRenderFns */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Schedule_vue_vue_type_template_id_25634e7c___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib??vue-loader-options!./Schedule.vue?vue&type=template&id=25634e7c& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/page/Schedule.vue?vue&type=template&id=25634e7c&");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Schedule_vue_vue_type_template_id_25634e7c___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_ShowUser_vue_vue_type_template_id_c5184066___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib??vue-loader-options!./ShowUser.vue?vue&type=template&id=c5184066& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/page/ShowUser.vue?vue&type=template&id=c5184066&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_ShowUser_vue_vue_type_template_id_c5184066___WEBPACK_IMPORTED_MODULE_0__["render"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Schedule_vue_vue_type_template_id_25634e7c___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_ShowUser_vue_vue_type_template_id_c5184066___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
 
 
 
@@ -26497,7 +28118,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vue__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var vue_router__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vue-router */ "./node_modules/vue-router/dist/vue-router.esm.js");
 /* harmony import */ var _components_page_Home__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./components/page/Home */ "./resources/js/components/page/Home.vue");
-/* harmony import */ var _components_page_Schedule__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./components/page/Schedule */ "./resources/js/components/page/Schedule.vue");
+/* harmony import */ var _components_page_ResultOfAttendance__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./components/page/ResultOfAttendance */ "./resources/js/components/page/ResultOfAttendance.vue");
 /* harmony import */ var _components_page_Register__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./components/page/Register */ "./resources/js/components/page/Register.vue");
 /* harmony import */ var _components_page_Login__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./components/page/Login */ "./resources/js/components/page/Login.vue");
 /* harmony import */ var _components_page_CreateGroup__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./components/page/CreateGroup */ "./resources/js/components/page/CreateGroup.vue");
@@ -26508,6 +28129,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _components_mail_SuccessSendEmail__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./components/mail/SuccessSendEmail */ "./resources/js/components/mail/SuccessSendEmail.vue");
 /* harmony import */ var _components_page_GroupMember__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./components/page/GroupMember */ "./resources/js/components/page/GroupMember.vue");
 /* harmony import */ var _components_page_KindOfTasks__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./components/page/KindOfTasks */ "./resources/js/components/page/KindOfTasks.vue");
+/* harmony import */ var _components_page_ShowUser__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./components/page/ShowUser */ "./resources/js/components/page/ShowUser.vue");
+
 
 
 
@@ -26532,9 +28155,9 @@ var router = new vue_router__WEBPACK_IMPORTED_MODULE_1__["default"]({
     component: _components_page_Home__WEBPACK_IMPORTED_MODULE_2__["default"] // URL「/」に対してHomeコンポーネントを使うという意味です
 
   }, {
-    path: '/schedule',
-    name: 'schedule',
-    component: _components_page_Schedule__WEBPACK_IMPORTED_MODULE_3__["default"]
+    path: '/resultOfAttendance',
+    name: 'resultOfAttendance',
+    component: _components_page_ResultOfAttendance__WEBPACK_IMPORTED_MODULE_15__["default"]
   }, {
     path: '/login',
     name: 'login',
@@ -26575,6 +28198,10 @@ var router = new vue_router__WEBPACK_IMPORTED_MODULE_1__["default"]({
     path: '/kindOfTasks',
     name: 'kindOfTasks',
     component: _components_page_KindOfTasks__WEBPACK_IMPORTED_MODULE_13__["default"]
+  }, {
+    path: '/showUser',
+    name: 'showUser',
+    component: _components_page_ShowUser__WEBPACK_IMPORTED_MODULE_14__["default"]
   }]
 });
 /* harmony default export */ __webpack_exports__["default"] = (router);

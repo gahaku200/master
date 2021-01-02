@@ -5,6 +5,7 @@ use App\Attendance;
 use App\Task;
 use App\KindOfTask;
 use App\User;
+use Illuminate\Support\Facades\Hash;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,6 +34,10 @@ Route::group(['middleware' => 'api'],function(){
         $KindOfTask = App\KindOfTask::where('groupId',$group_id)
         ->orderBy('orderNum', 'asc')->get();
         return $KindOfTask;
+    });
+    Route::get('/getUserInfo/{id}',function($id){
+        $user = App\User::find($id);
+        return $user;
     });
 
     Route::post('/taskStart/{id}',function($id){
@@ -112,7 +117,7 @@ Route::group(['middleware' => 'api'],function(){
     });
     Route::post('/kindOfTask/up/{id}',function($id){
         $kindOfTaskUp = App\KindOfTask::where('id', $id)->first();
-        $kindOfTaskDown = App\KindOfTask::where('orderNum', $kindOfTaskUp->orderNum + 1)->first();
+        $kindOfTaskDown = App\KindOfTask::where('groupId', $kindOfTaskUp->groupId)->where('orderNum', $kindOfTaskUp->orderNum + 1)->first();
         $kindOfTaskUp->orderNum++;
         $kindOfTaskDown->orderNum--;
         $kindOfTaskUp->save();
@@ -124,7 +129,7 @@ Route::group(['middleware' => 'api'],function(){
     });
     Route::post('/kindOfTask/down/{id}',function($id){
         $kindOfTaskDown = App\KindOfTask::where('id', $id)->first();
-        $kindOfTaskUp = App\KindOfTask::where('orderNum', $kindOfTaskDown->orderNum - 1)->first();
+        $kindOfTaskUp = App\KindOfTask::where('groupId', $kindOfTaskDown->groupId)->where('orderNum', $kindOfTaskDown->orderNum - 1)->first();
         $kindOfTaskDown->orderNum--;
         $kindOfTaskUp->orderNum++;
         $kindOfTaskDown->save();
@@ -134,4 +139,36 @@ Route::group(['middleware' => 'api'],function(){
         ->orderBy('orderNum', 'asc')->get();
         return $KindOfTask;
     });
+    Route::post('/editUserName/{id}',function($id){
+        $user = App\User::find($id);
+        $user->name = request('name');
+        $user->save();
+
+        return $user;
+    });
+    Route::post('/editUserEmail/{id}',function($id){
+        $user = App\User::find($id);
+        $user->email = request('email');
+        $user->save();
+
+        return $user;
+    });
+    Route::post('/updatePassword/{id}',function($id){
+        $user = App\User::find($id);
+        $new_password = request('newpassword');
+        $old_password = request('oldpassword');
+
+        if(!(Hash::check($old_password, $user->password))) {
+            return '現在のパスワードが間違っています。';
+        } else {
+            if(Hash::check($new_password, $user->password)) {
+                return '新しいパスワードが、現在のパスワードと同じです。違うパスワードを設定してください。';
+            } else {
+                $user->password = Hash::make($new_password);
+                $user->save();
+                return 'パスワードが正しく変更されました';
+            }
+        }
+    });
+    Route::post('/userAttendance/{id}', 'Api\AttendanceController@getDayAttendance');
 });

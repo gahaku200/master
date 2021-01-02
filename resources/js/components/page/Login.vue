@@ -54,9 +54,9 @@
                       <button type="submit" class="btn btn-primary">ログイン</button>
                     </div>
                   </div>
-                  <div class="forgetPass">
+                  <!--<div class="forgetPass">
                     <a class="btn btn-link" href>パスワードをお忘れですか?</a>
-                  </div>
+                  </div>-->
                 </ValidationObserver>
               </div>
             </div>
@@ -98,6 +98,12 @@ export default {
       type: Array | Object
     }
   },
+  mounted() {
+    var id = document.querySelector("meta[name='user-id']").getAttribute('content');
+    if (id <= 0) {
+      this.$router.push("/");
+    }
+   },
   methods: {
     async login() {
       const isValid = await this.$refs.observer.validate();

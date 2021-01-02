@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Home from './components/page/Home'
-import Schedule from './components/page/Schedule'
+import ResultOfAttendance from './components/page/ResultOfAttendance'
 import Register from './components/page/Register'
 import Login from './components/page/Login'
 import Group from './components/page/CreateGroup'
@@ -12,6 +12,7 @@ import SuccessInvite from './components/mail/SuccessInvite'
 import SuccessSendEmail from './components/mail/SuccessSendEmail'
 import GroupMember from './components/page/GroupMember'
 import KindOfTasks from './components/page/KindOfTasks'
+import ShowUser from './components/page/ShowUser'
 
 Vue.use(Router)
 
@@ -24,9 +25,9 @@ const router = new Router({
       component: Home // URL「/」に対してHomeコンポーネントを使うという意味です
     },
     {
-      path: '/schedule',
-      name: 'schedule',
-      component: Schedule
+      path: '/resultOfAttendance',
+      name: 'resultOfAttendance',
+      component: ResultOfAttendance
     },
     {
       path: '/login',
@@ -77,6 +78,11 @@ const router = new Router({
       path: '/kindOfTasks',
       name: 'kindOfTasks',
       component: KindOfTasks
+    },
+    {
+      path: '/showUser',
+      name: 'showUser',
+      component: ShowUser
     },
   ]
 })

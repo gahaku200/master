@@ -94,8 +94,8 @@ export default {
     if (isAdmin != '1') {
       this.goHome();
     }
-    var group_id = document.querySelector("meta[name='group-id']").getAttribute('content');
 
+    var group_id = document.querySelector("meta[name='group-id']").getAttribute('content');
     axios.get('/api/getKindOfTasks/' + group_id)
       .then(res =>  {
         this.tasks = [];

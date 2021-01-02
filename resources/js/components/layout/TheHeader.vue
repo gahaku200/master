@@ -25,14 +25,16 @@
               </svg>
               <drawer @close="toggle" :align="align" :closeable="true" :mask-closable="true">
                 <ul class="sideMenu" v-if="open">
-                  <p @click="goSchedule()">勤務予定表</p>
-                  <p>勤務実績表</p>
+                  <p @click="showUser()">ユーザー情報</p>
+                  <p @click="goResultOfAttendance()">勤務実績表</p>
                   <p>タスク実績表</p>
                   <p>給与計算</p>
-                  <a class="logout" id="header-nav__logout" @click="logout()">ログアウト</a>
-                  <form id="logout-form" action="/logout" method="POST" style="display: none;">
-                    <input type="hidden" name="_token" :value="csrf" />
-                  </form>
+                  <p>
+                    <a class="logout" id="header-nav__logout" @click="logout()">ログアウト</a>
+                    <form id="logout-form" action="/logout" method="POST" style="display: none;">
+                      <input type="hidden" name="_token" :value="csrf" />
+                    </form>
+                  </p>
                   <p v-if="auth.group_id === null" @click="goCreateGroup()">グループ作成</p>
                   <p v-if="auth.is_admin === '1'" @click="goInviteMember()">メンバー招待</p>
                   <p v-if="auth.is_admin === '1'" @click="goGroupMember()">メンバー情報</p>
@@ -89,8 +91,12 @@ export default {
     axios.get('/groups').then(response => this.groups = response.data) 
    },
   methods: {
-    goSchedule() {
-      this.$router.push("/schedule");
+    goResultOfAttendance() {
+      this.$router.push("/resultOfAttendance");
+      this.open = !this.open
+    },
+    showUser() {
+      this.$router.push("/showUser");
       this.open = !this.open
     },
     goCreateGroup() {
