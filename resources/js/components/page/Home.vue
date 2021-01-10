@@ -184,10 +184,10 @@ export default {
       }).catch( error => { console.log(error); })
 
     if (group_id != '') {
-      //this.getGroupInfo(authId, group_id);
+      this.getGroupInfo(authId, group_id);
       setInterval(() => {
       this.getGroupInfo(authId, group_id);
-      }, 5000);
+      }, 1000);
     }
    },
   methods: {
@@ -196,18 +196,12 @@ export default {
         .then(res =>  {
           this.users = [];
           res.data.forEach((user) => {
-            if (user.now_task_start == null) {
-              var d2 = 0;
-            } else {
-              var d2 = new Date(user.now_task_start).getTime();
-            }
-
             if (user.id == authId) {
               this.taskLabel = user.now_task;
-              this.doingTime = this.passingTime(d2);
-              this.passingTask(d2);
+              this.doingTime = this.passingTime(user.now_task_start);
+              this.passingTask(user.now_task_start);
             } else {
-              this.users.push({name: user.name, task: user.now_task, time: this.passingTime(d2)});
+              this.users.push({name: user.name, task: user.now_task, time: this.passingTime(user.now_task_start)});
             }
           })
         }).catch( error => { console.log(error); })
@@ -247,20 +241,22 @@ export default {
         this.selected = 'initial';
       }
     },
-    passingTime(d2) {
-      if (d2 == 0) {
-        return null;
+    passingTime(now_task_start) {
+      if (now_task_start == null) {
+        return now_task_start;
       }
-      var d1 = new Date();
-      var diffTime = d1.getTime() - d2;
+      var d1 = new Date().getTime();
+      var d2 = new Date(now_task_start).getTime();
+      var diffTime = d1 - d2;
       return this.convertTime(Math.floor(diffTime / 1000));
     },
-    passingTask(d2) {
-      if (d2 == 0) {
-        return null;
+    passingTask(now_task_start) {
+      if (now_task_start == null) {
+        return now_task_start;
       }
-      var d1 = new Date();
-      var diffTime = d1.getTime() - d2;
+      var d1 = new Date().getTime();
+      var d2 = new Date(now_task_start).getTime();
+      var diffTime = d1 - d2;
       this.taskTime = Math.floor(diffTime / 1000);
     },
     attendance() {

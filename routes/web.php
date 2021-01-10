@@ -44,6 +44,9 @@ Route::get('/kindOfTasks', function () {
 Route::get('/showUser', function () {
   return view('index');
 });
+Route::get('/attendanceDetail', function () {
+  return view('index');
+});
 
 Route::post('/register', 'Auth\RegisterController@register');
 Route::post('/login', 'Auth\LoginController@login');

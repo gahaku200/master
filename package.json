@@ -1,8 +1,13 @@
 {
-  "name": "vue_hello",
+  "name": "laravel_vue_attendance",
   "version": "1.0.0",
-  "description": "",
+  "description": "<p align=\"center\"><img src=\"https://res.cloudinary.com/dtfbvvkyp/image/upload/v1566331377/laravel-logolockup-cmyk-red.svg\" width=\"400\"></p>",
+  "main": "webpack.mix.js",
+  "directories": {
+    "test": "tests"
+  },
   "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "npm run development",
     "development": "cross-env NODE_ENV=development node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
     "watch": "npm run development -- --watch",
@@ -10,29 +15,32 @@
     "prod": "npm run production",
     "production": "cross-env NODE_ENV=production node_modules/webpack/bin/webpack.js --no-progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js"
   },
-  "keywords": [],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gahaku200/laravel_vue_attendance.git"
+  },
   "author": "",
   "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/gahaku200/laravel_vue_attendance/issues"
+  },
+  "homepage": "https://github.com/gahaku200/laravel_vue_attendance#readme",
   "devDependencies": {
-    "axios": "^0.20.0",
-    "browser-sync": "^2.26.12",
+    "browser-sync": "^2.26.13",
     "browser-sync-webpack-plugin": "^2.0.1",
-    "cross-env": "^7.0.2",
-    "laravel-mix": "^4.1.2",
-    "node-sass": "^4.14.1",
+    "cross-env": "^7.0.3",
+    "laravel-mix": "^4.1.4",
     "resolve-url-loader": "^3.1.0",
-    "sass": "^1.26.11",
     "sass-loader": "^7.3.1",
-    "vee-validate": "^3.4.3",
+    "v-calendar": "^2.1.6",
+    "vee-validate": "^3.4.5",
     "vue": "^2.6.12",
-    "vue-router": "^3.4.3",
+    "vue-router": "^3.4.9",
+    "vue-select": "^3.11.2",
+    "vue-simple-drawer": "^1.0.6",
     "vue-template-compiler": "^2.6.12"
   },
   "dependencies": {
-    "bootstrap": "^4.5.3",
-    "bootstrap-vue": "^2.18.0",
-    "moment": "^2.29.1",
-    "vue-select": "^3.10.8",
-    "vue-simple-drawer": "^1.0.6"
+    "node-sass": "^4.14.1"
   }
 }

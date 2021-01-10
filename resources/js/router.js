@@ -4,15 +4,16 @@ import Home from './components/page/Home'
 import ResultOfAttendance from './components/page/ResultOfAttendance'
 import Register from './components/page/Register'
 import Login from './components/page/Login'
-import Group from './components/page/CreateGroup'
-import InviteMember from './components/page/InviteMember'
+import Group from './components/admin/CreateGroup'
+import InviteMember from './components/admin/InviteMember'
 import AlreadyJoinGroup from './components/mail/AlreadyJoinGroup'
 import NotInviteData from './components/mail/NotInviteData'
 import SuccessInvite from './components/mail/SuccessInvite'
 import SuccessSendEmail from './components/mail/SuccessSendEmail'
-import GroupMember from './components/page/GroupMember'
-import KindOfTasks from './components/page/KindOfTasks'
+import GroupMember from './components/admin/GroupMember'
+import KindOfTasks from './components/admin/KindOfTasks'
 import ShowUser from './components/page/ShowUser'
+import AttendanceDetail from './components/page/AttendanceDetail'
 
 Vue.use(Router)
 
@@ -83,6 +84,11 @@ const router = new Router({
       path: '/showUser',
       name: 'showUser',
       component: ShowUser
+    },
+    {
+      path: '/attendanceDetail',
+      name: 'attendanceDetail',
+      component: AttendanceDetail
     },
   ]
 })

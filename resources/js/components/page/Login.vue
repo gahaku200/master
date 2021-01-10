@@ -1,6 +1,6 @@
 <template>
   <div>
-    <main>
+    <main style="margin-top: 0px">
       <div class="container">
         <div class="row">
           <div class="col-md-3"></div>

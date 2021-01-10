@@ -121,88 +121,52 @@ main .container .row .panel .panel-body .form-horizontal .form-group-register {
   }
 }
 
-.userGroupName {
-  display: flex;
-  justify-content: flex-end;
+.rowRow .headerLeft h2 {
+  cursor: pointer;
 }
 
-.userGroupName h5 {
-  align-self: flex-end;
+.rowRow .login .loginSelected {
+  margin: auto;
+  text-align: center;
 }
 
-.login {
-  align-self: center;
+.rowRow .login .loginSelected .userLoginSelected {
+  padding: 2px;
+  color: #fff !important;
+  box-sizing: border-box;
+  transition: all .3s;
 }
 
-.login .loginSelected {
-  display: flex;
-  float: right;
-  margin-bottom: 0;
+.rowRow .login .loginSelected .userLoginSelected:hover {
+  background-color: transparent;
+  border: 2px solid #998bfa;
+  color: #998bfa !important;
+  border-radius: 30px;
 }
 
-.login .loginSelected .authName {
-  align-self: center;
-  margin-right: 10px;
+.rowRow .login .loginSelected li {
   list-style: none;
 }
 
-.login .loginSelected a {
-  text-decoration: none !important;
-  color: #ffffff !important;
+.rowRow .login .bi-list {
   margin-left: 10px;
-}
-
-.login .loginSelected .bi-list {
   font-size: x-large;
   cursor: pointer;
   border: solid 3px #6091d3;
   border-radius: 10px;
 }
 
-.login .loginSelected .sideMenu {
-  padding-left: 0;
+.rowRow .login .sideMenu {
+  padding: initial;
 }
 
-.login .loginSelected .sideMenu p {
+.rowRow .login .sideMenu a {
+  color: #ffffff !important;
+  text-decoration: none !important;
+}
+
+.rowRow .login .sideMenu p {
   cursor: pointer;
-}
-
-.login .loginSelected .sideMenu a {
-  cursor: pointer;
-  margin: auto;
-}
-
-.ready {
-  position: relative;
-}
-
-.ready .fade-enter-active,
-.ready .fade-leave-active {
-  transition: opacity .5s;
-}
-
-.ready .fade-enter,
-.ready .fade-leave-to {
-  opacity: 0;
-}
-
-.ready .menu {
-  position: absolute;
-  right: 0;
-  top: 0px;
-  color: black;
-  background-color: white;
-}
-
-.ready .menu p {
-  text-align: center;
-  margin: 5px 0px 5px;
-  cursor: pointer;
-  border-bottom: aliceblue;
-}
-
-.ready .menu :hover {
-  background-color: #ffc9d7;
 }
 
 .formCheckbox {
@@ -220,5 +184,20 @@ main .container .row .panel .panel-body .form-horizontal .form-group-register {
 
 .forgetPass a {
   text-decoration: none;
+}
+
+.weekdays {
+  color: black;
+  cursor: pointer;
+}
+
+.saturday {
+  color: blue;
+  cursor: pointer;
+}
+
+.sunday {
+  color: red;
+  cursor: pointer;
 }
 

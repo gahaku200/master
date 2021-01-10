@@ -20,8 +20,8 @@
             <td>
               <button v-if="task.orderNum != tasks.length" @click="up(task.id)" type="button" class="btn btn-outline-primary">↓</button>
               <button v-if="task.orderNum != 1" @click="down(task.id)" type="button" class="btn btn-outline-primary">↑</button>
-              <button @click="edit(task.id, task.taskName)" type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#exampleModal">編集する</button>
-              <button @click="deleteT(task.id, task.taskName)" type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#exampleModal2">削除する</button>
+              <button @click="edit(task.id, task.taskName)" type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#exampleModal">編集</button>
+              <button @click="deleteT(task.id, task.taskName)" type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#exampleModal2">削除</button>
             </td>
           </li>
         </ul>
@@ -136,7 +136,6 @@ export default {
         })
       })
       .catch( error => { console.log(error); });
-      //this.$router.go({path: this.$router.currentRoute.path, force: true})
     },
     up(id) {
       this.taskId = id;

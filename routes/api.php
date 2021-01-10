@@ -39,6 +39,12 @@ Route::group(['middleware' => 'api'],function(){
         $user = App\User::find($id);
         return $user;
     });
+    Route::post('/attendanceTheDay/{id}',function($id){
+        
+        return request('day');
+    });
+    Route::get('/from_day/{id}/{time}', 'Api\AttendanceController@from_day');
+    Route::get('/to_day/{id}/{time}', 'Api\AttendanceController@to_day');
 
     Route::post('/taskStart/{id}',function($id){
         $user = App\User::where('id',$id)->first();
@@ -171,4 +177,10 @@ Route::group(['middleware' => 'api'],function(){
         }
     });
     Route::post('/userAttendance/{id}', 'Api\AttendanceController@getDayAttendance');
+    Route::post('/attendanceDetail/update/{id}',function($id){
+        $attendance = App\Attendance::find($id);
+        $attendance->time = request('time');
+        $attendance->note = request('note');
+        $attendance->save();
+    });
 });

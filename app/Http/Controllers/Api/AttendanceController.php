@@ -21,6 +21,36 @@ class AttendanceController extends Controller
 
       return $attendance;
     }
+    public function from_day($id, $time)
+    {
+      $attendance = User::find($id)->attendance()
+        ->where('time' , '<', $time)
+        ->latest('time')->get();
+
+      if ($attendance->count() == 0) {
+        return 'noData';
+      } else {
+        $attendance = User::find($id)->attendance()
+          ->where('time' , '<', $time)
+          ->latest('time')->first()->time;
+        return $attendance;
+      }
+    }
+    public function to_day($id, $time)
+    {
+      $attendance = User::find($id)->attendance()
+        ->where('time' , '>', $time)
+        ->orderBy('time', 'asc')->get();
+
+      if ($attendance->count() == 0) {
+        return 'noData';
+      } else {
+        $attendance = User::find($id)->attendance()
+          ->where('time' , '>', $time)
+          ->orderBy('time', 'asc')->first()->time;
+        return $attendance;
+      }
+    }
     public function getDayAttendance($id, Request $request)
     {
       $query = User::find($id)->attendance()

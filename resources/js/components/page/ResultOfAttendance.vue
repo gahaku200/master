@@ -1,13 +1,15 @@
 <template>
   <div>
-    <p>Schedule</p>
-    <p>goodGuys!!</p>
     <span class="btn-modal-close" @click="close($event)"></span>
 
-    <div class="calendar-title">
-      <span class="btn-monthMove prev fa fa-angle-left" @click="movePrevMonth()">＜</span>
-      {{currentYear+"/"+currentMonth}}
-      <span class="btn-monthMove next fa fa-angle-right" @click="moveNextMonth()">＞</span>
+    <div class="calendar-title" style="display: flex; justify-content: center">
+      <span class="btn-monthMove prev fa fa-angle-left" style="padding-top: 12px">
+        <button @click="movePrevMonth()" type="button" class="btn btn-outline-primary">＜</button>
+      </span>
+      <h2 style="padding: 10px">{{currentYear+"/"+currentMonth}}</h2>
+      <span class="btn-monthMove next fa fa-angle-right" style="padding-top: 12px">
+        <button @click="moveNextMonth()" type="button" class="btn btn-outline-primary">＞</button>
+      </span>
     </div>
 
     <table class="table">
@@ -23,9 +25,21 @@
       </thead>
       <tbody>
         <tr v-for="record in calendar">
-          <th v-if="record.day !== '土'　&& record.day !== '日'" scope="row">{{ record.date }}({{ record.day }})</th>
-          <th v-if="record.day === '土'" style="color: blue" scope="row">{{ record.date }}({{ record.day }})</th>
-          <th v-if="record.day === '日'" style="color: red" scope="row">{{ record.date }}({{ record.day }})</th>
+          <th v-if="record.day !== '土'　&& record.day !== '日'" scope="row">
+            <router-link class="weekdays" :to="{name:'attendanceDetail',params:{theDay: record.theDay, nextDay: record.nextDay}}">
+              {{ record.date }}({{ record.day }})
+            </router-link>
+          </th>
+          <th v-if="record.day === '土'" scope="row">
+            <router-link class="saturday" :to="{name:'attendanceDetail',params:{theDay: record.theDay, nextDay: record.nextDay}}">
+              {{ record.date }}({{ record.day }})
+            </router-link>
+          </th>
+          <th v-if="record.day === '日'" scope="row">
+            <router-link class="sunday" :to="{name:'attendanceDetail',params:{theDay: record.theDay, nextDay: record.nextDay}}">
+              {{ record.date }}({{ record.day }})
+            </router-link>
+          </th>
           <td>{{record.time}}</td>
           <td>{{record.overtime}}</td>
           <td>{{record.midnightTime}}</td>
@@ -43,8 +57,6 @@
 export default {
   data() {
     return {
-      today:"",
-      selectedDay:"",
       currentYear:0,
       currentMonth:0,
       currentDate:0,
@@ -58,8 +70,6 @@ export default {
   created(){
     const date  = new Date();
     [this.currentYear,  this.currentMonth, this.currentDate] = [date.getFullYear(), date.getMonth() + 1, date.getDate()];
-    this.today = this.selectedDay = `${this.currentYear}-${('0' + this.currentMonth).slice(-2)}-${this.currentDate}`;
-  
   },
   mounted() {
     var id = document.querySelector("meta[name='user-id']").getAttribute('content');
@@ -69,11 +79,6 @@ export default {
     this.calendarMaker();
    },
   methods:{
-    chekcSelectedDay(day){
-      return{
-        'selectedDay':`${this.currentYear}-${('0' + this.currentMonth).slice(-2)}-${('0' + day).slice(-2)}` == this.selectedDay
-      }
-    },
     movePrevMonth(){
       this.currentMonth = this.currentMonth != 1 ? this.currentMonth - 1 : 12;
       this.currentYear = this.currentMonth != 12 ? this.currentYear : this.currentYear - 1;
@@ -93,12 +98,11 @@ export default {
       const toDay = new Date(this.currentYear, this.currentMonth, 1);
       this.performances = [];
       const data = {
-      day: theDay,
-      to_day: toDay
+        day: theDay,
+        to_day: toDay
       }
       axios.post('/api/userAttendance/' + authId, data)
         .then(res =>  {
-          //console.log(res.data);
           if (res.data != 'noData') {
             res.data.forEach((attendance) => {
               this.performances.push({on_duty: attendance.on_duty, time: attendance.time});
@@ -132,35 +136,6 @@ export default {
               }
             })
 
-            console.log(i);
-            if(array.length != 0) {
-              var timetime = Date.parse(array[0].time);
-              //console.log(array[0].time);
-            }
-            console.log(array);
-
-            /*
-            ☆一日のデータの時間抽出
-            ・出勤→休入、退勤
-            ・休入→休出
-            ・休出→休入、退勤
-            ・退勤→出勤
-            □変数
-            ・time
-            ・overtime
-            ・midnightTime
-            ・midnightOvertime
-            ・restTime
-            ・X(AM5:00) am5.getTime()
-            ・Y(PM22:00) pm10.getTime()
-            ・past(前のデータ) array[x - 1].time 比較 Date.parse(array[x - 1].time)
-            ・now(今のデータ) array[x].time 比較 Date.parse(array[x].time)
-            */
-
-            //const am5 = new Date(this.currentYear, this.currentMonth - 1, i, 5).getTime();
-            //const pm10 = new Date(this.currentYear, this.currentMonth - 1, i, 22).getTime();
-            //console.log(am5);
-            //console.log(pm10);
             var time = 0;
             var overtime = 0;
             var midnightTime = 0
@@ -176,24 +151,18 @@ export default {
                 var am5 = new Date(this.currentYear, this.currentMonth - 1, i, 5).getTime();
                 var pm10 = new Date(this.currentYear, this.currentMonth - 1, i, 22).getTime();
                 var loopTime = Math.floor((nowData - today.getTime()) / (24 * 60 * 60 * 1000));
-                //console.log(loopTime);
-                //console.log(pastData - hours8);
-                //console.log(array[x].time.getDate());
 
                 if (array[x - 1].on_duty == '出勤' || array[x - 1].on_duty == '休出') {
                   if (pastData <= am5) {
                     if (nowData <= am5) {
                       if (time + midnightTime < hours8) {
                         midnightTime += nowData - pastData;
-                        //console.log(midnightTime);
                         if (time + midnightTime >= hours8) {
                           midnightOvertime += time + midnightTime - hours8;
                           midnightTime -= time + midnightTime - hours8;
-                          //console.log(9090);
                         }
                       } else {
                         midnightOvertime += nowData - pastData;
-                        //console.log(9090);
                       }
                     } else if(nowData > am5 && nowData <= pm10) {
                       if (time + midnightTime < hours8) {
@@ -201,7 +170,6 @@ export default {
                         if (time + midnightTime >= hours8) {
                           midnightOvertime += time + midnightTime - hours8;
                           midnightTime -= time + midnightTime - hours8;
-                          //console.log(9090);
                         }
                         time += nowData - am5;
                         if (time + midnightTime >= hours8) {
@@ -219,7 +187,6 @@ export default {
                           if (time + midnightTime > hours8) {
                             midnightOvertime += time + midnightTime - hours8;
                             midnightTime -= time + midnightTime - hours8;
-                            //console.log(9090);
                           }
                           time += 61200000;
                           if (time + midnightTime >= hours8) {
@@ -256,7 +223,7 @@ export default {
                       }
                     }
                   } else if (pastData > pm10) {
-                    if (nowData < today + hours24) {
+                    if (nowData < today.getTime() + hours24) {
                       if (time + midnightTime < hours8) {
                         midnightTime += nowData - pastData;
                         if (time + midnightTime >= hours8) {
@@ -267,7 +234,7 @@ export default {
                         midnightOvertime += nowData - pastData;
                       }
                     } else {
-                      midnightTime += 7200000;
+                      midnightTime += (today.getTime() + hours24 - pastData);
                       if (time + midnightTime >= hours8) {
                         midnightOvertime += time + midnightTime - hours8;
                         midnightTime -= time + midnightTime - hours8;
@@ -394,7 +361,21 @@ export default {
                 }
               }
             }
-            this.calendar.push({date: date, day: day, time: this.convertTime(Math.floor(time / 1000)), overtime: this.convertTime(Math.floor(overtime / 1000)), midnightTime: this.convertTime(Math.floor(midnightTime / 1000)), midnightOvertime: this.convertTime(Math.floor(midnightOvertime / 1000)), restTime: this.convertTime(Math.floor(restTime / 1000))});
+
+            var params1 = this.currentYear + ',' + this.currentMonth + ',' + i;
+            var plusOne = i + 1;
+            var params2 = this.currentYear + ',' + this.currentMonth + ',' + plusOne;
+            this.calendar.push({
+              date: date,
+              day: day,
+              time: this.convertTime(Math.floor(time / 1000)),
+              overtime: this.convertTime(Math.floor(overtime / 1000)),
+              midnightTime: this.convertTime(Math.floor(midnightTime / 1000)),
+              midnightOvertime: this.convertTime(Math.floor(midnightOvertime / 1000)),
+              restTime: this.convertTime(Math.floor(restTime / 1000)),
+              theDay: params1,
+              nextDay: params2,
+              });
           }
         }).catch( error => { console.log(error); })
     },
@@ -418,16 +399,6 @@ export default {
       return passTime;
     },
   },
-  computed:{
-    calendarMake(){
-      const firstday = new Date(this.currentYear, this.currentMonth - 1, 1).getDay();
-      const lastdate = new Date(this.currentYear, this.currentMonth, 0).getDate();
-      const necessarySpace = firstday == 0 ? 6 : firstday - 1;
-      const list = [[...Array(necessarySpace)].map(i=>" "), [...Array(lastdate)].map((_, i) => i+1)];
-      const week = list.reduce((pre,current) => {pre.push(...current);return pre},[]);
-      return week;
-    },
-  }
 };
 </script>
 
