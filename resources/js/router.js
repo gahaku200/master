@@ -14,6 +14,10 @@ import GroupMember from './components/admin/GroupMember'
 import KindOfTasks from './components/admin/KindOfTasks'
 import ShowUser from './components/page/ShowUser'
 import AttendanceDetail from './components/page/AttendanceDetail'
+import TaskDetail from './components/page/TaskDetail'
+import MemberAttendance from './components/admin/MemberAttendance'
+import MemberAttendanceDetail from './components/admin/MemberAttendanceDetail'
+import MemberTask from './components/admin/MemberTask'
 
 Vue.use(Router)
 
@@ -89,6 +93,26 @@ const router = new Router({
       path: '/attendanceDetail',
       name: 'attendanceDetail',
       component: AttendanceDetail
+    },
+    {
+      path: '/taskDetail',
+      name: 'taskDetail',
+      component: TaskDetail
+    },
+    {
+      path: '/memberAttendance',
+      name: 'memberAttendance',
+      component: MemberAttendance
+    },
+    {
+      path: '/memberAttendanceDetail',
+      name: 'memberAttendanceDetail',
+      component: MemberAttendanceDetail
+    },
+    {
+      path: '/memberTask',
+      name: 'memberTask',
+      component: MemberTask
     },
   ]
 })

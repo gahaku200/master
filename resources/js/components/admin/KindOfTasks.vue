@@ -1,15 +1,18 @@
 <template>
   <div>
-    <p>KindOfTasks</p>
+    <div style="text-align: center;" class="theTitle">
+      <h3 style="padding: 10px;">タスク種類</h3>
+    </div>
     <form　class="form-group" ref="observer" action="/kindOfTask" id="kindOfTask" method="post" tag="form">
       <input type="hidden" name="_token" :value="csrf" />
-      <div class="input-group mb-3">
-        <span class="input-group-text" id="inputGroup-sizing-default">追加するタスクの名前</span>
-        <div name="kindOfTask">
-          <input v-model="taskName" name="task" type="task" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" />
+      <div class="col-lg-4"></div>
+      <div class="col-lg-4">
+        <div class="input-group mb-3">
+          <input v-model="taskName" name="task" type="task" class="form-control" placeholder="追加するタスクの名前" aria-label="追加するタスクの名前" aria-describedby="inputGroup-sizing-default" />
+          <button @click="createTask()" type="button" class="btn btn-primary">+</button>
         </div>
-        <button @click="createTask()" type="button" class="btn btn-primary">+</button>
       </div>
+      <div class="col-lg-4"></div>
     </form>
     <div class="row">
       <div class="col-lg-3"></div>
@@ -71,7 +74,9 @@
       <div class="col-lg-3"></div>
     </div>
 
-    <button @click.stop.prevent="goHome()">戻る</button>
+    <div style="text-align:center; padding-top: 20px;" class="homeButton">
+      <button @click.stop.prevent="goHome()" type="button" class="btn btn-outline-info">ホームへ戻る</button>
+    </div>
   </div>
 </template>
 

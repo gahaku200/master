@@ -25,7 +25,7 @@
               </li>
             </ul>
           </div>
-          <div style="align-self: center">
+          <div v-if="auth.length !== 0" style="align-self: center">
             <svg @click="toggle()" width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-list" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
               <path fill-rule="evenodd" d="M2.5 11.5A.5.5 0 0 1 3 11h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4A.5.5 0 0 1 3 7h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4A.5.5 0 0 1 3 3h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/>
             </svg>
@@ -33,18 +33,17 @@
               <ul class="sideMenu" v-if="open">
                 <p @click="showUser()">ユーザー情報</p>
                 <p @click="goResultOfAttendance()">勤務実績表</p>
-                <p>タスク実績表</p>
-                <p>給与計算</p>
+                <p @click="goTaskDetail()">タスク実績表</p>
+                <p v-if="auth.group_id === null" @click="goCreateGroup()">グループ作成</p>
+                <p v-if="auth.is_admin === '1'" @click="goInviteMember()">メンバー招待</p>
+                <p v-if="auth.is_admin === '1'" @click="goGroupMember()">メンバー情報</p>
+                <p v-if="auth.is_admin === '1'" @click="goKindOfTasks()">タスク種類</p>
                 <p>
                   <a class="logout" id="header-nav__logout" @click="logout()">ログアウト</a>
                   <form id="logout-form" action="/logout" method="POST" style="display: none;">
                     <input type="hidden" name="_token" :value="csrf" />
                   </form>
                 </p>
-                <p v-if="auth.group_id === null" @click="goCreateGroup()">グループ作成</p>
-                <p v-if="auth.is_admin === '1'" @click="goInviteMember()">メンバー招待</p>
-                <p v-if="auth.is_admin === '1'" @click="goGroupMember()">メンバー情報</p>
-                <p v-if="auth.is_admin === '1'" @click="goKindOfTasks()">タスク種類</p>
               </ul>
             </drawer>
           </div>
@@ -108,6 +107,10 @@ export default {
     },
     goKindOfTasks() {
       this.$router.push("/kindOfTasks");
+      this.open = !this.open
+    },
+    goTaskDetail() {
+      this.$router.push("/taskDetail");
       this.open = !this.open
     },
     active() {  

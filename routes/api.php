@@ -183,4 +183,5 @@ Route::group(['middleware' => 'api'],function(){
         $attendance->note = request('note');
         $attendance->save();
     });
+    Route::post('/taskDetail/{id}', 'Api\TaskController@confirmDetail');
 });

@@ -1,19 +1,20 @@
 <template>
   <div>
-    {{users.name}}
-    <p>InviteMember</p>
-    <p>Hey!!InviteMember!!</p>
+    <div style="text-align: center;" class="inviteMemberTitle">
+      <h3 style="padding: 10px;">メンバー招待</h3>
+    </div>
     
     <form　class="form-group" ref="observer" action="/invite" id="inviteMember" method="post" tag="form">
       <input type="hidden" name="_token" :value="csrf" />
-      <div class="input-group mb-3">
-        <span class="input-group-text" id="inputGroup-sizing-default">招待するユーザーのメールアドレスを入力</span>
-        <div name="memberAddress">
-          <input v-model="memberEmail" name="memberEmail" type="email" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" />
+      <div class="col-lg-3"></div>
+      <div class="col-lg-6">
+        <div class="input-group input-group-lg">
+          <input v-model="memberEmail" name="memberEmail" type="text" class="form-control" placeholder="招待するユーザーのメールアドレスを入力" aria-label="招待するユーザーのメールアドレスを入力" aria-describedby="button-addon2">
+          <button v-if="!button" type="button" class="btn btn-primary" disabled>招待</button>
+          <button v-if="button" type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">招待</button>
         </div>
       </div>
-      <button v-if="!button" type="button" class="btn btn-primary" disabled>招待</button>
-      <button v-if="button" type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">招待</button>
+      <div class="col-lg-3"></div>
 
       <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -35,12 +36,14 @@
         </div>
       </div>
     </form>
-    <div v-model="isOKmessage">
-      <p v-if="isOK">グループに招待出来ます</p>
-      <p v-if="alreadyG">既にグループに所属しています</p>
-      <p v-if="!isOK && memberEmail.length > 0 && !alreadyG">現在入力しているメールアドレスは登録しているユーザーと一致しません</p>
+    <div v-model="isOKmessage" style="text-align: center; padding-top: 20px; color: red;">
+      <h5 v-if="isOK">グループに招待出来ます</h5>
+      <h5 v-if="alreadyG">既にグループに所属しています</h5>
+      <h5 v-if="!isOK && memberEmail.length > 0 && !alreadyG">現在入力しているメールアドレスは登録しているユーザーと一致しません</h5>
     </div>
-    <button @click.stop.prevent="goHome()">戻る</button>
+    <div style="text-align:center; padding-top: 20px;" class="homeButton">
+      <button @click.stop.prevent="goHome()" type="button" class="btn btn-outline-info">ホームへ戻る</button>
+    </div>
   </div>
 </template>
 

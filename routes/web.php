@@ -47,6 +47,18 @@ Route::get('/showUser', function () {
 Route::get('/attendanceDetail', function () {
   return view('index');
 });
+Route::get('/taskDetail', function () {
+  return view('index');
+});
+Route::get('/memberAttendance', function () {
+  return view('index');
+});
+Route::get('/memberAttendanceDetail', function () {
+  return view('index');
+});
+Route::get('/memberTask', function () {
+  return view('index');
+});
 
 Route::post('/register', 'Auth\RegisterController@register');
 Route::post('/login', 'Auth\LoginController@login');

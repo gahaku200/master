@@ -1,12 +1,12 @@
 <template>
   <div>
-    <div style="text-align: center;" class="attendanceDetailTitle">
-      <h3 style="padding-top: 10px;">勤務詳細</h3>
+    <div style="text-align: center;" class="ResultOfAttendanceTitle">
+      <h3 style="padding-top: 10px;">{{ userName }}さんの勤務実績表</h3>
     </div>
-    <h2 style="text-align: center">{{detailDate}}(
-      <nobr v-if="detailDay !== '土'　&& detailDay !== '日'">{{detailDay}}</nobr>
-      <nobr v-if="detailDay === '土'" style="color: blue">{{detailDay}}</nobr>
-      <nobr v-if="detailDay === '日'" style="color: red">{{detailDay}}</nobr>
+    <h2 style="text-align: center">{{ detailDate }}(
+      <nobr v-if="detailDay !== '土'　&& detailDay !== '日'">{{ detailDay }}</nobr>
+      <nobr v-if="detailDay === '土'" style="color: blue">{{ detailDay }}</nobr>
+      <nobr v-if="detailDay === '日'" style="color: red">{{ detailDay }}</nobr>
     )</h2>
     <div class="container">
       <div class="row">
@@ -123,6 +123,8 @@ Vue.use(VCalendar);
 export default {
   data() {
     return {
+      id: this.$route.params.id,
+      userName: this.$route.params.name,
       detailDate:'',
       detailDay:'',
       weeks:["日","月","火","水","木","金","土"],
@@ -244,7 +246,7 @@ export default {
       this.detailDate = theDay.getFullYear() + '/' + theMonth  + '/' + theDay.getDate();
       this.detailDay = this.weeks[theDay.getDay()];
 
-      var authId = document.querySelector("meta[name='user-id']").getAttribute('content');
+      var authId = this.$route.params.id;
       var performances = [];
       const data = {
         day: theDay,

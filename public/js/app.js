@@ -1909,6 +1909,14 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 Object(vee_validate__WEBPACK_IMPORTED_MODULE_1__["extend"])("required", _objectSpread(_objectSpread({}, vee_validate_dist_rules__WEBPACK_IMPORTED_MODULE_2__["required"]), {}, {
@@ -1988,6 +1996,36 @@ function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -2115,6 +2153,9 @@ function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
+//
+//
+//
 //
 //
 //
@@ -2330,6 +2371,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 //
 //
 //
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -2459,6 +2505,1445 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
 /***/ }),
 
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/admin/MemberAttendance.vue?vue&type=script&lang=js&":
+/*!*********************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/admin/MemberAttendance.vue?vue&type=script&lang=js& ***!
+  \*********************************************************************************************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+/* harmony default export */ __webpack_exports__["default"] = ({
+  data: function data() {
+    return {
+      id: this.$route.params.id,
+      userName: this.$route.params.name,
+      currentYear: 0,
+      currentMonth: 0,
+      currentDate: 0,
+      weeks: ["日", "月", "火", "水", "木", "金", "土"],
+      calendar: [],
+      performances: [],
+      holidays: [],
+      lastArray: ''
+    };
+  },
+  created: function created() {
+    var date = new Date();
+    var _ref = [date.getFullYear(), date.getMonth() + 1, date.getDate()];
+    this.currentYear = _ref[0];
+    this.currentMonth = _ref[1];
+    this.currentDate = _ref[2];
+  },
+  mounted: function mounted() {
+    var id = this.$route.params.id;
+
+    if (id == null) {
+      this.$router.push("/groupMember");
+    }
+
+    this.calendarMaker();
+  },
+  methods: {
+    movePrevMonth: function movePrevMonth() {
+      this.currentMonth = this.currentMonth != 1 ? this.currentMonth - 1 : 12;
+      this.currentYear = this.currentMonth != 12 ? this.currentYear : this.currentYear - 1;
+      this.calendarMaker();
+    },
+    moveNextMonth: function moveNextMonth() {
+      this.currentMonth = this.currentMonth != 12 ? this.currentMonth + 1 : 1;
+      this.currentYear = this.currentMonth != 1 ? this.currentYear : this.currentYear + 1;
+      this.calendarMaker();
+    },
+    goHome: function goHome() {
+      this.$router.push("/");
+    },
+    calendarMaker: function calendarMaker() {
+      var _this = this;
+
+      var authId = this.$route.params.id;
+      var theDay = new Date(this.currentYear, this.currentMonth - 1, 1);
+      var toDay = new Date(this.currentYear, this.currentMonth, 1);
+      this.performances = [];
+      var data = {
+        day: theDay,
+        to_day: toDay
+      };
+      axios.post('/api/userAttendance/' + authId, data).then(function (res) {
+        if (res.data != 'noData') {
+          res.data.forEach(function (attendance) {
+            _this.performances.push({
+              on_duty: attendance.on_duty,
+              time: attendance.time
+            });
+          });
+        }
+
+        _this.calendar = [];
+        var lastdate = new Date(_this.currentYear, _this.currentMonth, 0).getDate();
+
+        var _loop = function _loop(i) {
+          var today = new Date(_this.currentYear, _this.currentMonth - 1, i);
+          var nextDay = new Date(_this.currentYear, _this.currentMonth - 1, i + 1);
+          var date = today.getDate();
+
+          if (date < 10) {
+            date = '0' + date;
+          }
+
+          var day = _this.weeks[today.getDay()];
+
+          array = [];
+
+          _this.performances.forEach(function (performance) {
+            if (array.length == 0 && performance.on_duty == '出勤' && Date.parse(performance.time) >= today && Date.parse(performance.time) < nextDay) {
+              array.push(performance);
+              _this.lastArray = performance.on_duty;
+            } else if (array.length != 0 && Date.parse(performance.time) >= today && Date.parse(performance.time) < nextDay) {
+              array.push(performance);
+              _this.lastArray = performance.on_duty;
+            } else if (array.length != 0 && _this.lastArray == '退勤' && Date.parse(performance.time) >= nextDay) {
+              return true;
+            } else if (array.length != 0 && _this.lastArray != '退勤' && Date.parse(performance.time) >= nextDay) {
+              array.push(performance);
+              _this.lastArray = performance.on_duty;
+            }
+          });
+
+          time = 0;
+          overtime = 0;
+          midnightTime = 0;
+          midnightOvertime = 0;
+          restTime = 0;
+          var hours8 = 28800000;
+          var hours24 = 86400000;
+
+          if (array.length != 0) {
+            for (var x = 1; x < array.length; x++) {
+              pastData = Date.parse(array[x - 1].time);
+              nowData = Date.parse(array[x].time);
+              am5 = new Date(_this.currentYear, _this.currentMonth - 1, i, 5).getTime();
+              pm10 = new Date(_this.currentYear, _this.currentMonth - 1, i, 22).getTime();
+              loopTime = Math.floor((nowData - today.getTime()) / (24 * 60 * 60 * 1000));
+
+              if (array[x - 1].on_duty == '出勤' || array[x - 1].on_duty == '休出') {
+                resultArray = _this.detailCalc(today, time, overtime, midnightTime, midnightOvertime, hours8, hours24, pastData, nowData, am5, pm10, loopTime);
+                time = resultArray[0];
+                overtime = resultArray[1];
+                midnightTime = resultArray[2];
+                midnightOvertime = resultArray[3];
+              } else if (array[x - 1].on_duty == '休入') {
+                restTime += nowData - pastData;
+              }
+            }
+          }
+
+          params1 = _this.currentYear + ',' + _this.currentMonth + ',' + i;
+          plusOne = i + 1;
+          params2 = _this.currentYear + ',' + _this.currentMonth + ',' + plusOne;
+
+          _this.calendar.push({
+            date: date,
+            day: day,
+            time: _this.convertTime(Math.floor(time / 1000)),
+            overtime: _this.convertTime(Math.floor(overtime / 1000)),
+            midnightTime: _this.convertTime(Math.floor(midnightTime / 1000)),
+            midnightOvertime: _this.convertTime(Math.floor(midnightOvertime / 1000)),
+            restTime: _this.convertTime(Math.floor(restTime / 1000)),
+            theDay: params1,
+            nextDay: params2
+          });
+        };
+
+        for (var i = 1; i <= lastdate; i++) {
+          var array;
+          var time;
+          var overtime;
+          var midnightTime;
+          var midnightOvertime;
+          var restTime;
+          var pastData;
+          var nowData;
+          var am5;
+          var pm10;
+          var loopTime;
+          var resultArray;
+          var params1;
+          var plusOne;
+          var params2;
+
+          _loop(i);
+        }
+      })["catch"](function (error) {
+        console.log(error);
+      });
+    },
+    convertTime: function convertTime(diffTime) {
+      if (diffTime == 0) {
+        return '-';
+      }
+
+      var diffHour = Math.floor(diffTime / (60 * 60));
+
+      if (diffHour < 10) {
+        diffHour = '0' + diffHour;
+      }
+
+      var diffMinites = Math.floor(diffTime / 60 % 60);
+
+      if (diffMinites < 10) {
+        diffMinites = '0' + diffMinites;
+      }
+
+      var diffSeconds = Math.floor(diffTime % 60);
+
+      if (diffSeconds < 10) {
+        diffSeconds = '0' + diffSeconds;
+      }
+
+      var passTime = diffHour + ':' + diffMinites + ':' + diffSeconds;
+      return passTime;
+    },
+    detailCalc: function detailCalc(theDay, time, overtime, midnightTime, midnightOvertime, hours8, hours24, pastData, nowData, am5, pm10, loopTime) {
+      if (pastData <= am5) {
+        if (nowData <= am5) {
+          if (time + midnightTime < hours8) {
+            midnightTime += nowData - pastData;
+
+            if (time + midnightTime >= hours8) {
+              midnightOvertime += time + midnightTime - hours8;
+              midnightTime -= time + midnightTime - hours8;
+            }
+          } else {
+            midnightOvertime += nowData - pastData;
+          }
+        } else if (nowData > am5 && nowData <= pm10) {
+          if (time + midnightTime < hours8) {
+            midnightTime += am5 - pastData;
+
+            if (time + midnightTime >= hours8) {
+              midnightOvertime += time + midnightTime - hours8;
+              midnightTime -= time + midnightTime - hours8;
+            }
+
+            time += nowData - am5;
+
+            if (time + midnightTime >= hours8) {
+              overtime += time + midnightTime - hours8;
+              time -= time + midnightTime - hours8;
+            }
+          } else {
+            midnightOvertime += am5 - pastData;
+            overtime += nowData - am5;
+          }
+        } else {
+          if (loopTime == 0) {
+            if (time + midnightTime < hours8) {
+              midnightTime += am5 - pastData;
+
+              if (time + midnightTime > hours8) {
+                midnightOvertime += time + midnightTime - hours8;
+                midnightTime -= time + midnightTime - hours8;
+              }
+
+              time += 61200000;
+
+              if (time + midnightTime >= hours8) {
+                overtime += time + midnightTime - hours8;
+                time -= time + midnightTime - hours8;
+              }
+
+              midnightOvertime += nowData - pm10;
+            } else {
+              midnightOvertime += am5 - pastData;
+              overtime += 61200000;
+              midnightOvertime += nowData - pm10;
+            }
+          } else {
+            for (var y = 1; y <= loopTime; y++) {
+              am5 += hours24;
+              pm10 += hours24;
+
+              if (y == loopTime) {
+                if (nowData <= am5) {
+                  midnightOvertime += nowData - theDay.getTime() - hours24 * y;
+                } else if (nowData > am5 && nowData <= pm10) {
+                  midnightOvertime += 18000000;
+                  overtime += nowData - am5;
+                } else {
+                  midnightOvertime += 18000000;
+                  overtime += 61200000;
+                  midnightOvertime += nowData - pm10;
+                }
+              } else {
+                midnightOvertime += 18000000;
+                overtime += 61200000;
+                midnightOvertime += 7200000;
+              }
+            }
+          }
+        }
+      } else if (pastData > pm10) {
+        if (nowData < theDay.getTime() + hours24) {
+          if (time + midnightTime < hours8) {
+            midnightTime += nowData - pastData;
+
+            if (time + midnightTime >= hours8) {
+              midnightOvertime += time + midnightTime - hours8;
+              midnightTime -= time + midnightTime - hours8;
+            }
+          } else {
+            midnightOvertime += nowData - pastData;
+          }
+        } else {
+          if (pastData < theDay.getTime() + hours24) {
+            midnightTime += theDay.getTime() + hours24 - pastData;
+
+            if (time + midnightTime >= hours8) {
+              midnightOvertime += time + midnightTime - hours8;
+              midnightTime -= time + midnightTime - hours8;
+            }
+
+            for (var _y = 1; _y <= loopTime; _y++) {
+              am5 += hours24;
+              pm10 += hours24;
+
+              if (_y == loopTime) {
+                if (nowData <= am5) {
+                  midnightTime += nowData - theDay.getTime() - hours24 * _y;
+
+                  if (time + midnightTime >= hours8) {
+                    midnightOvertime += time + midnightTime - hours8;
+                    midnightTime -= time + midnightTime - hours8;
+                  }
+                } else if (nowData > am5 && nowData <= pm10) {
+                  midnightTime += 18000000;
+
+                  if (time + midnightTime >= hours8) {
+                    midnightOvertime += time + midnightTime - hours8;
+                    midnightTime -= time + midnightTime - hours8;
+                  }
+
+                  time += nowData - am5;
+
+                  if (time + midnightTime >= hours8) {
+                    overtime += time + midnightTime - hours8;
+                    time -= time + midnightTime - hours8;
+                  }
+                } else {
+                  midnightTime += 18000000;
+
+                  if (time + midnightTime >= hours8) {
+                    midnightOvertime += time + midnightTime - hours8;
+                    midnightTime -= time + midnightTime - hours8;
+                  }
+
+                  time += 61200000;
+
+                  if (time + midnightTime >= hours8) {
+                    overtime += time + midnightTime - hours8;
+                    time -= time + midnightTime - hours8;
+                  }
+
+                  midnightOvertime += nowData - pm10;
+                }
+              } else {
+                midnightTime += 18000000;
+
+                if (time + midnightTime >= hours8) {
+                  midnightOvertime += time + midnightTime - hours8;
+                  midnightTime -= time + midnightTime - hours8;
+                }
+
+                time += 61200000;
+
+                if (time + midnightTime >= hours8) {
+                  overtime += time + midnightTime - hours8;
+                  time -= time + midnightTime - hours8;
+                }
+
+                midnightOvertime += 7200000;
+              }
+            }
+          } else {
+            am5 += hours24;
+            pm10 += hours24;
+            loopTime--;
+            theDay.setDate(theDay.getDate() + 1);
+            var resultArray = this.detailCalc(theDay, time, overtime, midnightTime, midnightOvertime, hours8, hours24, pastData, nowData, am5, pm10, loopTime);
+            time = resultArray[0];
+            overtime = resultArray[1];
+            midnightTime = resultArray[2];
+            midnightOvertime = resultArray[3];
+          }
+        }
+      } else {
+        if (nowData <= pm10) {
+          time += nowData - pastData;
+
+          if (time + midnightTime >= hours8) {
+            overtime += time + midnightTime - hours8;
+            time -= time + midnightTime - hours8;
+          }
+        } else if (nowData <= theDay.getTime() + hours24) {
+          time += pm10 - pastData;
+
+          if (time + midnightTime >= hours8) {
+            overtime += time + midnightTime - hours8;
+            time -= time + midnightTime - hours8;
+          }
+
+          midnightTime += nowData - pm10;
+
+          if (time + midnightTime >= hours8) {
+            midnightOvertime += time + midnightTime - hours8;
+            midnightTime -= time + midnightTime - hours8;
+          }
+        } else {
+          time += pm10 - pastData;
+
+          if (time + midnightTime >= hours8) {
+            overtime += time + midnightTime - hours8;
+            time -= time + midnightTime - hours8;
+          }
+
+          midnightTime += 7200000;
+
+          if (time + midnightTime >= hours8) {
+            midnightOvertime += time + midnightTime - hours8;
+            midnightTime -= time + midnightTime - hours8;
+          }
+
+          for (var _y2 = 1; _y2 <= loopTime; _y2++) {
+            am5 += hours24;
+            pm10 += hours24;
+
+            if (_y2 == loopTime) {
+              if (nowData <= am5) {
+                midnightTime += nowData - theDay.getTime() - hours24 * _y2;
+
+                if (time + midnightTime >= hours8) {
+                  midnightOvertime += time + midnightTime - hours8;
+                  midnightTime -= time + midnightTime - hours8;
+                }
+              } else if (nowData > am5 && nowData <= pm10) {
+                midnightTime += 18000000;
+
+                if (time + midnightTime >= hours8) {
+                  midnightOvertime += time + midnightTime - hours8;
+                  midnightTime -= time + midnightTime - hours8;
+                }
+
+                time += nowData - am5;
+
+                if (time + midnightTime >= hours8) {
+                  overtime += time + midnightTime - hours8;
+                  time -= time + midnightTime - hours8;
+                }
+              } else {
+                midnightTime += 18000000;
+
+                if (time + midnightTime >= hours8) {
+                  midnightOvertime += time + midnightTime - hours8;
+                  midnightTime -= time + midnightTime - hours8;
+                }
+
+                time += 61200000;
+
+                if (time + midnightTime >= hours8) {
+                  overtime += time + midnightTime - hours8;
+                  time -= time + midnightTime - hours8;
+                }
+
+                midnightOvertime += nowData - pm10;
+              }
+            } else {
+              midnightTime += 18000000;
+
+              if (time + midnightTime >= hours8) {
+                midnightOvertime += time + midnightTime - hours8;
+                midnightTime -= time + midnightTime - hours8;
+              }
+
+              time += 61200000;
+
+              if (time + midnightTime >= hours8) {
+                overtime += time + midnightTime - hours8;
+                time -= time + midnightTime - hours8;
+              }
+
+              midnightOvertime += 7200000;
+            }
+          }
+        }
+      }
+
+      return [time, overtime, midnightTime, midnightOvertime];
+    }
+  }
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/admin/MemberAttendanceDetail.vue?vue&type=script&lang=js&":
+/*!***************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/admin/MemberAttendanceDetail.vue?vue&type=script&lang=js& ***!
+  \***************************************************************************************************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.js");
+/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vue__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var v_calendar__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! v-calendar */ "./node_modules/v-calendar/lib/v-calendar.umd.min.js");
+/* harmony import */ var v_calendar__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(v_calendar__WEBPACK_IMPORTED_MODULE_1__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+vue__WEBPACK_IMPORTED_MODULE_0___default.a.use(v_calendar__WEBPACK_IMPORTED_MODULE_1___default.a);
+/* harmony default export */ __webpack_exports__["default"] = ({
+  data: function data() {
+    return {
+      id: this.$route.params.id,
+      userName: this.$route.params.name,
+      detailDate: '',
+      detailDay: '',
+      weeks: ["日", "月", "火", "水", "木", "金", "土"],
+      attendanceRecords: [],
+      attendanceId: 0,
+      time: '',
+      overtime: '',
+      midnightTime: '',
+      midnightOvertime: '',
+      restTime: '',
+      label: '',
+      editNote: '',
+      from_day: '',
+      to_day: '',
+      updateButton: false,
+      count: 0,
+      theTime: '',
+      date: new Date(),
+      dateConf: new Date(0),
+      error: ''
+    };
+  },
+  mounted: function mounted() {
+    if (this.$route.params.theDay == null) {
+      this.$router.go(-1);
+    }
+
+    this.calcAttendance();
+  },
+  computed: {
+    judgeUpdate: function judgeUpdate() {
+      var _this = this;
+
+      if (Date.parse(this.date) == Date.parse(this.dateConf)) {
+        if (this.date != this.dateConf) {
+          this.error = '時刻を編集してください。';
+        }
+      } else if (Date.parse(this.date) < Date.parse(this.to_day) && Date.parse(this.date) > Date.parse(this.from_day)) {
+        this.updateButton = true;
+        this.error = '';
+      } else if (this.to_day == 'noData' && Date.parse(this.date) > Date.parse(this.from_day)) {
+        this.updateButton = true;
+        this.error = '';
+      } else if (this.from_day == 'noData' && Date.parse(this.date) < Date.parse(this.to_day)) {
+        this.updateButton = true;
+        this.error = '';
+      } else {
+        this.updateButton = false;
+
+        if (this.count == 0) {
+          this.count = 1;
+        } else {
+          var authId = document.querySelector("meta[name='user-id']").getAttribute('content');
+          axios.get('/api/from_day/' + authId + '/' + this.theTime).then(function (res) {
+            _this.from_day = res.data;
+            axios.get('/api/to_day/' + authId + '/' + _this.theTime).then(function (res) {
+              _this.to_day = res.data;
+
+              if (_this.from_day == 'noData' && Date.parse(_this.date) > Date.parse(_this.to_day)) {
+                _this.error = _this.to_day + 'までで時間を編集してください。';
+              } else if (_this.to_day == 'noData' && Date.parse(_this.date) < Date.parse(_this.from_day)) {
+                _this.error = _this.from_day + '以降で時間を編集してください。';
+              } else if (_this.from_day != 'noData' && _this.to_day != 'noData') {
+                if (Date.parse(_this.date) < Date.parse(_this.from_day) || Date.parse(_this.date) > Date.parse(_this.to_day)) {
+                  _this.error = _this.from_day + 'と' + _this.to_day + 'との間で時間を編集してください。';
+                }
+              }
+            })["catch"](function (error) {
+              console.log(error);
+            });
+          })["catch"](function (error) {
+            console.log(error);
+          });
+        }
+      }
+    }
+  },
+  methods: {
+    convertTime: function convertTime(diffTime) {
+      if (diffTime == 0) {
+        return '-';
+      }
+
+      var diffHour = Math.floor(diffTime / (60 * 60));
+
+      if (diffHour < 10) {
+        diffHour = '0' + diffHour;
+      }
+
+      var diffMinites = Math.floor(diffTime / 60 % 60);
+
+      if (diffMinites < 10) {
+        diffMinites = '0' + diffMinites;
+      }
+
+      var diffSeconds = Math.floor(diffTime % 60);
+
+      if (diffSeconds < 10) {
+        diffSeconds = '0' + diffSeconds;
+      }
+
+      var passTime = diffHour + ':' + diffMinites + ':' + diffSeconds;
+      return passTime;
+    },
+    goEdit: function goEdit(id, time, on_duty, note) {
+      this.error = '';
+      this.attendanceId = id;
+      this.date = time;
+      this.dateConf = time;
+      this.theTime = time;
+      this.label = on_duty;
+      this.editNote = note;
+    },
+    timeEdit: function timeEdit() {
+      var monthEx = ("0" + (this.date.getMonth() + 1)).slice(-2);
+      var dateEx = ("0" + this.date.getDate()).slice(-2);
+      var hourEx = ("0" + this.date.getHours()).slice(-2);
+      var minitesEx = ("0" + this.date.getMinutes()).slice(-2);
+      var strDate = this.date.getFullYear() + '-' + monthEx + '-' + dateEx + ' ' + hourEx + ':' + minitesEx + ':00';
+      var data = {
+        time: strDate,
+        note: this.editNote
+      };
+      axios.post('/api/attendanceDetail/update/' + this.attendanceId, data).then(function (res) {})["catch"](function (error) {
+        console.log(error);
+      });
+      this.calcAttendance();
+    },
+    calcAttendance: function calcAttendance() {
+      var _this2 = this;
+
+      var theDay = new Date(this.$route.params.theDay);
+      var nextDay = new Date(this.$route.params.nextDay);
+      var theMonth = theDay.getMonth() + 1;
+      this.detailDate = theDay.getFullYear() + '/' + theMonth + '/' + theDay.getDate();
+      this.detailDay = this.weeks[theDay.getDay()];
+      var authId = this.$route.params.id;
+      var performances = [];
+      var data = {
+        day: theDay,
+        to_day: nextDay
+      };
+      axios.post('/api/userAttendance/' + authId, data).then(function (res) {
+        if (res.data != 'noData') {
+          performances = res.data;
+        }
+
+        _this2.attendanceRecords = [];
+        performances.forEach(function (performance) {
+          if (_this2.attendanceRecords.length == 0 && performance.on_duty == '出勤') {
+            _this2.attendanceRecords.push(performance);
+          } else if (_this2.attendanceRecords.length != 0) {
+            _this2.attendanceRecords.push(performance);
+          }
+        });
+        var time = 0;
+        var overtime = 0;
+        var midnightTime = 0;
+        var midnightOvertime = 0;
+        var restTime = 0;
+        var hours8 = 28800000;
+        var hours24 = 86400000;
+
+        if (_this2.attendanceRecords.length != 0) {
+          for (var x = 1; x < _this2.attendanceRecords.length; x++) {
+            var pastData = Date.parse(_this2.attendanceRecords[x - 1].time);
+            var nowData = Date.parse(_this2.attendanceRecords[x].time);
+            var am5 = new Date(theDay.getFullYear(), theDay.getMonth(), theDay.getDate(), 5).getTime();
+            var pm10 = new Date(theDay.getFullYear(), theDay.getMonth(), theDay.getDate(), 22).getTime();
+            var loopTime = Math.floor((nowData - theDay.getTime()) / (24 * 60 * 60 * 1000));
+
+            if (_this2.attendanceRecords[x - 1].on_duty == '出勤' || _this2.attendanceRecords[x - 1].on_duty == '休出') {
+              var resultArray = _this2.detailCalc(theDay, time, overtime, midnightTime, midnightOvertime, hours8, hours24, pastData, nowData, am5, pm10, loopTime);
+
+              time = resultArray[0];
+              overtime = resultArray[1];
+              midnightTime = resultArray[2];
+              midnightOvertime = resultArray[3];
+            } else if (_this2.attendanceRecords[x - 1].on_duty == '休入') {
+              restTime += nowData - pastData;
+            }
+          }
+        }
+
+        _this2.time = _this2.convertTime(Math.floor(time / 1000));
+        _this2.overtime = _this2.convertTime(Math.floor(overtime / 1000));
+        _this2.midnightTime = _this2.convertTime(Math.floor(midnightTime / 1000));
+        _this2.midnightOvertime = _this2.convertTime(Math.floor(midnightOvertime / 1000));
+        _this2.restTime = _this2.convertTime(Math.floor(restTime / 1000));
+      })["catch"](function (error) {
+        console.log(error);
+      });
+    },
+    detailCalc: function detailCalc(theDay, time, overtime, midnightTime, midnightOvertime, hours8, hours24, pastData, nowData, am5, pm10, loopTime) {
+      if (pastData <= am5) {
+        if (nowData <= am5) {
+          if (time + midnightTime < hours8) {
+            midnightTime += nowData - pastData;
+
+            if (time + midnightTime >= hours8) {
+              midnightOvertime += time + midnightTime - hours8;
+              midnightTime -= time + midnightTime - hours8;
+            }
+          } else {
+            midnightOvertime += nowData - pastData;
+          }
+        } else if (nowData > am5 && nowData <= pm10) {
+          if (time + midnightTime < hours8) {
+            midnightTime += am5 - pastData;
+
+            if (time + midnightTime >= hours8) {
+              midnightOvertime += time + midnightTime - hours8;
+              midnightTime -= time + midnightTime - hours8;
+            }
+
+            time += nowData - am5;
+
+            if (time + midnightTime >= hours8) {
+              overtime += time + midnightTime - hours8;
+              time -= time + midnightTime - hours8;
+            }
+          } else {
+            midnightOvertime += am5 - pastData;
+            overtime += nowData - am5;
+          }
+        } else {
+          if (loopTime == 0) {
+            if (time + midnightTime < hours8) {
+              midnightTime += am5 - pastData;
+
+              if (time + midnightTime > hours8) {
+                midnightOvertime += time + midnightTime - hours8;
+                midnightTime -= time + midnightTime - hours8;
+              }
+
+              time += 61200000;
+
+              if (time + midnightTime >= hours8) {
+                overtime += time + midnightTime - hours8;
+                time -= time + midnightTime - hours8;
+              }
+
+              midnightOvertime += nowData - pm10;
+            } else {
+              midnightOvertime += am5 - pastData;
+              overtime += 61200000;
+              midnightOvertime += nowData - pm10;
+            }
+          } else {
+            for (var y = 1; y <= loopTime; y++) {
+              am5 += hours24;
+              pm10 += hours24;
+
+              if (y == loopTime) {
+                if (nowData <= am5) {
+                  midnightOvertime += nowData - theDay.getTime() - hours24 * y;
+                } else if (nowData > am5 && nowData <= pm10) {
+                  midnightOvertime += 18000000;
+                  overtime += nowData - am5;
+                } else {
+                  midnightOvertime += 18000000;
+                  overtime += 61200000;
+                  midnightOvertime += nowData - pm10;
+                }
+              } else {
+                midnightOvertime += 18000000;
+                overtime += 61200000;
+                midnightOvertime += 7200000;
+              }
+            }
+          }
+        }
+      } else if (pastData > pm10) {
+        if (nowData < theDay.getTime() + hours24) {
+          if (time + midnightTime < hours8) {
+            midnightTime += nowData - pastData;
+
+            if (time + midnightTime >= hours8) {
+              midnightOvertime += time + midnightTime - hours8;
+              midnightTime -= time + midnightTime - hours8;
+            }
+          } else {
+            midnightOvertime += nowData - pastData;
+          }
+        } else {
+          if (pastData < theDay.getTime() + hours24) {
+            midnightTime += theDay.getTime() + hours24 - pastData;
+
+            if (time + midnightTime >= hours8) {
+              midnightOvertime += time + midnightTime - hours8;
+              midnightTime -= time + midnightTime - hours8;
+            }
+
+            for (var _y = 1; _y <= loopTime; _y++) {
+              am5 += hours24;
+              pm10 += hours24;
+
+              if (_y == loopTime) {
+                if (nowData <= am5) {
+                  midnightTime += nowData - theDay.getTime() - hours24 * _y;
+
+                  if (time + midnightTime >= hours8) {
+                    midnightOvertime += time + midnightTime - hours8;
+                    midnightTime -= time + midnightTime - hours8;
+                  }
+                } else if (nowData > am5 && nowData <= pm10) {
+                  midnightTime += 18000000;
+
+                  if (time + midnightTime >= hours8) {
+                    midnightOvertime += time + midnightTime - hours8;
+                    midnightTime -= time + midnightTime - hours8;
+                  }
+
+                  time += nowData - am5;
+
+                  if (time + midnightTime >= hours8) {
+                    overtime += time + midnightTime - hours8;
+                    time -= time + midnightTime - hours8;
+                  }
+                } else {
+                  midnightTime += 18000000;
+
+                  if (time + midnightTime >= hours8) {
+                    midnightOvertime += time + midnightTime - hours8;
+                    midnightTime -= time + midnightTime - hours8;
+                  }
+
+                  time += 61200000;
+
+                  if (time + midnightTime >= hours8) {
+                    overtime += time + midnightTime - hours8;
+                    time -= time + midnightTime - hours8;
+                  }
+
+                  midnightOvertime += nowData - pm10;
+                }
+              } else {
+                midnightTime += 18000000;
+
+                if (time + midnightTime >= hours8) {
+                  midnightOvertime += time + midnightTime - hours8;
+                  midnightTime -= time + midnightTime - hours8;
+                }
+
+                time += 61200000;
+
+                if (time + midnightTime >= hours8) {
+                  overtime += time + midnightTime - hours8;
+                  time -= time + midnightTime - hours8;
+                }
+
+                midnightOvertime += 7200000;
+              }
+            }
+          } else {
+            am5 += hours24;
+            pm10 += hours24;
+            loopTime--;
+            theDay.setDate(theDay.getDate() + 1);
+            var resultArray = this.detailCalc(theDay, time, overtime, midnightTime, midnightOvertime, hours8, hours24, pastData, nowData, am5, pm10, loopTime);
+            time = resultArray[0];
+            overtime = resultArray[1];
+            midnightTime = resultArray[2];
+            midnightOvertime = resultArray[3];
+          }
+        }
+      } else {
+        if (nowData <= pm10) {
+          time += nowData - pastData;
+
+          if (time + midnightTime >= hours8) {
+            overtime += time + midnightTime - hours8;
+            time -= time + midnightTime - hours8;
+          }
+        } else if (nowData <= theDay.getTime() + hours24) {
+          time += pm10 - pastData;
+
+          if (time + midnightTime >= hours8) {
+            overtime += time + midnightTime - hours8;
+            time -= time + midnightTime - hours8;
+          }
+
+          midnightTime += nowData - pm10;
+
+          if (time + midnightTime >= hours8) {
+            midnightOvertime += time + midnightTime - hours8;
+            midnightTime -= time + midnightTime - hours8;
+          }
+        } else {
+          time += pm10 - pastData;
+
+          if (time + midnightTime >= hours8) {
+            overtime += time + midnightTime - hours8;
+            time -= time + midnightTime - hours8;
+          }
+
+          midnightTime += 7200000;
+
+          if (time + midnightTime >= hours8) {
+            midnightOvertime += time + midnightTime - hours8;
+            midnightTime -= time + midnightTime - hours8;
+          }
+
+          for (var _y2 = 1; _y2 <= loopTime; _y2++) {
+            am5 += hours24;
+            pm10 += hours24;
+
+            if (_y2 == loopTime) {
+              if (nowData <= am5) {
+                midnightTime += nowData - theDay.getTime() - hours24 * _y2;
+
+                if (time + midnightTime >= hours8) {
+                  midnightOvertime += time + midnightTime - hours8;
+                  midnightTime -= time + midnightTime - hours8;
+                }
+              } else if (nowData > am5 && nowData <= pm10) {
+                midnightTime += 18000000;
+
+                if (time + midnightTime >= hours8) {
+                  midnightOvertime += time + midnightTime - hours8;
+                  midnightTime -= time + midnightTime - hours8;
+                }
+
+                time += nowData - am5;
+
+                if (time + midnightTime >= hours8) {
+                  overtime += time + midnightTime - hours8;
+                  time -= time + midnightTime - hours8;
+                }
+              } else {
+                midnightTime += 18000000;
+
+                if (time + midnightTime >= hours8) {
+                  midnightOvertime += time + midnightTime - hours8;
+                  midnightTime -= time + midnightTime - hours8;
+                }
+
+                time += 61200000;
+
+                if (time + midnightTime >= hours8) {
+                  overtime += time + midnightTime - hours8;
+                  time -= time + midnightTime - hours8;
+                }
+
+                midnightOvertime += nowData - pm10;
+              }
+            } else {
+              midnightTime += 18000000;
+
+              if (time + midnightTime >= hours8) {
+                midnightOvertime += time + midnightTime - hours8;
+                midnightTime -= time + midnightTime - hours8;
+              }
+
+              time += 61200000;
+
+              if (time + midnightTime >= hours8) {
+                overtime += time + midnightTime - hours8;
+                time -= time + midnightTime - hours8;
+              }
+
+              midnightOvertime += 7200000;
+            }
+          }
+        }
+      }
+
+      return [time, overtime, midnightTime, midnightOvertime];
+    }
+  }
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/admin/MemberTask.vue?vue&type=script&lang=js&":
+/*!***************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/admin/MemberTask.vue?vue&type=script&lang=js& ***!
+  \***************************************************************************************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.js");
+/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vue__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var v_calendar__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! v-calendar */ "./node_modules/v-calendar/lib/v-calendar.umd.min.js");
+/* harmony import */ var v_calendar__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(v_calendar__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var vee_validate__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! vee-validate */ "./node_modules/vee-validate/dist/vee-validate.esm.js");
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+
+vue__WEBPACK_IMPORTED_MODULE_0___default.a.use(v_calendar__WEBPACK_IMPORTED_MODULE_1___default.a);
+/* harmony default export */ __webpack_exports__["default"] = ({
+  data: function data() {
+    return {
+      userName: this.$route.params.name,
+      date: new Date(),
+      year: 0,
+      month: 0,
+      theDate: '',
+      searchSwitch: true,
+      selectedYear: 'initial',
+      selectedMonth: 'initial',
+      taskRecordsInt: [],
+      taskRecords: [],
+      total: 0
+    };
+  },
+  created: function created() {
+    var date = new Date();
+    var _ref = [date.getFullYear(), ("0" + (date.getMonth() + 1)).slice(-2)];
+    this.year = _ref[0];
+    this.month = _ref[1];
+  },
+  mounted: function mounted() {
+    if (this.$route.params.id == null) {
+      this.$router.go(-1);
+    }
+
+    var from_day = this.year + '-' + this.month + '-01 00:00:00';
+
+    if (this.month == 12) {
+      var theYear = Number(this.year) + 1;
+      var theMonth = '01';
+    } else {
+      var theYear = this.year;
+      var theMonth = ("0" + (Number(this.month) + 1)).slice(-2);
+    }
+
+    var to_day = theYear + '-' + theMonth + '-01 00:00:00';
+    this.searchDetail(from_day, to_day);
+  },
+  methods: {
+    switchItem: function switchItem() {
+      this.searchSwitch = !this.searchSwitch;
+    },
+    searchTaskMonth: function searchTaskMonth() {
+      if (this.selectedYear != 'initial' && this.selectedMonth != 'initial') {
+        var from_day = this.selectedYear + '-' + this.selectedMonth + '-01 00:00:00';
+
+        if (this.selectedMonth == 12) {
+          var theYear = Number(this.selectedYear) + 1;
+          var theMonth = '01';
+        } else {
+          var theYear = this.selectedYear;
+          var theMonth = ("0" + (Number(this.selectedMonth) + 1)).slice(-2);
+        }
+
+        var to_day = theYear + '-' + theMonth + '-01 00:00:00';
+        this.searchDetail(from_day, to_day);
+        this.year = this.selectedYear;
+        this.month = this.selectedMonth;
+        this.selectedYear = 'initial';
+        this.selectedMonth = 'initial';
+      }
+    },
+    searchTaskDay: function searchTaskDay() {
+      var theMonth = ("0" + (Number(this.date.getMonth()) + 1)).slice(-2);
+      var theDate = ("0" + this.date.getDate()).slice(-2);
+      var from_day = this.date.getFullYear() + '-' + theMonth + '-' + theDate + ' 00:00:00';
+      var nextDay = new Date(this.date.getFullYear(), this.date.getMonth(), Number(theDate) + 1);
+      var nextDayMonth = ("0" + (Number(nextDay.getMonth()) + 1)).slice(-2);
+      var nextDayDate = ("0" + nextDay.getDate()).slice(-2);
+      var to_day = nextDay.getFullYear() + '-' + nextDayMonth + '-' + nextDayDate + ' 00:00:00';
+      this.searchDetail(from_day, to_day);
+      this.year = this.date.getFullYear();
+      this.month = theMonth;
+      this.theDate = '/' + theDate;
+    },
+    searchDetail: function searchDetail(from_day, to_day) {
+      var _this = this;
+
+      var data = {
+        fromDay: from_day,
+        toDay: to_day
+      };
+      var authId = this.$route.params.id;
+      axios.post('/api/taskDetail/' + authId, data).then(function (res) {
+        _this.taskRecordsInt = [];
+        _this.total = 0;
+        var i = 0;
+        res.data.forEach(function (task) {
+          _this.total += Number(task.task_time);
+
+          if (i == 0) {
+            _this.taskRecordsInt.push({
+              task_name: task.task_name,
+              task_time: task.task_time
+            });
+          } else {
+            var j = 0;
+
+            _this.taskRecordsInt.forEach(function (record) {
+              if (record.task_name == task.task_name) {
+                record.task_time = Number(record.task_time) + Number(task.task_time);
+                j++;
+                return true;
+              }
+            });
+
+            if (j == 0) {
+              _this.taskRecordsInt.push({
+                task_name: task.task_name,
+                task_time: task.task_time
+              });
+            }
+          }
+
+          i++;
+        });
+
+        _this.taskRecordsInt.sort(function (a, b) {
+          return b.task_time - a.task_time;
+        });
+
+        _this.adjustArray();
+      })["catch"](function (error) {
+        console.log(error);
+      });
+    },
+    adjustArray: function adjustArray() {
+      var _this2 = this;
+
+      this.taskRecords = [];
+
+      if (this.taskRecordsInt.length > 0) {
+        this.taskRecordsInt.forEach(function (record) {
+          var percentage = Math.round(Number(record.task_time) / _this2.total * 100 * 10) / 10;
+
+          _this2.taskRecords.push({
+            task_name: record.task_name,
+            task_time: _this2.convertTime(record.task_time),
+            task_percentage: percentage
+          });
+        });
+      }
+    },
+    convertTime: function convertTime(diffTime) {
+      var diffHour = Math.floor(diffTime / (60 * 60));
+
+      if (diffHour < 10) {
+        diffHour = '0' + diffHour;
+      }
+
+      var diffMinites = Math.floor(diffTime / 60 % 60);
+
+      if (diffMinites < 10) {
+        diffMinites = '0' + diffMinites;
+      }
+
+      var diffSeconds = Math.floor(diffTime % 60);
+
+      if (diffSeconds < 10) {
+        diffSeconds = '0' + diffSeconds;
+      }
+
+      var passTime = diffHour + ':' + diffMinites + ':' + diffSeconds;
+      return passTime;
+    },
+    goHome: function goHome() {
+      this.$router.push("/");
+    }
+  }
+});
+
+/***/ }),
+
 /***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/layout/TheHeader.vue?vue&type=script&lang=js&":
 /*!***************************************************************************************************************************************************************************!*\
   !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/layout/TheHeader.vue?vue&type=script&lang=js& ***!
@@ -2470,7 +3955,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var vue_simple_drawer__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue-simple-drawer */ "./node_modules/vue-simple-drawer/dist/vue-simple-drawer.umd.min.js");
 /* harmony import */ var vue_simple_drawer__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vue_simple_drawer__WEBPACK_IMPORTED_MODULE_0__);
-//
 //
 //
 //
@@ -2582,6 +4066,10 @@ __webpack_require__.r(__webpack_exports__);
       this.$router.push("/kindOfTasks");
       this.open = !this.open;
     },
+    goTaskDetail: function goTaskDetail() {
+      this.$router.push("/taskDetail");
+      this.open = !this.open;
+    },
     active: function active() {
       this.isActive = !this.isActive;
     },
@@ -2605,6 +4093,10 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+//
+//
+//
+//
 //
 //
 //
@@ -2638,6 +4130,10 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   methods: {
     goHome: function goHome() {
@@ -2664,6 +4160,10 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   methods: {
     goHome: function goHome() {
@@ -2683,6 +4183,10 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+//
+//
+//
+//
 //
 //
 //
@@ -2825,6 +4329,11 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
 
 
 vue__WEBPACK_IMPORTED_MODULE_0___default.a.use(v_calendar__WEBPACK_IMPORTED_MODULE_1___default.a);
@@ -2854,6 +4363,10 @@ vue__WEBPACK_IMPORTED_MODULE_0___default.a.use(v_calendar__WEBPACK_IMPORTED_MODU
     };
   },
   mounted: function mounted() {
+    if (this.$route.params.theDay == null) {
+      this.$router.go(-1);
+    }
+
     this.calcAttendance();
   },
   computed: {
@@ -2881,10 +4394,8 @@ vue__WEBPACK_IMPORTED_MODULE_0___default.a.use(v_calendar__WEBPACK_IMPORTED_MODU
         } else {
           var authId = document.querySelector("meta[name='user-id']").getAttribute('content');
           axios.get('/api/from_day/' + authId + '/' + this.theTime).then(function (res) {
-            console.log(res.data);
             _this.from_day = res.data;
             axios.get('/api/to_day/' + authId + '/' + _this.theTime).then(function (res) {
-              console.log(res.data);
               _this.to_day = res.data;
 
               if (_this.from_day == 'noData' && Date.parse(_this.date) > Date.parse(_this.to_day)) {
@@ -3001,252 +4512,12 @@ vue__WEBPACK_IMPORTED_MODULE_0___default.a.use(v_calendar__WEBPACK_IMPORTED_MODU
             var loopTime = Math.floor((nowData - theDay.getTime()) / (24 * 60 * 60 * 1000));
 
             if (_this2.attendanceRecords[x - 1].on_duty == '出勤' || _this2.attendanceRecords[x - 1].on_duty == '休出') {
-              if (pastData <= am5) {
-                if (nowData <= am5) {
-                  if (time + midnightTime < hours8) {
-                    midnightTime += nowData - pastData;
+              var resultArray = _this2.detailCalc(theDay, time, overtime, midnightTime, midnightOvertime, hours8, hours24, pastData, nowData, am5, pm10, loopTime);
 
-                    if (time + midnightTime >= hours8) {
-                      midnightOvertime += time + midnightTime - hours8;
-                      midnightTime -= time + midnightTime - hours8;
-                    }
-                  } else {
-                    midnightOvertime += nowData - pastData;
-                  }
-                } else if (nowData > am5 && nowData <= pm10) {
-                  if (time + midnightTime < hours8) {
-                    midnightTime += am5 - pastData;
-
-                    if (time + midnightTime >= hours8) {
-                      midnightOvertime += time + midnightTime - hours8;
-                      midnightTime -= time + midnightTime - hours8;
-                    }
-
-                    time += nowData - am5;
-
-                    if (time + midnightTime >= hours8) {
-                      overtime += time + midnightTime - hours8;
-                      time -= time + midnightTime - hours8;
-                    }
-                  } else {
-                    midnightOvertime += am5 - pastData;
-                    overtime += nowData - am5;
-                  }
-                } else {
-                  if (loopTime == 0) {
-                    if (time + midnightTime < hours8) {
-                      midnightTime += am5 - pastData;
-
-                      if (time + midnightTime > hours8) {
-                        midnightOvertime += time + midnightTime - hours8;
-                        midnightTime -= time + midnightTime - hours8;
-                      }
-
-                      time += 61200000;
-
-                      if (time + midnightTime >= hours8) {
-                        overtime += time + midnightTime - hours8;
-                        time -= time + midnightTime - hours8;
-                      }
-
-                      midnightOvertime += nowData - pm10;
-                    } else {
-                      midnightOvertime += am5 - pastData;
-                      overtime += 61200000;
-                      midnightOvertime += nowData - pm10;
-                    }
-                  } else {
-                    for (var y = 1; y <= loopTime; y++) {
-                      am5 += hours24;
-                      pm10 += hours24;
-
-                      if (y == loopTime) {
-                        if (nowData <= am5) {
-                          midnightOvertime += nowData - theDay.getTime() - hours24 * y;
-                        } else if (nowData > am5 && nowData <= pm10) {
-                          midnightOvertime += 18000000;
-                          overtime += nowData - am5;
-                        } else {
-                          midnightOvertime += 18000000;
-                          overtime += 61200000;
-                          midnightOvertime += nowData - pm10;
-                        }
-                      } else {
-                        midnightOvertime += 18000000;
-                        overtime += 61200000;
-                        midnightOvertime += 7200000;
-                      }
-                    }
-                  }
-                }
-              } else if (pastData > pm10) {
-                if (nowData < theDay.getTime() + hours24) {
-                  if (time + midnightTime < hours8) {
-                    midnightTime += nowData - pastData;
-
-                    if (time + midnightTime >= hours8) {
-                      midnightOvertime += time + midnightTime - hours8;
-                      midnightTime -= time + midnightTime - hours8;
-                    }
-                  } else {
-                    midnightOvertime += nowData - pastData;
-                  }
-                } else {
-                  midnightTime += theDay.getTime() + hours24 - pastData;
-
-                  if (time + midnightTime >= hours8) {
-                    midnightOvertime += time + midnightTime - hours8;
-                    midnightTime -= time + midnightTime - hours8;
-                  }
-
-                  for (var _y = 1; _y <= loopTime; _y++) {
-                    am5 += hours24;
-                    pm10 += hours24;
-
-                    if (_y == loopTime) {
-                      if (nowData <= am5) {
-                        midnightTime += nowData - theDay.getTime() - hours24 * _y;
-
-                        if (time + midnightTime >= hours8) {
-                          midnightOvertime += time + midnightTime - hours8;
-                          midnightTime -= time + midnightTime - hours8;
-                        }
-                      } else if (nowData > am5 && nowData <= pm10) {
-                        midnightTime += 18000000;
-
-                        if (time + midnightTime >= hours8) {
-                          midnightOvertime += time + midnightTime - hours8;
-                          midnightTime -= time + midnightTime - hours8;
-                        }
-
-                        time += nowData - am5;
-
-                        if (time + midnightTime >= hours8) {
-                          overtime += time + midnightTime - hours8;
-                          time -= time + midnightTime - hours8;
-                        }
-                      } else {
-                        midnightTime += 18000000;
-
-                        if (time + midnightTime >= hours8) {
-                          midnightOvertime += time + midnightTime - hours8;
-                          midnightTime -= time + midnightTime - hours8;
-                        }
-
-                        time += 61200000;
-
-                        if (time + midnightTime >= hours8) {
-                          overtime += time + midnightTime - hours8;
-                          time -= time + midnightTime - hours8;
-                        }
-
-                        midnightOvertime += nowData - pm10;
-                      }
-                    } else {
-                      midnightTime += 18000000;
-
-                      if (time + midnightTime >= hours8) {
-                        midnightOvertime += time + midnightTime - hours8;
-                        midnightTime -= time + midnightTime - hours8;
-                      }
-
-                      time += 61200000;
-
-                      if (time + midnightTime >= hours8) {
-                        overtime += time + midnightTime - hours8;
-                        time -= time + midnightTime - hours8;
-                      }
-
-                      midnightOvertime += 7200000;
-                    }
-                  }
-                }
-              } else {
-                if (nowData <= pm10) {
-                  time += nowData - pastData;
-
-                  if (time + midnightTime >= hours8) {
-                    overtime += time + midnightTime - hours8;
-                    time -= time + midnightTime - hours8;
-                  }
-                } else {
-                  time += pm10 - pastData;
-
-                  if (time + midnightTime >= hours8) {
-                    overtime += time + midnightTime - hours8;
-                    time -= time + midnightTime - hours8;
-                  }
-
-                  midnightTime += 7200000;
-
-                  if (time + midnightTime >= hours8) {
-                    midnightOvertime += time + midnightTime - hours8;
-                    midnightTime -= time + midnightTime - hours8;
-                  }
-
-                  for (var _y2 = 1; _y2 <= loopTime; _y2++) {
-                    am5 += hours24;
-                    pm10 += hours24;
-
-                    if (_y2 == loopTime) {
-                      if (nowData <= am5) {
-                        midnightTime += nowData - theDay.getTime() - hours24 * _y2;
-
-                        if (time + midnightTime >= hours8) {
-                          midnightOvertime += time + midnightTime - hours8;
-                          midnightTime -= time + midnightTime - hours8;
-                        }
-                      } else if (nowData > am5 && nowData <= pm10) {
-                        midnightTime += 18000000;
-
-                        if (time + midnightTime >= hours8) {
-                          midnightOvertime += time + midnightTime - hours8;
-                          midnightTime -= time + midnightTime - hours8;
-                        }
-
-                        time += nowData - am5;
-
-                        if (time + midnightTime >= hours8) {
-                          overtime += time + midnightTime - hours8;
-                          time -= time + midnightTime - hours8;
-                        }
-                      } else {
-                        midnightTime += 18000000;
-
-                        if (time + midnightTime >= hours8) {
-                          midnightOvertime += time + midnightTime - hours8;
-                          midnightTime -= time + midnightTime - hours8;
-                        }
-
-                        time += 61200000;
-
-                        if (time + midnightTime >= hours8) {
-                          overtime += time + midnightTime - hours8;
-                          time -= time + midnightTime - hours8;
-                        }
-
-                        midnightOvertime += nowData - pm10;
-                      }
-                    } else {
-                      midnightTime += 18000000;
-
-                      if (time + midnightTime >= hours8) {
-                        midnightOvertime += time + midnightTime - hours8;
-                        midnightTime -= time + midnightTime - hours8;
-                      }
-
-                      time += 61200000;
-
-                      if (time + midnightTime >= hours8) {
-                        overtime += time + midnightTime - hours8;
-                        time -= time + midnightTime - hours8;
-                      }
-
-                      midnightOvertime += 7200000;
-                    }
-                  }
-                }
-              }
+              time = resultArray[0];
+              overtime = resultArray[1];
+              midnightTime = resultArray[2];
+              midnightOvertime = resultArray[3];
             } else if (_this2.attendanceRecords[x - 1].on_duty == '休入') {
               restTime += nowData - pastData;
             }
@@ -3261,6 +4532,282 @@ vue__WEBPACK_IMPORTED_MODULE_0___default.a.use(v_calendar__WEBPACK_IMPORTED_MODU
       })["catch"](function (error) {
         console.log(error);
       });
+    },
+    detailCalc: function detailCalc(theDay, time, overtime, midnightTime, midnightOvertime, hours8, hours24, pastData, nowData, am5, pm10, loopTime) {
+      if (pastData <= am5) {
+        if (nowData <= am5) {
+          if (time + midnightTime < hours8) {
+            midnightTime += nowData - pastData;
+
+            if (time + midnightTime >= hours8) {
+              midnightOvertime += time + midnightTime - hours8;
+              midnightTime -= time + midnightTime - hours8;
+            }
+          } else {
+            midnightOvertime += nowData - pastData;
+          }
+        } else if (nowData > am5 && nowData <= pm10) {
+          if (time + midnightTime < hours8) {
+            midnightTime += am5 - pastData;
+
+            if (time + midnightTime >= hours8) {
+              midnightOvertime += time + midnightTime - hours8;
+              midnightTime -= time + midnightTime - hours8;
+            }
+
+            time += nowData - am5;
+
+            if (time + midnightTime >= hours8) {
+              overtime += time + midnightTime - hours8;
+              time -= time + midnightTime - hours8;
+            }
+          } else {
+            midnightOvertime += am5 - pastData;
+            overtime += nowData - am5;
+          }
+        } else {
+          if (loopTime == 0) {
+            if (time + midnightTime < hours8) {
+              midnightTime += am5 - pastData;
+
+              if (time + midnightTime > hours8) {
+                midnightOvertime += time + midnightTime - hours8;
+                midnightTime -= time + midnightTime - hours8;
+              }
+
+              time += 61200000;
+
+              if (time + midnightTime >= hours8) {
+                overtime += time + midnightTime - hours8;
+                time -= time + midnightTime - hours8;
+              }
+
+              midnightOvertime += nowData - pm10;
+            } else {
+              midnightOvertime += am5 - pastData;
+              overtime += 61200000;
+              midnightOvertime += nowData - pm10;
+            }
+          } else {
+            for (var y = 1; y <= loopTime; y++) {
+              am5 += hours24;
+              pm10 += hours24;
+
+              if (y == loopTime) {
+                if (nowData <= am5) {
+                  midnightOvertime += nowData - theDay.getTime() - hours24 * y;
+                } else if (nowData > am5 && nowData <= pm10) {
+                  midnightOvertime += 18000000;
+                  overtime += nowData - am5;
+                } else {
+                  midnightOvertime += 18000000;
+                  overtime += 61200000;
+                  midnightOvertime += nowData - pm10;
+                }
+              } else {
+                midnightOvertime += 18000000;
+                overtime += 61200000;
+                midnightOvertime += 7200000;
+              }
+            }
+          }
+        }
+      } else if (pastData > pm10) {
+        if (nowData < theDay.getTime() + hours24) {
+          if (time + midnightTime < hours8) {
+            midnightTime += nowData - pastData;
+
+            if (time + midnightTime >= hours8) {
+              midnightOvertime += time + midnightTime - hours8;
+              midnightTime -= time + midnightTime - hours8;
+            }
+          } else {
+            midnightOvertime += nowData - pastData;
+          }
+        } else {
+          if (pastData < theDay.getTime() + hours24) {
+            midnightTime += theDay.getTime() + hours24 - pastData;
+
+            if (time + midnightTime >= hours8) {
+              midnightOvertime += time + midnightTime - hours8;
+              midnightTime -= time + midnightTime - hours8;
+            }
+
+            for (var _y = 1; _y <= loopTime; _y++) {
+              am5 += hours24;
+              pm10 += hours24;
+
+              if (_y == loopTime) {
+                if (nowData <= am5) {
+                  midnightTime += nowData - theDay.getTime() - hours24 * _y;
+
+                  if (time + midnightTime >= hours8) {
+                    midnightOvertime += time + midnightTime - hours8;
+                    midnightTime -= time + midnightTime - hours8;
+                  }
+                } else if (nowData > am5 && nowData <= pm10) {
+                  midnightTime += 18000000;
+
+                  if (time + midnightTime >= hours8) {
+                    midnightOvertime += time + midnightTime - hours8;
+                    midnightTime -= time + midnightTime - hours8;
+                  }
+
+                  time += nowData - am5;
+
+                  if (time + midnightTime >= hours8) {
+                    overtime += time + midnightTime - hours8;
+                    time -= time + midnightTime - hours8;
+                  }
+                } else {
+                  midnightTime += 18000000;
+
+                  if (time + midnightTime >= hours8) {
+                    midnightOvertime += time + midnightTime - hours8;
+                    midnightTime -= time + midnightTime - hours8;
+                  }
+
+                  time += 61200000;
+
+                  if (time + midnightTime >= hours8) {
+                    overtime += time + midnightTime - hours8;
+                    time -= time + midnightTime - hours8;
+                  }
+
+                  midnightOvertime += nowData - pm10;
+                }
+              } else {
+                midnightTime += 18000000;
+
+                if (time + midnightTime >= hours8) {
+                  midnightOvertime += time + midnightTime - hours8;
+                  midnightTime -= time + midnightTime - hours8;
+                }
+
+                time += 61200000;
+
+                if (time + midnightTime >= hours8) {
+                  overtime += time + midnightTime - hours8;
+                  time -= time + midnightTime - hours8;
+                }
+
+                midnightOvertime += 7200000;
+              }
+            }
+          } else {
+            am5 += hours24;
+            pm10 += hours24;
+            loopTime--;
+            theDay.setDate(theDay.getDate() + 1);
+            var resultArray = this.detailCalc(theDay, time, overtime, midnightTime, midnightOvertime, hours8, hours24, pastData, nowData, am5, pm10, loopTime);
+            time = resultArray[0];
+            overtime = resultArray[1];
+            midnightTime = resultArray[2];
+            midnightOvertime = resultArray[3];
+          }
+        }
+      } else {
+        if (nowData <= pm10) {
+          time += nowData - pastData;
+
+          if (time + midnightTime >= hours8) {
+            overtime += time + midnightTime - hours8;
+            time -= time + midnightTime - hours8;
+          }
+        } else if (nowData <= theDay.getTime() + hours24) {
+          time += pm10 - pastData;
+
+          if (time + midnightTime >= hours8) {
+            overtime += time + midnightTime - hours8;
+            time -= time + midnightTime - hours8;
+          }
+
+          midnightTime += nowData - pm10;
+
+          if (time + midnightTime >= hours8) {
+            midnightOvertime += time + midnightTime - hours8;
+            midnightTime -= time + midnightTime - hours8;
+          }
+        } else {
+          time += pm10 - pastData;
+
+          if (time + midnightTime >= hours8) {
+            overtime += time + midnightTime - hours8;
+            time -= time + midnightTime - hours8;
+          }
+
+          midnightTime += 7200000;
+
+          if (time + midnightTime >= hours8) {
+            midnightOvertime += time + midnightTime - hours8;
+            midnightTime -= time + midnightTime - hours8;
+          }
+
+          for (var _y2 = 1; _y2 <= loopTime; _y2++) {
+            am5 += hours24;
+            pm10 += hours24;
+
+            if (_y2 == loopTime) {
+              if (nowData <= am5) {
+                midnightTime += nowData - theDay.getTime() - hours24 * _y2;
+
+                if (time + midnightTime >= hours8) {
+                  midnightOvertime += time + midnightTime - hours8;
+                  midnightTime -= time + midnightTime - hours8;
+                }
+              } else if (nowData > am5 && nowData <= pm10) {
+                midnightTime += 18000000;
+
+                if (time + midnightTime >= hours8) {
+                  midnightOvertime += time + midnightTime - hours8;
+                  midnightTime -= time + midnightTime - hours8;
+                }
+
+                time += nowData - am5;
+
+                if (time + midnightTime >= hours8) {
+                  overtime += time + midnightTime - hours8;
+                  time -= time + midnightTime - hours8;
+                }
+              } else {
+                midnightTime += 18000000;
+
+                if (time + midnightTime >= hours8) {
+                  midnightOvertime += time + midnightTime - hours8;
+                  midnightTime -= time + midnightTime - hours8;
+                }
+
+                time += 61200000;
+
+                if (time + midnightTime >= hours8) {
+                  overtime += time + midnightTime - hours8;
+                  time -= time + midnightTime - hours8;
+                }
+
+                midnightOvertime += nowData - pm10;
+              }
+            } else {
+              midnightTime += 18000000;
+
+              if (time + midnightTime >= hours8) {
+                midnightOvertime += time + midnightTime - hours8;
+                midnightTime -= time + midnightTime - hours8;
+              }
+
+              time += 61200000;
+
+              if (time + midnightTime >= hours8) {
+                overtime += time + midnightTime - hours8;
+                time -= time + midnightTime - hours8;
+              }
+
+              midnightOvertime += 7200000;
+            }
+          }
+        }
+      }
+
+      return [time, overtime, midnightTime, midnightOvertime];
     }
   }
 });
@@ -4112,6 +5659,10 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -4133,12 +5684,6 @@ __webpack_require__.r(__webpack_exports__);
     this.currentDate = _ref[2];
   },
   mounted: function mounted() {
-    var id = document.querySelector("meta[name='user-id']").getAttribute('content');
-
-    if (id <= 0) {
-      this.$router.push("/");
-    }
-
     this.calendarMaker();
   },
   methods: {
@@ -4224,252 +5769,11 @@ __webpack_require__.r(__webpack_exports__);
               loopTime = Math.floor((nowData - today.getTime()) / (24 * 60 * 60 * 1000));
 
               if (array[x - 1].on_duty == '出勤' || array[x - 1].on_duty == '休出') {
-                if (pastData <= am5) {
-                  if (nowData <= am5) {
-                    if (time + midnightTime < hours8) {
-                      midnightTime += nowData - pastData;
-
-                      if (time + midnightTime >= hours8) {
-                        midnightOvertime += time + midnightTime - hours8;
-                        midnightTime -= time + midnightTime - hours8;
-                      }
-                    } else {
-                      midnightOvertime += nowData - pastData;
-                    }
-                  } else if (nowData > am5 && nowData <= pm10) {
-                    if (time + midnightTime < hours8) {
-                      midnightTime += am5 - pastData;
-
-                      if (time + midnightTime >= hours8) {
-                        midnightOvertime += time + midnightTime - hours8;
-                        midnightTime -= time + midnightTime - hours8;
-                      }
-
-                      time += nowData - am5;
-
-                      if (time + midnightTime >= hours8) {
-                        overtime += time + midnightTime - hours8;
-                        time -= time + midnightTime - hours8;
-                      }
-                    } else {
-                      midnightOvertime += am5 - pastData;
-                      overtime += nowData - am5;
-                    }
-                  } else {
-                    if (loopTime == 0) {
-                      if (time + midnightTime < hours8) {
-                        midnightTime += am5 - pastData;
-
-                        if (time + midnightTime > hours8) {
-                          midnightOvertime += time + midnightTime - hours8;
-                          midnightTime -= time + midnightTime - hours8;
-                        }
-
-                        time += 61200000;
-
-                        if (time + midnightTime >= hours8) {
-                          overtime += time + midnightTime - hours8;
-                          time -= time + midnightTime - hours8;
-                        }
-
-                        midnightOvertime += nowData - pm10;
-                      } else {
-                        midnightOvertime += am5 - pastData;
-                        overtime += 61200000;
-                        midnightOvertime += nowData - pm10;
-                      }
-                    } else {
-                      for (var y = 1; y <= loopTime; y++) {
-                        am5 += hours24;
-                        pm10 += hours24;
-
-                        if (y == loopTime) {
-                          if (nowData <= am5) {
-                            midnightOvertime += nowData - today.getTime() - hours24 * y;
-                          } else if (nowData > am5 && nowData <= pm10) {
-                            midnightOvertime += 18000000;
-                            overtime += nowData - am5;
-                          } else {
-                            midnightOvertime += 18000000;
-                            overtime += 61200000;
-                            midnightOvertime += nowData - pm10;
-                          }
-                        } else {
-                          midnightOvertime += 18000000;
-                          overtime += 61200000;
-                          midnightOvertime += 7200000;
-                        }
-                      }
-                    }
-                  }
-                } else if (pastData > pm10) {
-                  if (nowData < today.getTime() + hours24) {
-                    if (time + midnightTime < hours8) {
-                      midnightTime += nowData - pastData;
-
-                      if (time + midnightTime >= hours8) {
-                        midnightOvertime += time + midnightTime - hours8;
-                        midnightTime -= time + midnightTime - hours8;
-                      }
-                    } else {
-                      midnightOvertime += nowData - pastData;
-                    }
-                  } else {
-                    midnightTime += today.getTime() + hours24 - pastData;
-
-                    if (time + midnightTime >= hours8) {
-                      midnightOvertime += time + midnightTime - hours8;
-                      midnightTime -= time + midnightTime - hours8;
-                    }
-
-                    for (var _y = 1; _y <= loopTime; _y++) {
-                      am5 += hours24;
-                      pm10 += hours24;
-
-                      if (_y == loopTime) {
-                        if (nowData <= am5) {
-                          midnightTime += nowData - today.getTime() - hours24 * _y;
-
-                          if (time + midnightTime >= hours8) {
-                            midnightOvertime += time + midnightTime - hours8;
-                            midnightTime -= time + midnightTime - hours8;
-                          }
-                        } else if (nowData > am5 && nowData <= pm10) {
-                          midnightTime += 18000000;
-
-                          if (time + midnightTime >= hours8) {
-                            midnightOvertime += time + midnightTime - hours8;
-                            midnightTime -= time + midnightTime - hours8;
-                          }
-
-                          time += nowData - am5;
-
-                          if (time + midnightTime >= hours8) {
-                            overtime += time + midnightTime - hours8;
-                            time -= time + midnightTime - hours8;
-                          }
-                        } else {
-                          midnightTime += 18000000;
-
-                          if (time + midnightTime >= hours8) {
-                            midnightOvertime += time + midnightTime - hours8;
-                            midnightTime -= time + midnightTime - hours8;
-                          }
-
-                          time += 61200000;
-
-                          if (time + midnightTime >= hours8) {
-                            overtime += time + midnightTime - hours8;
-                            time -= time + midnightTime - hours8;
-                          }
-
-                          midnightOvertime += nowData - pm10;
-                        }
-                      } else {
-                        midnightTime += 18000000;
-
-                        if (time + midnightTime >= hours8) {
-                          midnightOvertime += time + midnightTime - hours8;
-                          midnightTime -= time + midnightTime - hours8;
-                        }
-
-                        time += 61200000;
-
-                        if (time + midnightTime >= hours8) {
-                          overtime += time + midnightTime - hours8;
-                          time -= time + midnightTime - hours8;
-                        }
-
-                        midnightOvertime += 7200000;
-                      }
-                    }
-                  }
-                } else {
-                  if (nowData <= pm10) {
-                    time += nowData - pastData;
-
-                    if (time + midnightTime >= hours8) {
-                      overtime += time + midnightTime - hours8;
-                      time -= time + midnightTime - hours8;
-                    }
-                  } else {
-                    time += pm10 - pastData;
-
-                    if (time + midnightTime >= hours8) {
-                      overtime += time + midnightTime - hours8;
-                      time -= time + midnightTime - hours8;
-                    }
-
-                    midnightTime += 7200000;
-
-                    if (time + midnightTime >= hours8) {
-                      midnightOvertime += time + midnightTime - hours8;
-                      midnightTime -= time + midnightTime - hours8;
-                    }
-
-                    for (var _y2 = 1; _y2 <= loopTime; _y2++) {
-                      am5 += hours24;
-                      pm10 += hours24;
-
-                      if (_y2 == loopTime) {
-                        if (nowData <= am5) {
-                          midnightTime += nowData - today.getTime() - hours24 * _y2;
-
-                          if (time + midnightTime >= hours8) {
-                            midnightOvertime += time + midnightTime - hours8;
-                            midnightTime -= time + midnightTime - hours8;
-                          }
-                        } else if (nowData > am5 && nowData <= pm10) {
-                          midnightTime += 18000000;
-
-                          if (time + midnightTime >= hours8) {
-                            midnightOvertime += time + midnightTime - hours8;
-                            midnightTime -= time + midnightTime - hours8;
-                          }
-
-                          time += nowData - am5;
-
-                          if (time + midnightTime >= hours8) {
-                            overtime += time + midnightTime - hours8;
-                            time -= time + midnightTime - hours8;
-                          }
-                        } else {
-                          midnightTime += 18000000;
-
-                          if (time + midnightTime >= hours8) {
-                            midnightOvertime += time + midnightTime - hours8;
-                            midnightTime -= time + midnightTime - hours8;
-                          }
-
-                          time += 61200000;
-
-                          if (time + midnightTime >= hours8) {
-                            overtime += time + midnightTime - hours8;
-                            time -= time + midnightTime - hours8;
-                          }
-
-                          midnightOvertime += nowData - pm10;
-                        }
-                      } else {
-                        midnightTime += 18000000;
-
-                        if (time + midnightTime >= hours8) {
-                          midnightOvertime += time + midnightTime - hours8;
-                          midnightTime -= time + midnightTime - hours8;
-                        }
-
-                        time += 61200000;
-
-                        if (time + midnightTime >= hours8) {
-                          overtime += time + midnightTime - hours8;
-                          time -= time + midnightTime - hours8;
-                        }
-
-                        midnightOvertime += 7200000;
-                      }
-                    }
-                  }
-                }
+                resultArray = _this.detailCalc(today, time, overtime, midnightTime, midnightOvertime, hours8, hours24, pastData, nowData, am5, pm10, loopTime);
+                time = resultArray[0];
+                overtime = resultArray[1];
+                midnightTime = resultArray[2];
+                midnightOvertime = resultArray[3];
               } else if (array[x - 1].on_duty == '休入') {
                 restTime += nowData - pastData;
               }
@@ -4505,6 +5809,7 @@ __webpack_require__.r(__webpack_exports__);
           var am5;
           var pm10;
           var loopTime;
+          var resultArray;
           var params1;
           var plusOne;
           var params2;
@@ -4540,6 +5845,282 @@ __webpack_require__.r(__webpack_exports__);
 
       var passTime = diffHour + ':' + diffMinites + ':' + diffSeconds;
       return passTime;
+    },
+    detailCalc: function detailCalc(theDay, time, overtime, midnightTime, midnightOvertime, hours8, hours24, pastData, nowData, am5, pm10, loopTime) {
+      if (pastData <= am5) {
+        if (nowData <= am5) {
+          if (time + midnightTime < hours8) {
+            midnightTime += nowData - pastData;
+
+            if (time + midnightTime >= hours8) {
+              midnightOvertime += time + midnightTime - hours8;
+              midnightTime -= time + midnightTime - hours8;
+            }
+          } else {
+            midnightOvertime += nowData - pastData;
+          }
+        } else if (nowData > am5 && nowData <= pm10) {
+          if (time + midnightTime < hours8) {
+            midnightTime += am5 - pastData;
+
+            if (time + midnightTime >= hours8) {
+              midnightOvertime += time + midnightTime - hours8;
+              midnightTime -= time + midnightTime - hours8;
+            }
+
+            time += nowData - am5;
+
+            if (time + midnightTime >= hours8) {
+              overtime += time + midnightTime - hours8;
+              time -= time + midnightTime - hours8;
+            }
+          } else {
+            midnightOvertime += am5 - pastData;
+            overtime += nowData - am5;
+          }
+        } else {
+          if (loopTime == 0) {
+            if (time + midnightTime < hours8) {
+              midnightTime += am5 - pastData;
+
+              if (time + midnightTime > hours8) {
+                midnightOvertime += time + midnightTime - hours8;
+                midnightTime -= time + midnightTime - hours8;
+              }
+
+              time += 61200000;
+
+              if (time + midnightTime >= hours8) {
+                overtime += time + midnightTime - hours8;
+                time -= time + midnightTime - hours8;
+              }
+
+              midnightOvertime += nowData - pm10;
+            } else {
+              midnightOvertime += am5 - pastData;
+              overtime += 61200000;
+              midnightOvertime += nowData - pm10;
+            }
+          } else {
+            for (var y = 1; y <= loopTime; y++) {
+              am5 += hours24;
+              pm10 += hours24;
+
+              if (y == loopTime) {
+                if (nowData <= am5) {
+                  midnightOvertime += nowData - theDay.getTime() - hours24 * y;
+                } else if (nowData > am5 && nowData <= pm10) {
+                  midnightOvertime += 18000000;
+                  overtime += nowData - am5;
+                } else {
+                  midnightOvertime += 18000000;
+                  overtime += 61200000;
+                  midnightOvertime += nowData - pm10;
+                }
+              } else {
+                midnightOvertime += 18000000;
+                overtime += 61200000;
+                midnightOvertime += 7200000;
+              }
+            }
+          }
+        }
+      } else if (pastData > pm10) {
+        if (nowData < theDay.getTime() + hours24) {
+          if (time + midnightTime < hours8) {
+            midnightTime += nowData - pastData;
+
+            if (time + midnightTime >= hours8) {
+              midnightOvertime += time + midnightTime - hours8;
+              midnightTime -= time + midnightTime - hours8;
+            }
+          } else {
+            midnightOvertime += nowData - pastData;
+          }
+        } else {
+          if (pastData < theDay.getTime() + hours24) {
+            midnightTime += theDay.getTime() + hours24 - pastData;
+
+            if (time + midnightTime >= hours8) {
+              midnightOvertime += time + midnightTime - hours8;
+              midnightTime -= time + midnightTime - hours8;
+            }
+
+            for (var _y = 1; _y <= loopTime; _y++) {
+              am5 += hours24;
+              pm10 += hours24;
+
+              if (_y == loopTime) {
+                if (nowData <= am5) {
+                  midnightTime += nowData - theDay.getTime() - hours24 * _y;
+
+                  if (time + midnightTime >= hours8) {
+                    midnightOvertime += time + midnightTime - hours8;
+                    midnightTime -= time + midnightTime - hours8;
+                  }
+                } else if (nowData > am5 && nowData <= pm10) {
+                  midnightTime += 18000000;
+
+                  if (time + midnightTime >= hours8) {
+                    midnightOvertime += time + midnightTime - hours8;
+                    midnightTime -= time + midnightTime - hours8;
+                  }
+
+                  time += nowData - am5;
+
+                  if (time + midnightTime >= hours8) {
+                    overtime += time + midnightTime - hours8;
+                    time -= time + midnightTime - hours8;
+                  }
+                } else {
+                  midnightTime += 18000000;
+
+                  if (time + midnightTime >= hours8) {
+                    midnightOvertime += time + midnightTime - hours8;
+                    midnightTime -= time + midnightTime - hours8;
+                  }
+
+                  time += 61200000;
+
+                  if (time + midnightTime >= hours8) {
+                    overtime += time + midnightTime - hours8;
+                    time -= time + midnightTime - hours8;
+                  }
+
+                  midnightOvertime += nowData - pm10;
+                }
+              } else {
+                midnightTime += 18000000;
+
+                if (time + midnightTime >= hours8) {
+                  midnightOvertime += time + midnightTime - hours8;
+                  midnightTime -= time + midnightTime - hours8;
+                }
+
+                time += 61200000;
+
+                if (time + midnightTime >= hours8) {
+                  overtime += time + midnightTime - hours8;
+                  time -= time + midnightTime - hours8;
+                }
+
+                midnightOvertime += 7200000;
+              }
+            }
+          } else {
+            am5 += hours24;
+            pm10 += hours24;
+            loopTime--;
+            theDay.setDate(theDay.getDate() + 1);
+            var resultArray = this.detailCalc(theDay, time, overtime, midnightTime, midnightOvertime, hours8, hours24, pastData, nowData, am5, pm10, loopTime);
+            time = resultArray[0];
+            overtime = resultArray[1];
+            midnightTime = resultArray[2];
+            midnightOvertime = resultArray[3];
+          }
+        }
+      } else {
+        if (nowData <= pm10) {
+          time += nowData - pastData;
+
+          if (time + midnightTime >= hours8) {
+            overtime += time + midnightTime - hours8;
+            time -= time + midnightTime - hours8;
+          }
+        } else if (nowData <= theDay.getTime() + hours24) {
+          time += pm10 - pastData;
+
+          if (time + midnightTime >= hours8) {
+            overtime += time + midnightTime - hours8;
+            time -= time + midnightTime - hours8;
+          }
+
+          midnightTime += nowData - pm10;
+
+          if (time + midnightTime >= hours8) {
+            midnightOvertime += time + midnightTime - hours8;
+            midnightTime -= time + midnightTime - hours8;
+          }
+        } else {
+          time += pm10 - pastData;
+
+          if (time + midnightTime >= hours8) {
+            overtime += time + midnightTime - hours8;
+            time -= time + midnightTime - hours8;
+          }
+
+          midnightTime += 7200000;
+
+          if (time + midnightTime >= hours8) {
+            midnightOvertime += time + midnightTime - hours8;
+            midnightTime -= time + midnightTime - hours8;
+          }
+
+          for (var _y2 = 1; _y2 <= loopTime; _y2++) {
+            am5 += hours24;
+            pm10 += hours24;
+
+            if (_y2 == loopTime) {
+              if (nowData <= am5) {
+                midnightTime += nowData - theDay.getTime() - hours24 * _y2;
+
+                if (time + midnightTime >= hours8) {
+                  midnightOvertime += time + midnightTime - hours8;
+                  midnightTime -= time + midnightTime - hours8;
+                }
+              } else if (nowData > am5 && nowData <= pm10) {
+                midnightTime += 18000000;
+
+                if (time + midnightTime >= hours8) {
+                  midnightOvertime += time + midnightTime - hours8;
+                  midnightTime -= time + midnightTime - hours8;
+                }
+
+                time += nowData - am5;
+
+                if (time + midnightTime >= hours8) {
+                  overtime += time + midnightTime - hours8;
+                  time -= time + midnightTime - hours8;
+                }
+              } else {
+                midnightTime += 18000000;
+
+                if (time + midnightTime >= hours8) {
+                  midnightOvertime += time + midnightTime - hours8;
+                  midnightTime -= time + midnightTime - hours8;
+                }
+
+                time += 61200000;
+
+                if (time + midnightTime >= hours8) {
+                  overtime += time + midnightTime - hours8;
+                  time -= time + midnightTime - hours8;
+                }
+
+                midnightOvertime += nowData - pm10;
+              }
+            } else {
+              midnightTime += 18000000;
+
+              if (time + midnightTime >= hours8) {
+                midnightOvertime += time + midnightTime - hours8;
+                midnightTime -= time + midnightTime - hours8;
+              }
+
+              time += 61200000;
+
+              if (time + midnightTime >= hours8) {
+                overtime += time + midnightTime - hours8;
+                time -= time + midnightTime - hours8;
+              }
+
+              midnightOvertime += 7200000;
+            }
+          }
+        }
+      }
+
+      return [time, overtime, midnightTime, midnightOvertime];
     }
   }
 });
@@ -4571,6 +6152,10 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
+//
+//
+//
+//
 //
 //
 //
@@ -4818,6 +6403,289 @@ Object(vee_validate__WEBPACK_IMPORTED_MODULE_1__["extend"])("confirmed", _object
           }
         }, _callee);
       }))();
+    }
+  }
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/page/TaskDetail.vue?vue&type=script&lang=js&":
+/*!**************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/page/TaskDetail.vue?vue&type=script&lang=js& ***!
+  \**************************************************************************************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.js");
+/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vue__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var v_calendar__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! v-calendar */ "./node_modules/v-calendar/lib/v-calendar.umd.min.js");
+/* harmony import */ var v_calendar__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(v_calendar__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var vee_validate__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! vee-validate */ "./node_modules/vee-validate/dist/vee-validate.esm.js");
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+
+vue__WEBPACK_IMPORTED_MODULE_0___default.a.use(v_calendar__WEBPACK_IMPORTED_MODULE_1___default.a);
+/* harmony default export */ __webpack_exports__["default"] = ({
+  data: function data() {
+    return {
+      date: new Date(),
+      year: 0,
+      month: 0,
+      theDate: '',
+      searchSwitch: true,
+      selectedYear: 'initial',
+      selectedMonth: 'initial',
+      taskRecordsInt: [],
+      taskRecords: [],
+      total: 0
+    };
+  },
+  created: function created() {
+    var date = new Date();
+    var _ref = [date.getFullYear(), ("0" + (date.getMonth() + 1)).slice(-2)];
+    this.year = _ref[0];
+    this.month = _ref[1];
+  },
+  mounted: function mounted() {
+    var from_day = this.year + '-' + this.month + '-01 00:00:00';
+
+    if (this.month == 12) {
+      var theYear = Number(this.year) + 1;
+      var theMonth = '01';
+    } else {
+      var theYear = this.year;
+      var theMonth = ("0" + (Number(this.month) + 1)).slice(-2);
+    }
+
+    var to_day = theYear + '-' + theMonth + '-01 00:00:00';
+    this.searchDetail(from_day, to_day);
+  },
+  methods: {
+    switchItem: function switchItem() {
+      this.searchSwitch = !this.searchSwitch;
+      this.theDate = '';
+    },
+    searchTaskMonth: function searchTaskMonth() {
+      if (this.selectedYear != 'initial' && this.selectedMonth != 'initial') {
+        var from_day = this.selectedYear + '-' + this.selectedMonth + '-01 00:00:00';
+
+        if (this.selectedMonth == 12) {
+          var theYear = Number(this.selectedYear) + 1;
+          var theMonth = '01';
+        } else {
+          var theYear = this.selectedYear;
+          var theMonth = ("0" + (Number(this.selectedMonth) + 1)).slice(-2);
+        }
+
+        var to_day = theYear + '-' + theMonth + '-01 00:00:00';
+        this.searchDetail(from_day, to_day);
+        this.year = this.selectedYear;
+        this.month = this.selectedMonth;
+        this.selectedYear = 'initial';
+        this.selectedMonth = 'initial';
+      }
+    },
+    searchTaskDay: function searchTaskDay() {
+      var theMonth = ("0" + (Number(this.date.getMonth()) + 1)).slice(-2);
+      var theDate = ("0" + this.date.getDate()).slice(-2);
+      var from_day = this.date.getFullYear() + '-' + theMonth + '-' + theDate + ' 00:00:00';
+      var nextDay = new Date(this.date.getFullYear(), this.date.getMonth(), Number(theDate) + 1);
+      var nextDayMonth = ("0" + (Number(nextDay.getMonth()) + 1)).slice(-2);
+      var nextDayDate = ("0" + nextDay.getDate()).slice(-2);
+      var to_day = nextDay.getFullYear() + '-' + nextDayMonth + '-' + nextDayDate + ' 00:00:00';
+      this.searchDetail(from_day, to_day);
+      this.year = this.date.getFullYear();
+      this.month = theMonth;
+      this.theDate = '/' + theDate;
+    },
+    searchDetail: function searchDetail(from_day, to_day) {
+      var _this = this;
+
+      var data = {
+        fromDay: from_day,
+        toDay: to_day
+      };
+      var authId = document.querySelector("meta[name='user-id']").getAttribute('content');
+      axios.post('/api/taskDetail/' + authId, data).then(function (res) {
+        _this.taskRecordsInt = [];
+        _this.total = 0;
+        var i = 0;
+        res.data.forEach(function (task) {
+          _this.total += Number(task.task_time);
+
+          if (i == 0) {
+            _this.taskRecordsInt.push({
+              task_name: task.task_name,
+              task_time: task.task_time
+            });
+          } else {
+            var j = 0;
+
+            _this.taskRecordsInt.forEach(function (record) {
+              if (record.task_name == task.task_name) {
+                record.task_time = Number(record.task_time) + Number(task.task_time);
+                j++;
+                return true;
+              }
+            });
+
+            if (j == 0) {
+              _this.taskRecordsInt.push({
+                task_name: task.task_name,
+                task_time: task.task_time
+              });
+            }
+          }
+
+          i++;
+        });
+
+        _this.taskRecordsInt.sort(function (a, b) {
+          return b.task_time - a.task_time;
+        });
+
+        _this.adjustArray();
+      })["catch"](function (error) {
+        console.log(error);
+      });
+    },
+    adjustArray: function adjustArray() {
+      var _this2 = this;
+
+      this.taskRecords = [];
+
+      if (this.taskRecordsInt.length > 0) {
+        this.taskRecordsInt.forEach(function (record) {
+          var percentage = Math.round(Number(record.task_time) / _this2.total * 100 * 10) / 10;
+
+          _this2.taskRecords.push({
+            task_name: record.task_name,
+            task_time: _this2.convertTime(record.task_time),
+            task_percentage: percentage
+          });
+        });
+      }
+    },
+    convertTime: function convertTime(diffTime) {
+      var diffHour = Math.floor(diffTime / (60 * 60));
+
+      if (diffHour < 10) {
+        diffHour = '0' + diffHour;
+      }
+
+      var diffMinites = Math.floor(diffTime / 60 % 60);
+
+      if (diffMinites < 10) {
+        diffMinites = '0' + diffMinites;
+      }
+
+      var diffSeconds = Math.floor(diffTime % 60);
+
+      if (diffSeconds < 10) {
+        diffSeconds = '0' + diffSeconds;
+      }
+
+      var passTime = diffHour + ':' + diffMinites + ':' + diffSeconds;
+      return passTime;
+    },
+    goHome: function goHome() {
+      this.$router.push("/");
     }
   }
 });
@@ -8870,9 +10738,7 @@ var render = function() {
   return _c(
     "div",
     [
-      _c("p", [_vm._v("CreateGroup")]),
-      _vm._v(" "),
-      _c("p", [_vm._v("hey!!createGroup!!")]),
+      _vm._m(0),
       _vm._v(" "),
       _c("ValidationObserver", {
         ref: "observer",
@@ -8889,96 +10755,104 @@ var render = function() {
                   domProps: { value: _vm.csrf }
                 }),
                 _vm._v(" "),
-                _c(
-                  "div",
-                  { staticClass: "input-group mb-3" },
-                  [
-                    _c(
-                      "span",
-                      {
-                        staticClass: "input-group-text",
-                        attrs: { id: "inputGroup-sizing-default" }
-                      },
-                      [_vm._v("グループ or 会社名")]
-                    ),
-                    _vm._v(" "),
-                    _c("validation-provider", {
-                      attrs: { name: "グループ名", rules: "required|max:100" },
-                      scopedSlots: _vm._u(
-                        [
-                          {
-                            key: "default",
-                            fn: function(ref) {
-                              var errors = ref.errors
-                              return [
-                                _c("input", {
-                                  directives: [
-                                    {
-                                      name: "model",
-                                      rawName: "v-model",
-                                      value: _vm.name,
-                                      expression: "name"
-                                    }
-                                  ],
-                                  staticClass: "form-control",
-                                  attrs: {
-                                    name: "name",
-                                    type: "text",
-                                    "aria-label": "Sizing example input",
-                                    "aria-describedby":
-                                      "inputGroup-sizing-default"
-                                  },
-                                  domProps: { value: _vm.name },
-                                  on: {
-                                    input: function($event) {
-                                      if ($event.target.composing) {
-                                        return
-                                      }
-                                      _vm.name = $event.target.value
-                                    }
-                                  }
-                                }),
-                                _vm._v(" "),
-                                _c(
-                                  "div",
-                                  {
-                                    directives: [
-                                      {
-                                        name: "show",
-                                        rawName: "v-show",
-                                        value: errors[0],
-                                        expression: "errors[0]"
-                                      }
-                                    ],
-                                    staticClass: "alert alert-danger"
-                                  },
-                                  [_vm._v(_vm._s(errors[0]))]
-                                )
-                              ]
-                            }
-                          }
-                        ],
-                        null,
-                        true
-                      )
-                    })
-                  ],
-                  1
-                ),
+                _c("div", { staticClass: "col-lg-3" }),
                 _vm._v(" "),
-                _c(
-                  "button",
-                  {
-                    staticClass: "btn btn-primary",
-                    attrs: { type: "button" },
-                    on: {
-                      click: function($event) {
-                        return _vm.createG()
-                      }
-                    }
-                  },
-                  [_vm._v("作成")]
-                )
+                _c("div", { staticClass: "col-lg-6" }, [
+                  _c(
+                    "div",
+                    [
+                      _c("validation-provider", {
+                        attrs: {
+                          name: "グループ名",
+                          rules: "required|max:100"
+                        },
+                        scopedSlots: _vm._u(
+                          [
+                            {
+                              key: "default",
+                              fn: function(ref) {
+                                var errors = ref.errors
+                                return [
+                                  _c(
+                                    "div",
+                                    {
+                                      directives: [
+                                        {
+                                          name: "show",
+                                          rawName: "v-show",
+                                          value: errors[0],
+                                          expression: "errors[0]"
+                                        }
+                                      ],
+                                      staticClass: "alert alert-danger"
+                                    },
+                                    [_vm._v(_vm._s(errors[0]))]
+                                  ),
+                                  _vm._v(" "),
+                                  _c(
+                                    "div",
+                                    {
+                                      staticClass: "input-group input-group-lg"
+                                    },
+                                    [
+                                      _c("input", {
+                                        directives: [
+                                          {
+                                            name: "model",
+                                            rawName: "v-model",
+                                            value: _vm.name,
+                                            expression: "name"
+                                          }
+                                        ],
+                                        staticClass: "form-control",
+                                        attrs: {
+                                          name: "name",
+                                          type: "text",
+                                          placeholder: "グループ名 or 会社名",
+                                          "aria-label": "グループ名 or 会社名",
+                                          "aria-describedby":
+                                            "inputGroup-sizing-default"
+                                        },
+                                        domProps: { value: _vm.name },
+                                        on: {
+                                          input: function($event) {
+                                            if ($event.target.composing) {
+                                              return
+                                            }
+                                            _vm.name = $event.target.value
+                                          }
+                                        }
+                                      }),
+                                      _vm._v(" "),
+                                      _c(
+                                        "button",
+                                        {
+                                          staticClass: "btn btn-primary",
+                                          attrs: { type: "button" },
+                                          on: {
+                                            click: function($event) {
+                                              return _vm.createG()
+                                            }
+                                          }
+                                        },
+                                        [_vm._v("作成")]
+                                      )
+                                    ]
+                                  )
+                                ]
+                              }
+                            }
+                          ],
+                          null,
+                          true
+                        )
+                      })
+                    ],
+                    1
+                  )
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "col-lg-3" })
               ]
             }
           }
@@ -8986,23 +10860,48 @@ var render = function() {
       }),
       _vm._v(" "),
       _c(
-        "button",
+        "div",
         {
-          on: {
-            click: function($event) {
-              $event.stopPropagation()
-              $event.preventDefault()
-              return _vm.goHome()
-            }
-          }
+          staticClass: "homeButton",
+          staticStyle: { "text-align": "center", "padding-top": "20px" }
         },
-        [_vm._v("戻る")]
+        [
+          _c(
+            "button",
+            {
+              staticClass: "btn btn-outline-info",
+              attrs: { type: "button" },
+              on: {
+                click: function($event) {
+                  $event.stopPropagation()
+                  $event.preventDefault()
+                  return _vm.goHome()
+                }
+              }
+            },
+            [_vm._v("ホームへ戻る")]
+          )
+        ]
       )
     ],
     1
   )
 }
-var staticRenderFns = []
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c(
+      "div",
+      {
+        staticClass: "createGroupTitle",
+        staticStyle: { "text-align": "center" }
+      },
+      [_c("h3", { staticStyle: { padding: "10px" } }, [_vm._v("グループ作成")])]
+    )
+  }
+]
 render._withStripped = true
 
 
@@ -9025,42 +10924,100 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c("div", [
-    _c("p", [_vm._v("GroupMember")]),
+    _vm._m(0),
     _vm._v(" "),
-    _c(
-      "ul",
-      { staticClass: "list-group" },
-      _vm._l(_vm.users, function(user) {
-        return _c(
-          "li",
-          {
-            staticClass:
-              "list-group-item d-flex justify-content-between align-items-center"
-          },
-          [
-            _vm._v("\n      " + _vm._s(user.name) + "\n      "),
+    _c("div", { staticClass: "container" }, [
+      _c("div", { staticClass: "row" }, [
+        _c("div", { staticClass: "col-lg-3" }),
+        _vm._v(" "),
+        _c("div", { staticClass: "col-lg-6" }, [
+          _c("table", { staticClass: "table" }, [
+            _vm._m(1),
+            _vm._v(" "),
             _c(
-              "button",
-              {
-                staticClass: "btn btn-outline-primary",
-                attrs: {
-                  type: "button",
-                  "data-toggle": "modal",
-                  "data-target": "#exampleModal"
-                },
-                on: {
-                  click: function($event) {
-                    return _vm.banishName(user.id, user.name)
-                  }
-                }
-              },
-              [_vm._v("\n        追放する\n      ")]
+              "tbody",
+              _vm._l(_vm.users, function(user) {
+                return _c("tr", [
+                  _c("td", { attrs: { scope: "row" } }),
+                  _vm._v(" "),
+                  _c("td", [_vm._v(_vm._s(user.name))]),
+                  _vm._v(" "),
+                  _c(
+                    "td",
+                    { staticStyle: { "text-align": "right" } },
+                    [
+                      _c(
+                        "router-link",
+                        {
+                          staticClass: "btn btn-outline-primary",
+                          attrs: {
+                            type: "button",
+                            to: {
+                              name: "memberAttendance",
+                              params: { id: user.id, name: user.name }
+                            }
+                          }
+                        },
+                        [
+                          _vm._v(
+                            "\n                  勤怠詳細\n                "
+                          )
+                        ]
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "router-link",
+                        {
+                          staticClass: "btn btn-outline-primary",
+                          attrs: {
+                            type: "button",
+                            to: {
+                              name: "memberTask",
+                              params: { id: user.id, name: user.name }
+                            }
+                          }
+                        },
+                        [
+                          _vm._v(
+                            "\n                  タスク詳細\n                "
+                          )
+                        ]
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "button",
+                        {
+                          staticClass: "btn btn-outline-primary",
+                          attrs: {
+                            type: "button",
+                            "data-toggle": "modal",
+                            "data-target": "#exampleModal"
+                          },
+                          on: {
+                            click: function($event) {
+                              return _vm.banishName(user.id, user.name)
+                            }
+                          }
+                        },
+                        [
+                          _vm._v(
+                            "\n                  追放する\n                "
+                          )
+                        ]
+                      )
+                    ],
+                    1
+                  )
+                ])
+              }),
+              0
             )
-          ]
-        )
-      }),
-      0
-    ),
+          ])
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "col-lg-3" })
+      ])
+    ]),
     _vm._v(" "),
     _c(
       "div",
@@ -9076,7 +11033,7 @@ var render = function() {
       [
         _c("div", { staticClass: "modal-dialog" }, [
           _c("div", { staticClass: "modal-content" }, [
-            _vm._m(0),
+            _vm._m(2),
             _vm._v(" "),
             _c("div", { staticClass: "modal-body" }, [
               _vm._v(
@@ -9115,24 +11072,61 @@ var render = function() {
       ]
     ),
     _vm._v(" "),
-    _c("p", [_vm._v("goodGuys!!")]),
-    _vm._v(" "),
     _c(
-      "button",
+      "div",
       {
-        on: {
-          click: function($event) {
-            $event.stopPropagation()
-            $event.preventDefault()
-            return _vm.goHome()
-          }
-        }
+        staticClass: "homeButton",
+        staticStyle: { "text-align": "center", "padding-top": "20px" }
       },
-      [_vm._v("戻る")]
+      [
+        _c(
+          "button",
+          {
+            staticClass: "btn btn-outline-info",
+            attrs: { type: "button" },
+            on: {
+              click: function($event) {
+                $event.stopPropagation()
+                $event.preventDefault()
+                return _vm.goHome()
+              }
+            }
+          },
+          [_vm._v("ホームへ戻る")]
+        )
+      ]
     )
   ])
 }
 var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c(
+      "div",
+      { staticClass: "theTitle", staticStyle: { "text-align": "center" } },
+      [
+        _c("h3", { staticStyle: { padding: "10px" } }, [
+          _vm._v("グループメンバー情報")
+        ])
+      ]
+    )
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("thead", [
+      _c("tr", [
+        _c("th", { attrs: { scope: "col" } }),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("ユーザー名")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } })
+      ])
+    ])
+  },
   function() {
     var _vm = this
     var _h = _vm.$createElement
@@ -9181,10 +11175,7 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c("div", [
-    _vm._v("\n  " + _vm._s(_vm.users.name) + "\n  "),
-    _c("p", [_vm._v("InviteMember")]),
-    _vm._v(" "),
-    _c("p", [_vm._v("Hey!!InviteMember!!")]),
+    _vm._m(0),
     _vm._v(" "),
     _c(
       "form",
@@ -9204,17 +11195,10 @@ var render = function() {
           domProps: { value: _vm.csrf }
         }),
         _vm._v(" "),
-        _c("div", { staticClass: "input-group mb-3" }, [
-          _c(
-            "span",
-            {
-              staticClass: "input-group-text",
-              attrs: { id: "inputGroup-sizing-default" }
-            },
-            [_vm._v("招待するユーザーのメールアドレスを入力")]
-          ),
-          _vm._v(" "),
-          _c("div", { attrs: { name: "memberAddress" } }, [
+        _c("div", { staticClass: "col-lg-3" }),
+        _vm._v(" "),
+        _c("div", { staticClass: "col-lg-6" }, [
+          _c("div", { staticClass: "input-group input-group-lg" }, [
             _c("input", {
               directives: [
                 {
@@ -9227,9 +11211,10 @@ var render = function() {
               staticClass: "form-control",
               attrs: {
                 name: "memberEmail",
-                type: "email",
-                "aria-label": "Sizing example input",
-                "aria-describedby": "inputGroup-sizing-default"
+                type: "text",
+                placeholder: "招待するユーザーのメールアドレスを入力",
+                "aria-label": "招待するユーザーのメールアドレスを入力",
+                "aria-describedby": "button-addon2"
               },
               domProps: { value: _vm.memberEmail },
               on: {
@@ -9240,35 +11225,37 @@ var render = function() {
                   _vm.memberEmail = $event.target.value
                 }
               }
-            })
+            }),
+            _vm._v(" "),
+            !_vm.button
+              ? _c(
+                  "button",
+                  {
+                    staticClass: "btn btn-primary",
+                    attrs: { type: "button", disabled: "" }
+                  },
+                  [_vm._v("招待")]
+                )
+              : _vm._e(),
+            _vm._v(" "),
+            _vm.button
+              ? _c(
+                  "button",
+                  {
+                    staticClass: "btn btn-primary",
+                    attrs: {
+                      type: "button",
+                      "data-toggle": "modal",
+                      "data-target": "#exampleModal"
+                    }
+                  },
+                  [_vm._v("招待")]
+                )
+              : _vm._e()
           ])
         ]),
         _vm._v(" "),
-        !_vm.button
-          ? _c(
-              "button",
-              {
-                staticClass: "btn btn-primary",
-                attrs: { type: "button", disabled: "" }
-              },
-              [_vm._v("招待")]
-            )
-          : _vm._e(),
-        _vm._v(" "),
-        _vm.button
-          ? _c(
-              "button",
-              {
-                staticClass: "btn btn-primary",
-                attrs: {
-                  type: "button",
-                  "data-toggle": "modal",
-                  "data-target": "#exampleModal"
-                }
-              },
-              [_vm._v("招待")]
-            )
-          : _vm._e(),
+        _c("div", { staticClass: "col-lg-3" }),
         _vm._v(" "),
         _c(
           "div",
@@ -9284,7 +11271,7 @@ var render = function() {
           [
             _c("div", { staticClass: "modal-dialog" }, [
               _c("div", { staticClass: "modal-content" }, [
-                _vm._m(0),
+                _vm._m(1),
                 _vm._v(" "),
                 _c("div", { staticClass: "modal-body" }, [
                   _vm._v(
@@ -9326,6 +11313,11 @@ var render = function() {
     _c(
       "div",
       {
+        staticStyle: {
+          "text-align": "center",
+          "padding-top": "20px",
+          color: "red"
+        },
         model: {
           value: _vm.isOKmessage,
           callback: function($$v) {
@@ -9335,14 +11327,14 @@ var render = function() {
         }
       },
       [
-        _vm.isOK ? _c("p", [_vm._v("グループに招待出来ます")]) : _vm._e(),
+        _vm.isOK ? _c("h5", [_vm._v("グループに招待出来ます")]) : _vm._e(),
         _vm._v(" "),
         _vm.alreadyG
-          ? _c("p", [_vm._v("既にグループに所属しています")])
+          ? _c("h5", [_vm._v("既にグループに所属しています")])
           : _vm._e(),
         _vm._v(" "),
         !_vm.isOK && _vm.memberEmail.length > 0 && !_vm.alreadyG
-          ? _c("p", [
+          ? _c("h5", [
               _vm._v(
                 "現在入力しているメールアドレスは登録しているユーザーと一致しません"
               )
@@ -9352,21 +11344,45 @@ var render = function() {
     ),
     _vm._v(" "),
     _c(
-      "button",
+      "div",
       {
-        on: {
-          click: function($event) {
-            $event.stopPropagation()
-            $event.preventDefault()
-            return _vm.goHome()
-          }
-        }
+        staticClass: "homeButton",
+        staticStyle: { "text-align": "center", "padding-top": "20px" }
       },
-      [_vm._v("戻る")]
+      [
+        _c(
+          "button",
+          {
+            staticClass: "btn btn-outline-info",
+            attrs: { type: "button" },
+            on: {
+              click: function($event) {
+                $event.stopPropagation()
+                $event.preventDefault()
+                return _vm.goHome()
+              }
+            }
+          },
+          [_vm._v("ホームへ戻る")]
+        )
+      ]
     )
   ])
 }
 var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c(
+      "div",
+      {
+        staticClass: "inviteMemberTitle",
+        staticStyle: { "text-align": "center" }
+      },
+      [_c("h3", { staticStyle: { padding: "10px" } }, [_vm._v("メンバー招待")])]
+    )
+  },
   function() {
     var _vm = this
     var _h = _vm.$createElement
@@ -9415,7 +11431,7 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c("div", [
-    _c("p", [_vm._v("KindOfTasks")]),
+    _vm._m(0),
     _vm._v(" "),
     _c(
       "form",
@@ -9435,17 +11451,10 @@ var render = function() {
           domProps: { value: _vm.csrf }
         }),
         _vm._v(" "),
-        _c("div", { staticClass: "input-group mb-3" }, [
-          _c(
-            "span",
-            {
-              staticClass: "input-group-text",
-              attrs: { id: "inputGroup-sizing-default" }
-            },
-            [_vm._v("追加するタスクの名前")]
-          ),
-          _vm._v(" "),
-          _c("div", { attrs: { name: "kindOfTask" } }, [
+        _c("div", { staticClass: "col-lg-4" }),
+        _vm._v(" "),
+        _c("div", { staticClass: "col-lg-4" }, [
+          _c("div", { staticClass: "input-group mb-3" }, [
             _c("input", {
               directives: [
                 {
@@ -9459,7 +11468,8 @@ var render = function() {
               attrs: {
                 name: "task",
                 type: "task",
-                "aria-label": "Sizing example input",
+                placeholder: "追加するタスクの名前",
+                "aria-label": "追加するタスクの名前",
                 "aria-describedby": "inputGroup-sizing-default"
               },
               domProps: { value: _vm.taskName },
@@ -9471,23 +11481,25 @@ var render = function() {
                   _vm.taskName = $event.target.value
                 }
               }
-            })
-          ]),
-          _vm._v(" "),
-          _c(
-            "button",
-            {
-              staticClass: "btn btn-primary",
-              attrs: { type: "button" },
-              on: {
-                click: function($event) {
-                  return _vm.createTask()
+            }),
+            _vm._v(" "),
+            _c(
+              "button",
+              {
+                staticClass: "btn btn-primary",
+                attrs: { type: "button" },
+                on: {
+                  click: function($event) {
+                    return _vm.createTask()
+                  }
                 }
-              }
-            },
-            [_vm._v("+")]
-          )
-        ])
+              },
+              [_vm._v("+")]
+            )
+          ])
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "col-lg-4" })
       ]
     ),
     _vm._v(" "),
@@ -9597,7 +11609,7 @@ var render = function() {
           [
             _c("div", { staticClass: "modal-dialog" }, [
               _c("div", { staticClass: "modal-content" }, [
-                _vm._m(0),
+                _vm._m(1),
                 _vm._v(" "),
                 _c("div", { staticClass: "modal-body" }, [
                   _c("input", {
@@ -9671,7 +11683,7 @@ var render = function() {
           [
             _c("div", { staticClass: "modal-dialog" }, [
               _c("div", { staticClass: "modal-content" }, [
-                _vm._m(1),
+                _vm._m(2),
                 _vm._v(" "),
                 _c("div", { staticClass: "modal-body" }, [
                   _vm._v(
@@ -9715,21 +11727,42 @@ var render = function() {
     ]),
     _vm._v(" "),
     _c(
-      "button",
+      "div",
       {
-        on: {
-          click: function($event) {
-            $event.stopPropagation()
-            $event.preventDefault()
-            return _vm.goHome()
-          }
-        }
+        staticClass: "homeButton",
+        staticStyle: { "text-align": "center", "padding-top": "20px" }
       },
-      [_vm._v("戻る")]
+      [
+        _c(
+          "button",
+          {
+            staticClass: "btn btn-outline-info",
+            attrs: { type: "button" },
+            on: {
+              click: function($event) {
+                $event.stopPropagation()
+                $event.preventDefault()
+                return _vm.goHome()
+              }
+            }
+          },
+          [_vm._v("ホームへ戻る")]
+        )
+      ]
     )
   ])
 }
 var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c(
+      "div",
+      { staticClass: "theTitle", staticStyle: { "text-align": "center" } },
+      [_c("h3", { staticStyle: { padding: "10px" } }, [_vm._v("タスク種類")])]
+    )
+  },
   function() {
     var _vm = this
     var _h = _vm.$createElement
@@ -9787,10 +11820,10 @@ render._withStripped = true
 
 /***/ }),
 
-/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/layout/TheFooter.vue?vue&type=template&id=1d1ea11c&":
-/*!*******************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/layout/TheFooter.vue?vue&type=template&id=1d1ea11c& ***!
-  \*******************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/admin/MemberAttendance.vue?vue&type=template&id=57874e8e&":
+/*!*************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/admin/MemberAttendance.vue?vue&type=template&id=57874e8e& ***!
+  \*************************************************************************************************************************************************************************************************************************/
 /*! exports provided: render, staticRenderFns */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -9802,16 +11835,253 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _vm._m(0)
+  return _c("div", [
+    _c(
+      "div",
+      {
+        staticClass: "ResultOfAttendanceTitle",
+        staticStyle: { "text-align": "center" }
+      },
+      [
+        _c("h3", { staticStyle: { "padding-top": "10px" } }, [
+          _vm._v(_vm._s(_vm.userName) + "さんの勤務実績表")
+        ])
+      ]
+    ),
+    _vm._v(" "),
+    _c(
+      "div",
+      {
+        staticClass: "calendar-title",
+        staticStyle: { display: "flex", "justify-content": "center" }
+      },
+      [
+        _c(
+          "span",
+          {
+            staticClass: "btn-monthMove prev fa fa-angle-left",
+            staticStyle: { "padding-top": "12px" }
+          },
+          [
+            _c(
+              "button",
+              {
+                staticClass: "btn btn-outline-primary",
+                attrs: { type: "button" },
+                on: {
+                  click: function($event) {
+                    return _vm.movePrevMonth()
+                  }
+                }
+              },
+              [_vm._v("＜")]
+            )
+          ]
+        ),
+        _vm._v(" "),
+        _c("h2", { staticStyle: { padding: "10px" } }, [
+          _vm._v(_vm._s(_vm.currentYear + "/" + _vm.currentMonth))
+        ]),
+        _vm._v(" "),
+        _c(
+          "span",
+          {
+            staticClass: "btn-monthMove next fa fa-angle-right",
+            staticStyle: { "padding-top": "12px" }
+          },
+          [
+            _c(
+              "button",
+              {
+                staticClass: "btn btn-outline-primary",
+                attrs: { type: "button" },
+                on: {
+                  click: function($event) {
+                    return _vm.moveNextMonth()
+                  }
+                }
+              },
+              [_vm._v("＞")]
+            )
+          ]
+        )
+      ]
+    ),
+    _vm._v(" "),
+    _c("table", { staticClass: "table" }, [
+      _vm._m(0),
+      _vm._v(" "),
+      _c(
+        "tbody",
+        _vm._l(_vm.calendar, function(record) {
+          return _c("tr", [
+            record.day !== "土" && record.day !== "日"
+              ? _c(
+                  "th",
+                  { attrs: { scope: "row" } },
+                  [
+                    _c(
+                      "router-link",
+                      {
+                        staticClass: "weekdays",
+                        attrs: {
+                          to: {
+                            name: "memberAttendanceDetail",
+                            params: {
+                              id: _vm.id,
+                              name: _vm.userName,
+                              theDay: record.theDay,
+                              nextDay: record.nextDay
+                            }
+                          }
+                        }
+                      },
+                      [
+                        _vm._v(
+                          "\n            " +
+                            _vm._s(record.date) +
+                            "(" +
+                            _vm._s(record.day) +
+                            ")\n          "
+                        )
+                      ]
+                    )
+                  ],
+                  1
+                )
+              : _vm._e(),
+            _vm._v(" "),
+            record.day === "土"
+              ? _c(
+                  "th",
+                  { attrs: { scope: "row" } },
+                  [
+                    _c(
+                      "router-link",
+                      {
+                        staticClass: "saturday",
+                        attrs: {
+                          to: {
+                            name: "memberAttendanceDetail",
+                            params: {
+                              id: _vm.id,
+                              name: _vm.userName,
+                              theDay: record.theDay,
+                              nextDay: record.nextDay
+                            }
+                          }
+                        }
+                      },
+                      [
+                        _vm._v(
+                          "\n            " +
+                            _vm._s(record.date) +
+                            "(" +
+                            _vm._s(record.day) +
+                            ")\n          "
+                        )
+                      ]
+                    )
+                  ],
+                  1
+                )
+              : _vm._e(),
+            _vm._v(" "),
+            record.day === "日"
+              ? _c(
+                  "th",
+                  { attrs: { scope: "row" } },
+                  [
+                    _c(
+                      "router-link",
+                      {
+                        staticClass: "sunday",
+                        attrs: {
+                          to: {
+                            name: "memberAttendanceDetail",
+                            params: {
+                              id: _vm.id,
+                              name: _vm.userName,
+                              theDay: record.theDay,
+                              nextDay: record.nextDay
+                            }
+                          }
+                        }
+                      },
+                      [
+                        _vm._v(
+                          "\n            " +
+                            _vm._s(record.date) +
+                            "(" +
+                            _vm._s(record.day) +
+                            ")\n          "
+                        )
+                      ]
+                    )
+                  ],
+                  1
+                )
+              : _vm._e(),
+            _vm._v(" "),
+            _c("td", [_vm._v(_vm._s(record.time))]),
+            _vm._v(" "),
+            _c("td", [_vm._v(_vm._s(record.overtime))]),
+            _vm._v(" "),
+            _c("td", [_vm._v(_vm._s(record.midnightTime))]),
+            _vm._v(" "),
+            _c("td", [_vm._v(_vm._s(record.midnightOvertime))]),
+            _vm._v(" "),
+            _c("td", [_vm._v(_vm._s(record.restTime))])
+          ])
+        }),
+        0
+      )
+    ]),
+    _vm._v(" "),
+    _c(
+      "div",
+      {
+        staticClass: "homeButton",
+        staticStyle: { "text-align": "center", "padding-top": "20px" }
+      },
+      [
+        _c(
+          "button",
+          {
+            staticClass: "btn btn-outline-info",
+            attrs: { type: "button" },
+            on: {
+              click: function($event) {
+                $event.stopPropagation()
+                $event.preventDefault()
+                return _vm.goHome()
+              }
+            }
+          },
+          [_vm._v("ホームへ戻る")]
+        )
+      ]
+    )
+  ])
 }
 var staticRenderFns = [
   function() {
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("footer", [
-      _c("div", { staticClass: "container text-center" }, [
-        _c("small", [_vm._v("© 2020 gahaku200. All rights reserved.")])
+    return _c("thead", [
+      _c("tr", [
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("日付")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("通常勤務時間")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("時間外")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("深夜時間")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("深夜時間外")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("休憩時間")])
       ])
     ])
   }
@@ -9822,332 +12092,10 @@ render._withStripped = true
 
 /***/ }),
 
-/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/layout/TheHeader.vue?vue&type=template&id=12a31364&":
-/*!*******************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/layout/TheHeader.vue?vue&type=template&id=12a31364& ***!
-  \*******************************************************************************************************************************************************************************************************************/
-/*! exports provided: render, staticRenderFns */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
-var render = function() {
-  var _vm = this
-  var _h = _vm.$createElement
-  var _c = _vm._self._c || _h
-  return _c("header", [
-    _c("div", { staticClass: "bg-dark text-white container-fluid" }, [
-      _c(
-        "div",
-        {
-          staticClass: "rowRow",
-          staticStyle: { display: "flex", "justify-content": "space-between" }
-        },
-        [
-          _c(
-            "div",
-            {
-              staticClass: "headerLeft",
-              staticStyle: { "align-self": "center" }
-            },
-            [
-              _c(
-                "h2",
-                {
-                  on: {
-                    click: function($event) {
-                      return _vm.goHome()
-                    }
-                  }
-                },
-                [_vm._v("勤怠アプリ")]
-              )
-            ]
-          ),
-          _vm._v(" "),
-          _c(
-            "div",
-            {
-              staticClass: "login",
-              staticStyle: {
-                display: "flex",
-                "justify-content": "space-between"
-              }
-            },
-            [
-              _c(
-                "div",
-                { staticStyle: { "align-self": "center" } },
-                [
-                  _vm._l(
-                    _vm.groups.filter(function(e) {
-                      return e.id == _vm.auth.group_id
-                    }),
-                    function(group) {
-                      return _c(
-                        "ul",
-                        {
-                          staticClass: "userGroupName",
-                          staticStyle: {
-                            margin: "auto",
-                            "justify-content": "center"
-                          }
-                        },
-                        [
-                          _vm._v(
-                            "\n            グループ名：" +
-                              _vm._s(group.name) +
-                              "\n          "
-                          )
-                        ]
-                      )
-                    }
-                  ),
-                  _vm._v(" "),
-                  _vm.auth.length === 0
-                    ? _c(
-                        "ul",
-                        { staticClass: "loginSelected" },
-                        [
-                          _c(
-                            "router-link",
-                            {
-                              staticClass: "btn userLoginSelected",
-                              attrs: {
-                                id: "header-nav__register",
-                                to: "/register"
-                              }
-                            },
-                            [_vm._v("ユーザー登録")]
-                          )
-                        ],
-                        1
-                      )
-                    : _vm._e(),
-                  _vm._v(" "),
-                  _vm.auth.length === 0
-                    ? _c(
-                        "ul",
-                        { staticClass: "loginSelected" },
-                        [
-                          _c(
-                            "router-link",
-                            {
-                              staticClass: "btn userLoginSelected",
-                              attrs: { id: "header-nav__login", to: "/login" }
-                            },
-                            [_vm._v("ログイン")]
-                          )
-                        ],
-                        1
-                      )
-                    : _vm._e(),
-                  _vm._v(" "),
-                  _vm.auth.length !== 0
-                    ? _c("ul", { staticClass: "loginSelected" }, [
-                        _c("li", { staticClass: "authName" }, [
-                          _vm._v(
-                            "\n                ユーザー名：" +
-                              _vm._s(_vm.auth.name) +
-                              "\n            "
-                          )
-                        ])
-                      ])
-                    : _vm._e()
-                ],
-                2
-              ),
-              _vm._v(" "),
-              _c(
-                "div",
-                { staticStyle: { "align-self": "center" } },
-                [
-                  _c(
-                    "svg",
-                    {
-                      staticClass: "bi bi-list",
-                      attrs: {
-                        width: "2em",
-                        height: "2em",
-                        viewBox: "0 0 16 16",
-                        fill: "currentColor",
-                        xmlns: "http://www.w3.org/2000/svg"
-                      },
-                      on: {
-                        click: function($event) {
-                          return _vm.toggle()
-                        }
-                      }
-                    },
-                    [
-                      _c("path", {
-                        attrs: {
-                          "fill-rule": "evenodd",
-                          d:
-                            "M2.5 11.5A.5.5 0 0 1 3 11h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4A.5.5 0 0 1 3 7h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4A.5.5 0 0 1 3 3h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"
-                        }
-                      })
-                    ]
-                  ),
-                  _vm._v(" "),
-                  _c(
-                    "drawer",
-                    {
-                      attrs: {
-                        align: _vm.align,
-                        closeable: true,
-                        "mask-closable": true
-                      },
-                      on: { close: _vm.toggle }
-                    },
-                    [
-                      _vm.open
-                        ? _c("ul", { staticClass: "sideMenu" }, [
-                            _c(
-                              "p",
-                              {
-                                on: {
-                                  click: function($event) {
-                                    return _vm.showUser()
-                                  }
-                                }
-                              },
-                              [_vm._v("ユーザー情報")]
-                            ),
-                            _vm._v(" "),
-                            _c(
-                              "p",
-                              {
-                                on: {
-                                  click: function($event) {
-                                    return _vm.goResultOfAttendance()
-                                  }
-                                }
-                              },
-                              [_vm._v("勤務実績表")]
-                            ),
-                            _vm._v(" "),
-                            _c("p", [_vm._v("タスク実績表")]),
-                            _vm._v(" "),
-                            _c("p", [_vm._v("給与計算")]),
-                            _vm._v(" "),
-                            _c("p", [
-                              _c(
-                                "a",
-                                {
-                                  staticClass: "logout",
-                                  attrs: { id: "header-nav__logout" },
-                                  on: {
-                                    click: function($event) {
-                                      return _vm.logout()
-                                    }
-                                  }
-                                },
-                                [_vm._v("ログアウト")]
-                              )
-                            ]),
-                            _c(
-                              "form",
-                              {
-                                staticStyle: { display: "none" },
-                                attrs: {
-                                  id: "logout-form",
-                                  action: "/logout",
-                                  method: "POST"
-                                }
-                              },
-                              [
-                                _c("input", {
-                                  attrs: { type: "hidden", name: "_token" },
-                                  domProps: { value: _vm.csrf }
-                                })
-                              ]
-                            ),
-                            _vm._v(" "),
-                            _c("p"),
-                            _vm._v(" "),
-                            _vm.auth.group_id === null
-                              ? _c(
-                                  "p",
-                                  {
-                                    on: {
-                                      click: function($event) {
-                                        return _vm.goCreateGroup()
-                                      }
-                                    }
-                                  },
-                                  [_vm._v("グループ作成")]
-                                )
-                              : _vm._e(),
-                            _vm._v(" "),
-                            _vm.auth.is_admin === "1"
-                              ? _c(
-                                  "p",
-                                  {
-                                    on: {
-                                      click: function($event) {
-                                        return _vm.goInviteMember()
-                                      }
-                                    }
-                                  },
-                                  [_vm._v("メンバー招待")]
-                                )
-                              : _vm._e(),
-                            _vm._v(" "),
-                            _vm.auth.is_admin === "1"
-                              ? _c(
-                                  "p",
-                                  {
-                                    on: {
-                                      click: function($event) {
-                                        return _vm.goGroupMember()
-                                      }
-                                    }
-                                  },
-                                  [_vm._v("メンバー情報")]
-                                )
-                              : _vm._e(),
-                            _vm._v(" "),
-                            _vm.auth.is_admin === "1"
-                              ? _c(
-                                  "p",
-                                  {
-                                    on: {
-                                      click: function($event) {
-                                        return _vm.goKindOfTasks()
-                                      }
-                                    }
-                                  },
-                                  [_vm._v("タスク種類")]
-                                )
-                              : _vm._e()
-                          ])
-                        : _vm._e()
-                    ]
-                  )
-                ],
-                1
-              )
-            ]
-          )
-        ]
-      )
-    ])
-  ])
-}
-var staticRenderFns = []
-render._withStripped = true
-
-
-
-/***/ }),
-
-/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/mail/AlreadyJoinGroup.vue?vue&type=template&id=1cc707ba&":
-/*!************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/mail/AlreadyJoinGroup.vue?vue&type=template&id=1cc707ba& ***!
-  \************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/admin/MemberAttendanceDetail.vue?vue&type=template&id=778961ff&":
+/*!*******************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/admin/MemberAttendanceDetail.vue?vue&type=template&id=778961ff& ***!
+  \*******************************************************************************************************************************************************************************************************************************/
 /*! exports provided: render, staticRenderFns */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -10160,166 +12108,19 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c("div", [
-    _c("p", [_vm._v("既にグループに参加しています。")]),
-    _vm._v(" "),
     _c(
-      "button",
+      "div",
       {
-        on: {
-          click: function($event) {
-            $event.stopPropagation()
-            $event.preventDefault()
-            return _vm.goHome()
-          }
-        }
+        staticClass: "ResultOfAttendanceTitle",
+        staticStyle: { "text-align": "center" }
       },
-      [_vm._v("ホームへ戻る")]
-    )
-  ])
-}
-var staticRenderFns = []
-render._withStripped = true
-
-
-
-/***/ }),
-
-/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/mail/NotInviteData.vue?vue&type=template&id=f9a094ce&":
-/*!*********************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/mail/NotInviteData.vue?vue&type=template&id=f9a094ce& ***!
-  \*********************************************************************************************************************************************************************************************************************/
-/*! exports provided: render, staticRenderFns */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
-var render = function() {
-  var _vm = this
-  var _h = _vm.$createElement
-  var _c = _vm._self._c || _h
-  return _c("div", [
-    _c("p", [_vm._v("グループ参加招待が無効になっています。")]),
+      [
+        _c("h3", { staticStyle: { "padding-top": "10px" } }, [
+          _vm._v(_vm._s(_vm.userName) + "さんの勤務実績表")
+        ])
+      ]
+    ),
     _vm._v(" "),
-    _c(
-      "button",
-      {
-        on: {
-          click: function($event) {
-            $event.stopPropagation()
-            $event.preventDefault()
-            return _vm.goHome()
-          }
-        }
-      },
-      [_vm._v("ホームへ戻る")]
-    )
-  ])
-}
-var staticRenderFns = []
-render._withStripped = true
-
-
-
-/***/ }),
-
-/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/mail/SuccessInvite.vue?vue&type=template&id=60d34402&":
-/*!*********************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/mail/SuccessInvite.vue?vue&type=template&id=60d34402& ***!
-  \*********************************************************************************************************************************************************************************************************************/
-/*! exports provided: render, staticRenderFns */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
-var render = function() {
-  var _vm = this
-  var _h = _vm.$createElement
-  var _c = _vm._self._c || _h
-  return _c("div", [
-    _c("p", [_vm._v("グループに参加しました！")]),
-    _vm._v(" "),
-    _c(
-      "button",
-      {
-        on: {
-          click: function($event) {
-            $event.stopPropagation()
-            $event.preventDefault()
-            return _vm.goHome()
-          }
-        }
-      },
-      [_vm._v("ホームへ戻る")]
-    )
-  ])
-}
-var staticRenderFns = []
-render._withStripped = true
-
-
-
-/***/ }),
-
-/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/mail/SuccessSendEmail.vue?vue&type=template&id=4440dbee&":
-/*!************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/mail/SuccessSendEmail.vue?vue&type=template&id=4440dbee& ***!
-  \************************************************************************************************************************************************************************************************************************/
-/*! exports provided: render, staticRenderFns */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
-var render = function() {
-  var _vm = this
-  var _h = _vm.$createElement
-  var _c = _vm._self._c || _h
-  return _c("div", [
-    _c("p", [_vm._v("招待メールが送信されました！")]),
-    _vm._v(" "),
-    _c(
-      "button",
-      {
-        on: {
-          click: function($event) {
-            $event.stopPropagation()
-            $event.preventDefault()
-            return _vm.goHome()
-          }
-        }
-      },
-      [_vm._v("ホームへ戻る")]
-    )
-  ])
-}
-var staticRenderFns = []
-render._withStripped = true
-
-
-
-/***/ }),
-
-/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/page/AttendanceDetail.vue?vue&type=template&id=bb4f8c02&":
-/*!************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/page/AttendanceDetail.vue?vue&type=template&id=bb4f8c02& ***!
-  \************************************************************************************************************************************************************************************************************************/
-/*! exports provided: render, staticRenderFns */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
-var render = function() {
-  var _vm = this
-  var _h = _vm.$createElement
-  var _c = _vm._self._c || _h
-  return _c("div", [
     _c(
       "h2",
       { staticStyle: { "text-align": "center" } },
@@ -10651,10 +12452,1504 @@ var render = function() {
         _vm._v(" "),
         _c("div", { staticClass: "col-lg-3" })
       ])
-    ])
+    ]),
+    _vm._v(" "),
+    _c(
+      "div",
+      {
+        staticClass: "homeButton",
+        staticStyle: { "text-align": "center", "padding-top": "20px" }
+      },
+      [
+        _c(
+          "button",
+          {
+            staticClass: "btn btn-outline-info",
+            attrs: { type: "button" },
+            on: {
+              click: function($event) {
+                $event.stopPropagation()
+                $event.preventDefault()
+                return _vm.goHome()
+              }
+            }
+          },
+          [_vm._v("ホームへ戻る")]
+        )
+      ]
+    )
   ])
 }
 var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("thead", [
+      _c("tr", [
+        _c("th", { attrs: { scope: "col" } }),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("勤怠履歴")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("日時")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("備考")]),
+        _vm._v(" "),
+        _c("th")
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "modal-header" }, [
+      _c(
+        "h5",
+        { staticClass: "modal-title", attrs: { id: "exampleModalLabel" } },
+        [_vm._v("勤怠履歴を編集する")]
+      ),
+      _vm._v(" "),
+      _c(
+        "button",
+        {
+          staticClass: "close",
+          attrs: {
+            type: "button",
+            "data-dismiss": "modal",
+            "aria-label": "Close"
+          }
+        },
+        [_c("span", { attrs: { "aria-hidden": "true" } }, [_vm._v("×")])]
+      )
+    ])
+  }
+]
+render._withStripped = true
+
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/admin/MemberTask.vue?vue&type=template&id=266160ea&":
+/*!*******************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/admin/MemberTask.vue?vue&type=template&id=266160ea& ***!
+  \*******************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", [
+    _c(
+      "div",
+      {
+        staticClass: "taskDetailTitle",
+        staticStyle: { "text-align": "center" }
+      },
+      [
+        _c("h3", { staticStyle: { "padding-top": "10px" } }, [
+          _vm._v(_vm._s(_vm.userName) + "さんのタスク実績表")
+        ])
+      ]
+    ),
+    _vm._v(" "),
+    _c(
+      "div",
+      {
+        staticClass: "calendar-title",
+        staticStyle: { display: "flex", "justify-content": "center" }
+      },
+      [
+        _c("h2", { staticStyle: { padding: "10px" } }, [
+          _vm._v(
+            _vm._s(_vm.year) + "/" + _vm._s(_vm.month) + _vm._s(_vm.theDate)
+          )
+        ])
+      ]
+    ),
+    _vm._v(" "),
+    !_vm.searchSwitch
+      ? _c(
+          "div",
+          {
+            staticClass: "searchDay",
+            staticStyle: { "text-align": "center", "margin-bottom": "10px" }
+          },
+          [
+            _c("v-date-picker", {
+              scopedSlots: _vm._u(
+                [
+                  {
+                    key: "default",
+                    fn: function(ref) {
+                      var inputValue = ref.inputValue
+                      var inputEvents = ref.inputEvents
+                      return [
+                        _c(
+                          "input",
+                          _vm._g(
+                            {
+                              staticClass: "bg-white border px-2 py-1 rounded",
+                              domProps: { value: inputValue }
+                            },
+                            inputEvents
+                          )
+                        )
+                      ]
+                    }
+                  }
+                ],
+                null,
+                false,
+                245967115
+              ),
+              model: {
+                value: _vm.date,
+                callback: function($$v) {
+                  _vm.date = $$v
+                },
+                expression: "date"
+              }
+            }),
+            _vm._v(" "),
+            _c(
+              "button",
+              {
+                staticClass: "btn btn-outline-primary",
+                attrs: { type: "button" },
+                on: {
+                  click: function($event) {
+                    return _vm.searchTaskDay()
+                  }
+                }
+              },
+              [_vm._v("検索")]
+            ),
+            _vm._v(" "),
+            _c(
+              "button",
+              {
+                staticClass: "btn btn-outline-secondary",
+                attrs: { type: "button" },
+                on: {
+                  click: function($event) {
+                    return _vm.switchItem()
+                  }
+                }
+              },
+              [_vm._v("月単位")]
+            )
+          ],
+          1
+        )
+      : _vm._e(),
+    _vm._v(" "),
+    _vm.searchSwitch
+      ? _c(
+          "div",
+          {
+            staticClass: "searchMonth",
+            staticStyle: {
+              display: "flex",
+              "justify-content": "center",
+              "margin-bottom": "10px"
+            }
+          },
+          [
+            _c(
+              "div",
+              { staticClass: "selectYear", staticStyle: { display: "flex" } },
+              [
+                _c(
+                  "select",
+                  {
+                    directives: [
+                      {
+                        name: "model",
+                        rawName: "v-model",
+                        value: _vm.selectedYear,
+                        expression: "selectedYear"
+                      }
+                    ],
+                    staticClass: "form-select",
+                    attrs: { "aria-label": "Default select example" },
+                    on: {
+                      change: function($event) {
+                        var $$selectedVal = Array.prototype.filter
+                          .call($event.target.options, function(o) {
+                            return o.selected
+                          })
+                          .map(function(o) {
+                            var val = "_value" in o ? o._value : o.value
+                            return val
+                          })
+                        _vm.selectedYear = $event.target.multiple
+                          ? $$selectedVal
+                          : $$selectedVal[0]
+                      }
+                    }
+                  },
+                  [
+                    _c(
+                      "option",
+                      { attrs: { disabled: "", value: "initial" } },
+                      [_vm._v("年")]
+                    ),
+                    _vm._v(" "),
+                    _c("option", { attrs: { value: "2020" } }, [
+                      _vm._v("2020")
+                    ]),
+                    _vm._v(" "),
+                    _c("option", { attrs: { value: "2021" } }, [
+                      _vm._v("2021")
+                    ]),
+                    _vm._v(" "),
+                    _c("option", { attrs: { value: "2022" } }, [_vm._v("2022")])
+                  ]
+                ),
+                _vm._v(" "),
+                _c("p", { staticStyle: { margin: "auto" } }, [_vm._v("年")])
+              ]
+            ),
+            _vm._v(" "),
+            _c(
+              "div",
+              { staticClass: "selectMonth", staticStyle: { display: "flex" } },
+              [
+                _c(
+                  "select",
+                  {
+                    directives: [
+                      {
+                        name: "model",
+                        rawName: "v-model",
+                        value: _vm.selectedMonth,
+                        expression: "selectedMonth"
+                      }
+                    ],
+                    staticClass: "form-select",
+                    attrs: { "aria-label": "Default select example" },
+                    on: {
+                      change: function($event) {
+                        var $$selectedVal = Array.prototype.filter
+                          .call($event.target.options, function(o) {
+                            return o.selected
+                          })
+                          .map(function(o) {
+                            var val = "_value" in o ? o._value : o.value
+                            return val
+                          })
+                        _vm.selectedMonth = $event.target.multiple
+                          ? $$selectedVal
+                          : $$selectedVal[0]
+                      }
+                    }
+                  },
+                  [
+                    _c(
+                      "option",
+                      { attrs: { disabled: "", value: "initial" } },
+                      [_vm._v("月")]
+                    ),
+                    _vm._v(" "),
+                    _c("option", { attrs: { value: "01" } }, [_vm._v("1")]),
+                    _vm._v(" "),
+                    _c("option", { attrs: { value: "02" } }, [_vm._v("2")]),
+                    _vm._v(" "),
+                    _c("option", { attrs: { value: "03" } }, [_vm._v("3")]),
+                    _vm._v(" "),
+                    _c("option", { attrs: { value: "04" } }, [_vm._v("4")]),
+                    _vm._v(" "),
+                    _c("option", { attrs: { value: "05" } }, [_vm._v("5")]),
+                    _vm._v(" "),
+                    _c("option", { attrs: { value: "06" } }, [_vm._v("6")]),
+                    _vm._v(" "),
+                    _c("option", { attrs: { value: "07" } }, [_vm._v("7")]),
+                    _vm._v(" "),
+                    _c("option", { attrs: { value: "08" } }, [_vm._v("8")]),
+                    _vm._v(" "),
+                    _c("option", { attrs: { value: "09" } }, [_vm._v("9")]),
+                    _vm._v(" "),
+                    _c("option", { attrs: { value: "10" } }, [_vm._v("10")]),
+                    _vm._v(" "),
+                    _c("option", { attrs: { value: "11" } }, [_vm._v("11")]),
+                    _vm._v(" "),
+                    _c("option", { attrs: { value: "12" } }, [_vm._v("12")])
+                  ]
+                ),
+                _vm._v(" "),
+                _c("p", { staticStyle: { margin: "auto" } }, [_vm._v("月")])
+              ]
+            ),
+            _vm._v(" "),
+            _c("div", { staticClass: "searchButton" }, [
+              _c(
+                "button",
+                {
+                  staticClass: "btn btn-outline-primary",
+                  attrs: { type: "button" },
+                  on: {
+                    click: function($event) {
+                      return _vm.searchTaskMonth()
+                    }
+                  }
+                },
+                [_vm._v("検索")]
+              ),
+              _vm._v(" "),
+              _c(
+                "button",
+                {
+                  staticClass: "btn btn-outline-secondary",
+                  attrs: { type: "button" },
+                  on: {
+                    click: function($event) {
+                      return _vm.switchItem()
+                    }
+                  }
+                },
+                [_vm._v("日単位")]
+              )
+            ])
+          ]
+        )
+      : _vm._e(),
+    _vm._v(" "),
+    _vm.taskRecords.length === 0
+      ? _c("div", { staticClass: "noRecord" }, [
+          _c(
+            "h3",
+            { staticStyle: { "text-align": "center", color: "tomato" } },
+            [_vm._v("検索結果がありません")]
+          )
+        ])
+      : _vm._e(),
+    _vm._v(" "),
+    _vm.taskRecords.length !== 0
+      ? _c("div", { staticClass: "container" }, [
+          _c("div", { staticClass: "row" }, [
+            _c("div", { staticClass: "col-lg-3" }),
+            _vm._v(" "),
+            _c("div", { staticClass: "col-lg-6" }, [
+              _c(
+                "span",
+                {
+                  staticClass: "d-block p-2 bg-secondary text-white tableName"
+                },
+                [_vm._v("タスク履歴")]
+              ),
+              _vm._v(" "),
+              _c("table", { staticClass: "table" }, [
+                _vm._m(0),
+                _vm._v(" "),
+                _c(
+                  "tbody",
+                  _vm._l(_vm.taskRecords, function(record) {
+                    return _c("tr", [
+                      _c("td", { attrs: { scope: "row" } }),
+                      _vm._v(" "),
+                      _c("td", [_vm._v(_vm._s(record.task_name))]),
+                      _vm._v(" "),
+                      _c("td", [_vm._v(_vm._s(record.task_time))]),
+                      _vm._v(" "),
+                      _c("td", [_vm._v(_vm._s(record.task_percentage) + "%")])
+                    ])
+                  }),
+                  0
+                )
+              ])
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "col-lg-3" })
+          ])
+        ])
+      : _vm._e(),
+    _vm._v(" "),
+    _c(
+      "div",
+      { staticClass: "homeButton", staticStyle: { "text-align": "center" } },
+      [
+        _c(
+          "button",
+          {
+            staticClass: "btn btn-outline-info",
+            attrs: { type: "button" },
+            on: {
+              click: function($event) {
+                $event.stopPropagation()
+                $event.preventDefault()
+                return _vm.goHome()
+              }
+            }
+          },
+          [_vm._v("ホームへ戻る")]
+        )
+      ]
+    )
+  ])
+}
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("thead", [
+      _c("tr", [
+        _c("th", { attrs: { scope: "col" } }),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("タスク名")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("合計時間")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("割合")])
+      ])
+    ])
+  }
+]
+render._withStripped = true
+
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/layout/TheFooter.vue?vue&type=template&id=1d1ea11c&":
+/*!*******************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/layout/TheFooter.vue?vue&type=template&id=1d1ea11c& ***!
+  \*******************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _vm._m(0)
+}
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("footer", [
+      _c(
+        "div",
+        {
+          staticClass: "container text-center",
+          staticStyle: { padding: "20px" }
+        },
+        [_c("small", [_vm._v("© 2020 gahaku200. All rights reserved.")])]
+      )
+    ])
+  }
+]
+render._withStripped = true
+
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/layout/TheHeader.vue?vue&type=template&id=12a31364&":
+/*!*******************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/layout/TheHeader.vue?vue&type=template&id=12a31364& ***!
+  \*******************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("header", [
+    _c("div", { staticClass: "bg-dark text-white container-fluid" }, [
+      _c(
+        "div",
+        {
+          staticClass: "rowRow",
+          staticStyle: { display: "flex", "justify-content": "space-between" }
+        },
+        [
+          _c(
+            "div",
+            {
+              staticClass: "headerLeft",
+              staticStyle: { "align-self": "center" }
+            },
+            [
+              _c(
+                "h2",
+                {
+                  on: {
+                    click: function($event) {
+                      return _vm.goHome()
+                    }
+                  }
+                },
+                [_vm._v("勤怠アプリ")]
+              )
+            ]
+          ),
+          _vm._v(" "),
+          _c(
+            "div",
+            {
+              staticClass: "login",
+              staticStyle: {
+                display: "flex",
+                "justify-content": "space-between"
+              }
+            },
+            [
+              _c(
+                "div",
+                { staticStyle: { "align-self": "center" } },
+                [
+                  _vm._l(
+                    _vm.groups.filter(function(e) {
+                      return e.id == _vm.auth.group_id
+                    }),
+                    function(group) {
+                      return _c(
+                        "ul",
+                        {
+                          staticClass: "userGroupName",
+                          staticStyle: {
+                            margin: "auto",
+                            "justify-content": "center"
+                          }
+                        },
+                        [
+                          _vm._v(
+                            "\n            グループ名：" +
+                              _vm._s(group.name) +
+                              "\n          "
+                          )
+                        ]
+                      )
+                    }
+                  ),
+                  _vm._v(" "),
+                  _vm.auth.length === 0
+                    ? _c(
+                        "ul",
+                        { staticClass: "loginSelected" },
+                        [
+                          _c(
+                            "router-link",
+                            {
+                              staticClass: "btn userLoginSelected",
+                              attrs: {
+                                id: "header-nav__register",
+                                to: "/register"
+                              }
+                            },
+                            [_vm._v("ユーザー登録")]
+                          )
+                        ],
+                        1
+                      )
+                    : _vm._e(),
+                  _vm._v(" "),
+                  _vm.auth.length === 0
+                    ? _c(
+                        "ul",
+                        { staticClass: "loginSelected" },
+                        [
+                          _c(
+                            "router-link",
+                            {
+                              staticClass: "btn userLoginSelected",
+                              attrs: { id: "header-nav__login", to: "/login" }
+                            },
+                            [_vm._v("ログイン")]
+                          )
+                        ],
+                        1
+                      )
+                    : _vm._e(),
+                  _vm._v(" "),
+                  _vm.auth.length !== 0
+                    ? _c("ul", { staticClass: "loginSelected" }, [
+                        _c("li", { staticClass: "authName" }, [
+                          _vm._v(
+                            "\n                ユーザー名：" +
+                              _vm._s(_vm.auth.name) +
+                              "\n            "
+                          )
+                        ])
+                      ])
+                    : _vm._e()
+                ],
+                2
+              ),
+              _vm._v(" "),
+              _vm.auth.length !== 0
+                ? _c(
+                    "div",
+                    { staticStyle: { "align-self": "center" } },
+                    [
+                      _c(
+                        "svg",
+                        {
+                          staticClass: "bi bi-list",
+                          attrs: {
+                            width: "2em",
+                            height: "2em",
+                            viewBox: "0 0 16 16",
+                            fill: "currentColor",
+                            xmlns: "http://www.w3.org/2000/svg"
+                          },
+                          on: {
+                            click: function($event) {
+                              return _vm.toggle()
+                            }
+                          }
+                        },
+                        [
+                          _c("path", {
+                            attrs: {
+                              "fill-rule": "evenodd",
+                              d:
+                                "M2.5 11.5A.5.5 0 0 1 3 11h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4A.5.5 0 0 1 3 7h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4A.5.5 0 0 1 3 3h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"
+                            }
+                          })
+                        ]
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "drawer",
+                        {
+                          attrs: {
+                            align: _vm.align,
+                            closeable: true,
+                            "mask-closable": true
+                          },
+                          on: { close: _vm.toggle }
+                        },
+                        [
+                          _vm.open
+                            ? _c("ul", { staticClass: "sideMenu" }, [
+                                _c(
+                                  "p",
+                                  {
+                                    on: {
+                                      click: function($event) {
+                                        return _vm.showUser()
+                                      }
+                                    }
+                                  },
+                                  [_vm._v("ユーザー情報")]
+                                ),
+                                _vm._v(" "),
+                                _c(
+                                  "p",
+                                  {
+                                    on: {
+                                      click: function($event) {
+                                        return _vm.goResultOfAttendance()
+                                      }
+                                    }
+                                  },
+                                  [_vm._v("勤務実績表")]
+                                ),
+                                _vm._v(" "),
+                                _c(
+                                  "p",
+                                  {
+                                    on: {
+                                      click: function($event) {
+                                        return _vm.goTaskDetail()
+                                      }
+                                    }
+                                  },
+                                  [_vm._v("タスク実績表")]
+                                ),
+                                _vm._v(" "),
+                                _vm.auth.group_id === null
+                                  ? _c(
+                                      "p",
+                                      {
+                                        on: {
+                                          click: function($event) {
+                                            return _vm.goCreateGroup()
+                                          }
+                                        }
+                                      },
+                                      [_vm._v("グループ作成")]
+                                    )
+                                  : _vm._e(),
+                                _vm._v(" "),
+                                _vm.auth.is_admin === "1"
+                                  ? _c(
+                                      "p",
+                                      {
+                                        on: {
+                                          click: function($event) {
+                                            return _vm.goInviteMember()
+                                          }
+                                        }
+                                      },
+                                      [_vm._v("メンバー招待")]
+                                    )
+                                  : _vm._e(),
+                                _vm._v(" "),
+                                _vm.auth.is_admin === "1"
+                                  ? _c(
+                                      "p",
+                                      {
+                                        on: {
+                                          click: function($event) {
+                                            return _vm.goGroupMember()
+                                          }
+                                        }
+                                      },
+                                      [_vm._v("メンバー情報")]
+                                    )
+                                  : _vm._e(),
+                                _vm._v(" "),
+                                _vm.auth.is_admin === "1"
+                                  ? _c(
+                                      "p",
+                                      {
+                                        on: {
+                                          click: function($event) {
+                                            return _vm.goKindOfTasks()
+                                          }
+                                        }
+                                      },
+                                      [_vm._v("タスク種類")]
+                                    )
+                                  : _vm._e(),
+                                _vm._v(" "),
+                                _c("p", [
+                                  _c(
+                                    "a",
+                                    {
+                                      staticClass: "logout",
+                                      attrs: { id: "header-nav__logout" },
+                                      on: {
+                                        click: function($event) {
+                                          return _vm.logout()
+                                        }
+                                      }
+                                    },
+                                    [_vm._v("ログアウト")]
+                                  )
+                                ]),
+                                _c(
+                                  "form",
+                                  {
+                                    staticStyle: { display: "none" },
+                                    attrs: {
+                                      id: "logout-form",
+                                      action: "/logout",
+                                      method: "POST"
+                                    }
+                                  },
+                                  [
+                                    _c("input", {
+                                      attrs: { type: "hidden", name: "_token" },
+                                      domProps: { value: _vm.csrf }
+                                    })
+                                  ]
+                                ),
+                                _vm._v(" "),
+                                _c("p")
+                              ])
+                            : _vm._e()
+                        ]
+                      )
+                    ],
+                    1
+                  )
+                : _vm._e()
+            ]
+          )
+        ]
+      )
+    ])
+  ])
+}
+var staticRenderFns = []
+render._withStripped = true
+
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/mail/AlreadyJoinGroup.vue?vue&type=template&id=1cc707ba&":
+/*!************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/mail/AlreadyJoinGroup.vue?vue&type=template&id=1cc707ba& ***!
+  \************************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", [
+    _vm._m(0),
+    _vm._v(" "),
+    _c(
+      "div",
+      {
+        staticClass: "homeButton",
+        staticStyle: { "text-align": "center", "padding-top": "20px" }
+      },
+      [
+        _c(
+          "button",
+          {
+            staticClass: "btn btn-outline-info",
+            attrs: { type: "button" },
+            on: {
+              click: function($event) {
+                $event.stopPropagation()
+                $event.preventDefault()
+                return _vm.goHome()
+              }
+            }
+          },
+          [_vm._v("ホームへ戻る")]
+        )
+      ]
+    )
+  ])
+}
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c(
+      "div",
+      { staticClass: "theTitle", staticStyle: { "text-align": "center" } },
+      [
+        _c("h3", { staticStyle: { padding: "10px" } }, [
+          _vm._v("既にグループに参加しています。")
+        ])
+      ]
+    )
+  }
+]
+render._withStripped = true
+
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/mail/NotInviteData.vue?vue&type=template&id=f9a094ce&":
+/*!*********************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/mail/NotInviteData.vue?vue&type=template&id=f9a094ce& ***!
+  \*********************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", [
+    _vm._m(0),
+    _vm._v(" "),
+    _c(
+      "div",
+      {
+        staticClass: "homeButton",
+        staticStyle: { "text-align": "center", "padding-top": "20px" }
+      },
+      [
+        _c(
+          "button",
+          {
+            staticClass: "btn btn-outline-info",
+            attrs: { type: "button" },
+            on: {
+              click: function($event) {
+                $event.stopPropagation()
+                $event.preventDefault()
+                return _vm.goHome()
+              }
+            }
+          },
+          [_vm._v("ホームへ戻る")]
+        )
+      ]
+    )
+  ])
+}
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c(
+      "div",
+      { staticClass: "theTitle", staticStyle: { "text-align": "center" } },
+      [
+        _c("h3", { staticStyle: { padding: "10px" } }, [
+          _vm._v("グループ参加招待が無効になっています。")
+        ])
+      ]
+    )
+  }
+]
+render._withStripped = true
+
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/mail/SuccessInvite.vue?vue&type=template&id=60d34402&":
+/*!*********************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/mail/SuccessInvite.vue?vue&type=template&id=60d34402& ***!
+  \*********************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", [
+    _vm._m(0),
+    _vm._v(" "),
+    _c(
+      "div",
+      {
+        staticClass: "homeButton",
+        staticStyle: { "text-align": "center", "padding-top": "20px" }
+      },
+      [
+        _c(
+          "button",
+          {
+            staticClass: "btn btn-outline-info",
+            attrs: { type: "button" },
+            on: {
+              click: function($event) {
+                $event.stopPropagation()
+                $event.preventDefault()
+                return _vm.goHome()
+              }
+            }
+          },
+          [_vm._v("ホームへ戻る")]
+        )
+      ]
+    )
+  ])
+}
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c(
+      "div",
+      { staticClass: "theTitle", staticStyle: { "text-align": "center" } },
+      [
+        _c("h3", { staticStyle: { padding: "10px" } }, [
+          _vm._v("グループに参加しました！")
+        ])
+      ]
+    )
+  }
+]
+render._withStripped = true
+
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/mail/SuccessSendEmail.vue?vue&type=template&id=4440dbee&":
+/*!************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/mail/SuccessSendEmail.vue?vue&type=template&id=4440dbee& ***!
+  \************************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", [
+    _vm._m(0),
+    _vm._v(" "),
+    _c(
+      "div",
+      {
+        staticClass: "homeButton",
+        staticStyle: { "text-align": "center", "padding-top": "20px" }
+      },
+      [
+        _c(
+          "button",
+          {
+            staticClass: "btn btn-outline-info",
+            attrs: { type: "button" },
+            on: {
+              click: function($event) {
+                $event.stopPropagation()
+                $event.preventDefault()
+                return _vm.goHome()
+              }
+            }
+          },
+          [_vm._v("ホームへ戻る")]
+        )
+      ]
+    )
+  ])
+}
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c(
+      "div",
+      { staticClass: "theTitle", staticStyle: { "text-align": "center" } },
+      [
+        _c("h3", { staticStyle: { padding: "10px" } }, [
+          _vm._v("招待メールが送信されました！")
+        ])
+      ]
+    )
+  }
+]
+render._withStripped = true
+
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/page/AttendanceDetail.vue?vue&type=template&id=bb4f8c02&":
+/*!************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/page/AttendanceDetail.vue?vue&type=template&id=bb4f8c02& ***!
+  \************************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", [
+    _vm._m(0),
+    _vm._v(" "),
+    _c(
+      "h2",
+      { staticStyle: { "text-align": "center" } },
+      [
+        _vm._v(_vm._s(_vm.detailDate) + "(\n    "),
+        _vm.detailDay !== "土" && _vm.detailDay !== "日"
+          ? _c("nobr", [_vm._v(_vm._s(_vm.detailDay))])
+          : _vm._e(),
+        _vm._v(" "),
+        _vm.detailDay === "土"
+          ? _c("nobr", { staticStyle: { color: "blue" } }, [
+              _vm._v(_vm._s(_vm.detailDay))
+            ])
+          : _vm._e(),
+        _vm._v(" "),
+        _vm.detailDay === "日"
+          ? _c("nobr", { staticStyle: { color: "red" } }, [
+              _vm._v(_vm._s(_vm.detailDay))
+            ])
+          : _vm._e(),
+        _vm._v("\n  )")
+      ],
+      1
+    ),
+    _vm._v(" "),
+    _c("div", { staticClass: "container" }, [
+      _c("div", { staticClass: "row" }, [
+        _c("div", { staticClass: "col-lg-3" }),
+        _vm._v(" "),
+        _c("div", { staticClass: "col-lg-6" }, [
+          _c(
+            "span",
+            { staticClass: "d-block p-2 bg-primary text-white tableName" },
+            [_vm._v("勤怠状況")]
+          ),
+          _vm._v(" "),
+          _c("table", { staticClass: "table" }, [
+            _vm._m(1),
+            _vm._v(" "),
+            _c(
+              "tbody",
+              _vm._l(_vm.attendanceRecords, function(attendance) {
+                return _c("tr", [
+                  _c("td", { attrs: { scope: "row" } }),
+                  _vm._v(" "),
+                  _c("td", { staticStyle: { "padding-top": "15px" } }, [
+                    _vm._v(_vm._s(attendance.on_duty))
+                  ]),
+                  _vm._v(" "),
+                  attendance.created_at === attendance.updated_at
+                    ? _c("td", { staticStyle: { "padding-top": "15px" } }, [
+                        _vm._v(_vm._s(attendance.time))
+                      ])
+                    : _vm._e(),
+                  _vm._v(" "),
+                  attendance.created_at !== attendance.updated_at
+                    ? _c(
+                        "td",
+                        {
+                          staticStyle: { "padding-top": "15px", color: "red" }
+                        },
+                        [_vm._v(_vm._s(attendance.time))]
+                      )
+                    : _vm._e(),
+                  _vm._v(" "),
+                  _c("td", { staticStyle: { "padding-top": "15px" } }, [
+                    _vm._v(_vm._s(attendance.note))
+                  ]),
+                  _vm._v(" "),
+                  _c("td", { staticStyle: { "text-align": "right" } }, [
+                    _c(
+                      "button",
+                      {
+                        staticClass: "btn btn-outline-primary",
+                        attrs: {
+                          type: "button",
+                          "data-toggle": "modal",
+                          "data-target": "#exampleModal"
+                        },
+                        on: {
+                          click: function($event) {
+                            return _vm.goEdit(
+                              attendance.id,
+                              attendance.time,
+                              attendance.on_duty,
+                              attendance.note
+                            )
+                          }
+                        }
+                      },
+                      [_vm._v("編集")]
+                    )
+                  ])
+                ])
+              }),
+              0
+            )
+          ]),
+          _vm._v(" "),
+          _c(
+            "div",
+            {
+              staticClass: "modal fade",
+              attrs: {
+                id: "exampleModal",
+                tabindex: "-1",
+                "aria-labelledby": "exampleModalLabel",
+                "aria-hidden": "true"
+              },
+              model: {
+                value: _vm.judgeUpdate,
+                callback: function($$v) {
+                  _vm.judgeUpdate = $$v
+                },
+                expression: "judgeUpdate"
+              }
+            },
+            [
+              _c("div", { staticClass: "modal-dialog" }, [
+                _c("div", { staticClass: "modal-content" }, [
+                  _vm._m(2),
+                  _vm._v(" "),
+                  _c(
+                    "div",
+                    { staticClass: "modal-body" },
+                    [
+                      _c("h4", [_vm._v(_vm._s(_vm.label))]),
+                      _vm._v(" "),
+                      _vm.error !== ""
+                        ? _c("div", { staticClass: "form-group has-error" }, [
+                            _c(
+                              "div",
+                              { staticClass: "alert alert-danger text-center" },
+                              [_c("div", [_vm._v(_vm._s(_vm.error))])]
+                            )
+                          ])
+                        : _vm._e(),
+                      _vm._v(" "),
+                      _c("li", { staticStyle: { "list-style": "none" } }, [
+                        _vm._v("日時:")
+                      ]),
+                      _vm._v(" "),
+                      _c("v-date-picker", {
+                        attrs: { mode: "dateTime", is24hr: "" },
+                        scopedSlots: _vm._u([
+                          {
+                            key: "default",
+                            fn: function(ref) {
+                              var inputValue = ref.inputValue
+                              var inputEvents = ref.inputEvents
+                              return [
+                                _c(
+                                  "input",
+                                  _vm._g(
+                                    {
+                                      staticClass:
+                                        "px-2 py-1 border rounded focus:outline-none focus:border-blue-300",
+                                      domProps: { value: inputValue }
+                                    },
+                                    inputEvents
+                                  )
+                                )
+                              ]
+                            }
+                          }
+                        ]),
+                        model: {
+                          value: _vm.date,
+                          callback: function($$v) {
+                            _vm.date = $$v
+                          },
+                          expression: "date"
+                        }
+                      }),
+                      _vm._v(" "),
+                      _c("li", { staticStyle: { "list-style": "none" } }, [
+                        _vm._v("備考:")
+                      ]),
+                      _vm._v(" "),
+                      _c("input", {
+                        directives: [
+                          {
+                            name: "model",
+                            rawName: "v-model",
+                            value: _vm.editNote,
+                            expression: "editNote"
+                          }
+                        ],
+                        staticClass: "form-control",
+                        attrs: {
+                          name: "note",
+                          type: "text",
+                          "aria-label": "Sizing example input",
+                          "aria-describedby": "inputGroup-sizing-default"
+                        },
+                        domProps: { value: _vm.editNote },
+                        on: {
+                          input: function($event) {
+                            if ($event.target.composing) {
+                              return
+                            }
+                            _vm.editNote = $event.target.value
+                          }
+                        }
+                      })
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "modal-footer" }, [
+                    _c(
+                      "button",
+                      {
+                        staticClass: "btn btn-secondary",
+                        attrs: { type: "button", "data-dismiss": "modal" }
+                      },
+                      [_vm._v("キャンセル")]
+                    ),
+                    _vm._v(" "),
+                    _vm.updateButton
+                      ? _c(
+                          "button",
+                          {
+                            staticClass: "btn btn-primary",
+                            attrs: { type: "button", "data-dismiss": "modal" },
+                            on: {
+                              click: function($event) {
+                                return _vm.timeEdit()
+                              }
+                            }
+                          },
+                          [_vm._v("更新する")]
+                        )
+                      : _vm._e(),
+                    _vm._v(" "),
+                    !_vm.updateButton
+                      ? _c(
+                          "button",
+                          {
+                            staticClass: "btn btn-primary",
+                            attrs: { type: "button", disabled: "" }
+                          },
+                          [_vm._v("更新する")]
+                        )
+                      : _vm._e()
+                  ])
+                ])
+              ])
+            ]
+          )
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "col-lg-3" })
+      ])
+    ]),
+    _vm._v(" "),
+    _c("div", { staticClass: "container" }, [
+      _c("div", { staticClass: "row" }, [
+        _c("div", { staticClass: "col-lg-3" }),
+        _vm._v(" "),
+        _c("div", { staticClass: "col-lg-6" }, [
+          _c("ul", { staticClass: "list-group" }, [
+            _c(
+              "li",
+              {
+                staticClass:
+                  "list-group-item d-flex justify-content-between align-items-center"
+              },
+              [
+                _c("td", [_vm._v("通常勤務時間")]),
+                _vm._v(" "),
+                _c("td", [_vm._v(_vm._s(_vm.time))])
+              ]
+            ),
+            _vm._v(" "),
+            _c(
+              "li",
+              {
+                staticClass:
+                  "list-group-item d-flex justify-content-between align-items-center"
+              },
+              [
+                _c("td", [_vm._v("時間外")]),
+                _vm._v(" "),
+                _c("td", [_vm._v(_vm._s(_vm.overtime))])
+              ]
+            ),
+            _vm._v(" "),
+            _c(
+              "li",
+              {
+                staticClass:
+                  "list-group-item d-flex justify-content-between align-items-center"
+              },
+              [
+                _c("td", [_vm._v("深夜時間")]),
+                _vm._v(" "),
+                _c("td", [_vm._v(_vm._s(_vm.midnightTime))])
+              ]
+            ),
+            _vm._v(" "),
+            _c(
+              "li",
+              {
+                staticClass:
+                  "list-group-item d-flex justify-content-between align-items-center"
+              },
+              [
+                _c("td", [_vm._v("深夜時間外")]),
+                _vm._v(" "),
+                _c("td", [_vm._v(_vm._s(_vm.midnightOvertime))])
+              ]
+            ),
+            _vm._v(" "),
+            _c(
+              "li",
+              {
+                staticClass:
+                  "list-group-item d-flex justify-content-between align-items-center"
+              },
+              [
+                _c("td", [_vm._v("休憩時間")]),
+                _vm._v(" "),
+                _c("td", [_vm._v(_vm._s(_vm.restTime))])
+              ]
+            )
+          ])
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "col-lg-3" })
+      ])
+    ]),
+    _vm._v(" "),
+    _c(
+      "div",
+      {
+        staticClass: "homeButton",
+        staticStyle: { "text-align": "center", "padding-top": "20px" }
+      },
+      [
+        _c(
+          "button",
+          {
+            staticClass: "btn btn-outline-info",
+            attrs: { type: "button" },
+            on: {
+              click: function($event) {
+                $event.stopPropagation()
+                $event.preventDefault()
+                return _vm.goHome()
+              }
+            }
+          },
+          [_vm._v("ホームへ戻る")]
+        )
+      ]
+    )
+  ])
+}
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c(
+      "div",
+      {
+        staticClass: "attendanceDetailTitle",
+        staticStyle: { "text-align": "center" }
+      },
+      [
+        _c("h3", { staticStyle: { "padding-top": "10px" } }, [
+          _vm._v("勤務詳細")
+        ])
+      ]
+    )
+  },
   function() {
     var _vm = this
     var _h = _vm.$createElement
@@ -11881,14 +15176,7 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c("div", [
-    _c("span", {
-      staticClass: "btn-modal-close",
-      on: {
-        click: function($event) {
-          return _vm.close($event)
-        }
-      }
-    }),
+    _vm._m(0),
     _vm._v(" "),
     _c(
       "div",
@@ -11950,7 +15238,7 @@ var render = function() {
     ),
     _vm._v(" "),
     _c("table", { staticClass: "table" }, [
-      _vm._m(0),
+      _vm._m(1),
       _vm._v(" "),
       _c(
         "tbody",
@@ -12074,21 +15362,49 @@ var render = function() {
     ]),
     _vm._v(" "),
     _c(
-      "button",
+      "div",
       {
-        on: {
-          click: function($event) {
-            $event.stopPropagation()
-            $event.preventDefault()
-            return _vm.goHome()
-          }
-        }
+        staticClass: "homeButton",
+        staticStyle: { "text-align": "center", "padding-top": "20px" }
       },
-      [_vm._v("戻る")]
+      [
+        _c(
+          "button",
+          {
+            staticClass: "btn btn-outline-info",
+            attrs: { type: "button" },
+            on: {
+              click: function($event) {
+                $event.stopPropagation()
+                $event.preventDefault()
+                return _vm.goHome()
+              }
+            }
+          },
+          [_vm._v("ホームへ戻る")]
+        )
+      ]
     )
   ])
 }
 var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c(
+      "div",
+      {
+        staticClass: "ResultOfAttendanceTitle",
+        staticStyle: { "text-align": "center" }
+      },
+      [
+        _c("h3", { staticStyle: { "padding-top": "10px" } }, [
+          _vm._v("勤務実績表")
+        ])
+      ]
+    )
+  },
   function() {
     var _vm = this
     var _h = _vm.$createElement
@@ -12132,7 +15448,7 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c("div", [
-    _c("p", [_vm._v("showUser")]),
+    _vm._m(0),
     _vm._v(" "),
     _c("div", { staticClass: "row" }, [
       _c("div", { staticClass: "col-lg-3" }),
@@ -12727,21 +16043,437 @@ var render = function() {
     ]),
     _vm._v(" "),
     _c(
-      "button",
+      "div",
       {
-        on: {
-          click: function($event) {
-            $event.stopPropagation()
-            $event.preventDefault()
-            return _vm.goHome()
-          }
-        }
+        staticClass: "homeButton",
+        staticStyle: { "text-align": "center", "padding-top": "20px" }
       },
-      [_vm._v("戻る")]
+      [
+        _c(
+          "button",
+          {
+            staticClass: "btn btn-outline-info",
+            attrs: { type: "button" },
+            on: {
+              click: function($event) {
+                $event.stopPropagation()
+                $event.preventDefault()
+                return _vm.goHome()
+              }
+            }
+          },
+          [_vm._v("ホームへ戻る")]
+        )
+      ]
     )
   ])
 }
-var staticRenderFns = []
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c(
+      "div",
+      { staticClass: "showUserTitle", staticStyle: { "text-align": "center" } },
+      [_c("h3", { staticStyle: { padding: "10px" } }, [_vm._v("ユーザー情報")])]
+    )
+  }
+]
+render._withStripped = true
+
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/page/TaskDetail.vue?vue&type=template&id=329c175b&":
+/*!******************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/page/TaskDetail.vue?vue&type=template&id=329c175b& ***!
+  \******************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", [
+    _vm._m(0),
+    _vm._v(" "),
+    _c(
+      "div",
+      {
+        staticClass: "calendar-title",
+        staticStyle: { display: "flex", "justify-content": "center" }
+      },
+      [
+        _c("h2", { staticStyle: { padding: "10px" } }, [
+          _vm._v(
+            _vm._s(_vm.year) + "/" + _vm._s(_vm.month) + _vm._s(_vm.theDate)
+          )
+        ])
+      ]
+    ),
+    _vm._v(" "),
+    !_vm.searchSwitch
+      ? _c(
+          "div",
+          {
+            staticClass: "searchDay",
+            staticStyle: { "text-align": "center", "margin-bottom": "10px" }
+          },
+          [
+            _c("v-date-picker", {
+              scopedSlots: _vm._u(
+                [
+                  {
+                    key: "default",
+                    fn: function(ref) {
+                      var inputValue = ref.inputValue
+                      var inputEvents = ref.inputEvents
+                      return [
+                        _c(
+                          "input",
+                          _vm._g(
+                            {
+                              staticClass: "bg-white border px-2 py-1 rounded",
+                              domProps: { value: inputValue }
+                            },
+                            inputEvents
+                          )
+                        )
+                      ]
+                    }
+                  }
+                ],
+                null,
+                false,
+                245967115
+              ),
+              model: {
+                value: _vm.date,
+                callback: function($$v) {
+                  _vm.date = $$v
+                },
+                expression: "date"
+              }
+            }),
+            _vm._v(" "),
+            _c(
+              "button",
+              {
+                staticClass: "btn btn-outline-primary",
+                attrs: { type: "button" },
+                on: {
+                  click: function($event) {
+                    return _vm.searchTaskDay()
+                  }
+                }
+              },
+              [_vm._v("検索")]
+            ),
+            _vm._v(" "),
+            _c(
+              "button",
+              {
+                staticClass: "btn btn-outline-secondary",
+                attrs: { type: "button" },
+                on: {
+                  click: function($event) {
+                    return _vm.switchItem()
+                  }
+                }
+              },
+              [_vm._v("月単位")]
+            )
+          ],
+          1
+        )
+      : _vm._e(),
+    _vm._v(" "),
+    _vm.searchSwitch
+      ? _c(
+          "div",
+          {
+            staticClass: "searchMonth",
+            staticStyle: {
+              display: "flex",
+              "justify-content": "center",
+              "margin-bottom": "10px"
+            }
+          },
+          [
+            _c(
+              "div",
+              { staticClass: "selectYear", staticStyle: { display: "flex" } },
+              [
+                _c(
+                  "select",
+                  {
+                    directives: [
+                      {
+                        name: "model",
+                        rawName: "v-model",
+                        value: _vm.selectedYear,
+                        expression: "selectedYear"
+                      }
+                    ],
+                    staticClass: "form-select",
+                    attrs: { "aria-label": "Default select example" },
+                    on: {
+                      change: function($event) {
+                        var $$selectedVal = Array.prototype.filter
+                          .call($event.target.options, function(o) {
+                            return o.selected
+                          })
+                          .map(function(o) {
+                            var val = "_value" in o ? o._value : o.value
+                            return val
+                          })
+                        _vm.selectedYear = $event.target.multiple
+                          ? $$selectedVal
+                          : $$selectedVal[0]
+                      }
+                    }
+                  },
+                  [
+                    _c(
+                      "option",
+                      { attrs: { disabled: "", value: "initial" } },
+                      [_vm._v("年")]
+                    ),
+                    _vm._v(" "),
+                    _c("option", { attrs: { value: "2020" } }, [
+                      _vm._v("2020")
+                    ]),
+                    _vm._v(" "),
+                    _c("option", { attrs: { value: "2021" } }, [
+                      _vm._v("2021")
+                    ]),
+                    _vm._v(" "),
+                    _c("option", { attrs: { value: "2022" } }, [_vm._v("2022")])
+                  ]
+                ),
+                _vm._v(" "),
+                _c("p", { staticStyle: { margin: "auto" } }, [_vm._v("年")])
+              ]
+            ),
+            _vm._v(" "),
+            _c(
+              "div",
+              { staticClass: "selectMonth", staticStyle: { display: "flex" } },
+              [
+                _c(
+                  "select",
+                  {
+                    directives: [
+                      {
+                        name: "model",
+                        rawName: "v-model",
+                        value: _vm.selectedMonth,
+                        expression: "selectedMonth"
+                      }
+                    ],
+                    staticClass: "form-select",
+                    attrs: { "aria-label": "Default select example" },
+                    on: {
+                      change: function($event) {
+                        var $$selectedVal = Array.prototype.filter
+                          .call($event.target.options, function(o) {
+                            return o.selected
+                          })
+                          .map(function(o) {
+                            var val = "_value" in o ? o._value : o.value
+                            return val
+                          })
+                        _vm.selectedMonth = $event.target.multiple
+                          ? $$selectedVal
+                          : $$selectedVal[0]
+                      }
+                    }
+                  },
+                  [
+                    _c(
+                      "option",
+                      { attrs: { disabled: "", value: "initial" } },
+                      [_vm._v("月")]
+                    ),
+                    _vm._v(" "),
+                    _c("option", { attrs: { value: "01" } }, [_vm._v("1")]),
+                    _vm._v(" "),
+                    _c("option", { attrs: { value: "02" } }, [_vm._v("2")]),
+                    _vm._v(" "),
+                    _c("option", { attrs: { value: "03" } }, [_vm._v("3")]),
+                    _vm._v(" "),
+                    _c("option", { attrs: { value: "04" } }, [_vm._v("4")]),
+                    _vm._v(" "),
+                    _c("option", { attrs: { value: "05" } }, [_vm._v("5")]),
+                    _vm._v(" "),
+                    _c("option", { attrs: { value: "06" } }, [_vm._v("6")]),
+                    _vm._v(" "),
+                    _c("option", { attrs: { value: "07" } }, [_vm._v("7")]),
+                    _vm._v(" "),
+                    _c("option", { attrs: { value: "08" } }, [_vm._v("8")]),
+                    _vm._v(" "),
+                    _c("option", { attrs: { value: "09" } }, [_vm._v("9")]),
+                    _vm._v(" "),
+                    _c("option", { attrs: { value: "10" } }, [_vm._v("10")]),
+                    _vm._v(" "),
+                    _c("option", { attrs: { value: "11" } }, [_vm._v("11")]),
+                    _vm._v(" "),
+                    _c("option", { attrs: { value: "12" } }, [_vm._v("12")])
+                  ]
+                ),
+                _vm._v(" "),
+                _c("p", { staticStyle: { margin: "auto" } }, [_vm._v("月")])
+              ]
+            ),
+            _vm._v(" "),
+            _c("div", { staticClass: "searchButton" }, [
+              _c(
+                "button",
+                {
+                  staticClass: "btn btn-outline-primary",
+                  attrs: { type: "button" },
+                  on: {
+                    click: function($event) {
+                      return _vm.searchTaskMonth()
+                    }
+                  }
+                },
+                [_vm._v("検索")]
+              ),
+              _vm._v(" "),
+              _c(
+                "button",
+                {
+                  staticClass: "btn btn-outline-secondary",
+                  attrs: { type: "button" },
+                  on: {
+                    click: function($event) {
+                      return _vm.switchItem()
+                    }
+                  }
+                },
+                [_vm._v("日単位")]
+              )
+            ])
+          ]
+        )
+      : _vm._e(),
+    _vm._v(" "),
+    _vm.taskRecords.length === 0
+      ? _c("div", { staticClass: "noRecord" }, [
+          _c(
+            "h3",
+            { staticStyle: { "text-align": "center", color: "tomato" } },
+            [_vm._v("検索結果がありません")]
+          )
+        ])
+      : _vm._e(),
+    _vm._v(" "),
+    _vm.taskRecords.length !== 0
+      ? _c("div", { staticClass: "container" }, [
+          _c("div", { staticClass: "row" }, [
+            _c("div", { staticClass: "col-lg-3" }),
+            _vm._v(" "),
+            _c("div", { staticClass: "col-lg-6" }, [
+              _c(
+                "span",
+                {
+                  staticClass: "d-block p-2 bg-secondary text-white tableName"
+                },
+                [_vm._v("タスク履歴")]
+              ),
+              _vm._v(" "),
+              _c("table", { staticClass: "table" }, [
+                _vm._m(1),
+                _vm._v(" "),
+                _c(
+                  "tbody",
+                  _vm._l(_vm.taskRecords, function(record) {
+                    return _c("tr", [
+                      _c("td", { attrs: { scope: "row" } }),
+                      _vm._v(" "),
+                      _c("td", [_vm._v(_vm._s(record.task_name))]),
+                      _vm._v(" "),
+                      _c("td", [_vm._v(_vm._s(record.task_time))]),
+                      _vm._v(" "),
+                      _c("td", [_vm._v(_vm._s(record.task_percentage) + "%")])
+                    ])
+                  }),
+                  0
+                )
+              ])
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "col-lg-3" })
+          ])
+        ])
+      : _vm._e(),
+    _vm._v(" "),
+    _c(
+      "div",
+      { staticClass: "homeButton", staticStyle: { "text-align": "center" } },
+      [
+        _c(
+          "button",
+          {
+            staticClass: "btn btn-outline-info",
+            attrs: { type: "button" },
+            on: {
+              click: function($event) {
+                $event.stopPropagation()
+                $event.preventDefault()
+                return _vm.goHome()
+              }
+            }
+          },
+          [_vm._v("ホームへ戻る")]
+        )
+      ]
+    )
+  ])
+}
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c(
+      "div",
+      {
+        staticClass: "taskDetailTitle",
+        staticStyle: { "text-align": "center" }
+      },
+      [
+        _c("h3", { staticStyle: { "padding-top": "10px" } }, [
+          _vm._v("タスク実績表")
+        ])
+      ]
+    )
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("thead", [
+      _c("tr", [
+        _c("th", { attrs: { scope: "col" } }),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("タスク名")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("合計時間")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("割合")])
+      ])
+    ])
+  }
+]
 render._withStripped = true
 
 
@@ -28287,6 +32019,213 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/js/components/admin/MemberAttendance.vue":
+/*!************************************************************!*\
+  !*** ./resources/js/components/admin/MemberAttendance.vue ***!
+  \************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _MemberAttendance_vue_vue_type_template_id_57874e8e___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./MemberAttendance.vue?vue&type=template&id=57874e8e& */ "./resources/js/components/admin/MemberAttendance.vue?vue&type=template&id=57874e8e&");
+/* harmony import */ var _MemberAttendance_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./MemberAttendance.vue?vue&type=script&lang=js& */ "./resources/js/components/admin/MemberAttendance.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _MemberAttendance_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _MemberAttendance_vue_vue_type_template_id_57874e8e___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _MemberAttendance_vue_vue_type_template_id_57874e8e___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/components/admin/MemberAttendance.vue"
+/* harmony default export */ __webpack_exports__["default"] = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/js/components/admin/MemberAttendance.vue?vue&type=script&lang=js&":
+/*!*************************************************************************************!*\
+  !*** ./resources/js/components/admin/MemberAttendance.vue?vue&type=script&lang=js& ***!
+  \*************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_MemberAttendance_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib??ref--4-0!../../../../node_modules/vue-loader/lib??vue-loader-options!./MemberAttendance.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/admin/MemberAttendance.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_MemberAttendance_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/js/components/admin/MemberAttendance.vue?vue&type=template&id=57874e8e&":
+/*!*******************************************************************************************!*\
+  !*** ./resources/js/components/admin/MemberAttendance.vue?vue&type=template&id=57874e8e& ***!
+  \*******************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_MemberAttendance_vue_vue_type_template_id_57874e8e___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib??vue-loader-options!./MemberAttendance.vue?vue&type=template&id=57874e8e& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/admin/MemberAttendance.vue?vue&type=template&id=57874e8e&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_MemberAttendance_vue_vue_type_template_id_57874e8e___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_MemberAttendance_vue_vue_type_template_id_57874e8e___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+
+
+
+/***/ }),
+
+/***/ "./resources/js/components/admin/MemberAttendanceDetail.vue":
+/*!******************************************************************!*\
+  !*** ./resources/js/components/admin/MemberAttendanceDetail.vue ***!
+  \******************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _MemberAttendanceDetail_vue_vue_type_template_id_778961ff___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./MemberAttendanceDetail.vue?vue&type=template&id=778961ff& */ "./resources/js/components/admin/MemberAttendanceDetail.vue?vue&type=template&id=778961ff&");
+/* harmony import */ var _MemberAttendanceDetail_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./MemberAttendanceDetail.vue?vue&type=script&lang=js& */ "./resources/js/components/admin/MemberAttendanceDetail.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _MemberAttendanceDetail_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _MemberAttendanceDetail_vue_vue_type_template_id_778961ff___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _MemberAttendanceDetail_vue_vue_type_template_id_778961ff___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/components/admin/MemberAttendanceDetail.vue"
+/* harmony default export */ __webpack_exports__["default"] = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/js/components/admin/MemberAttendanceDetail.vue?vue&type=script&lang=js&":
+/*!*******************************************************************************************!*\
+  !*** ./resources/js/components/admin/MemberAttendanceDetail.vue?vue&type=script&lang=js& ***!
+  \*******************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_MemberAttendanceDetail_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib??ref--4-0!../../../../node_modules/vue-loader/lib??vue-loader-options!./MemberAttendanceDetail.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/admin/MemberAttendanceDetail.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_MemberAttendanceDetail_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/js/components/admin/MemberAttendanceDetail.vue?vue&type=template&id=778961ff&":
+/*!*************************************************************************************************!*\
+  !*** ./resources/js/components/admin/MemberAttendanceDetail.vue?vue&type=template&id=778961ff& ***!
+  \*************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_MemberAttendanceDetail_vue_vue_type_template_id_778961ff___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib??vue-loader-options!./MemberAttendanceDetail.vue?vue&type=template&id=778961ff& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/admin/MemberAttendanceDetail.vue?vue&type=template&id=778961ff&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_MemberAttendanceDetail_vue_vue_type_template_id_778961ff___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_MemberAttendanceDetail_vue_vue_type_template_id_778961ff___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+
+
+
+/***/ }),
+
+/***/ "./resources/js/components/admin/MemberTask.vue":
+/*!******************************************************!*\
+  !*** ./resources/js/components/admin/MemberTask.vue ***!
+  \******************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _MemberTask_vue_vue_type_template_id_266160ea___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./MemberTask.vue?vue&type=template&id=266160ea& */ "./resources/js/components/admin/MemberTask.vue?vue&type=template&id=266160ea&");
+/* harmony import */ var _MemberTask_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./MemberTask.vue?vue&type=script&lang=js& */ "./resources/js/components/admin/MemberTask.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _MemberTask_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _MemberTask_vue_vue_type_template_id_266160ea___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _MemberTask_vue_vue_type_template_id_266160ea___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/components/admin/MemberTask.vue"
+/* harmony default export */ __webpack_exports__["default"] = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/js/components/admin/MemberTask.vue?vue&type=script&lang=js&":
+/*!*******************************************************************************!*\
+  !*** ./resources/js/components/admin/MemberTask.vue?vue&type=script&lang=js& ***!
+  \*******************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_MemberTask_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib??ref--4-0!../../../../node_modules/vue-loader/lib??vue-loader-options!./MemberTask.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/admin/MemberTask.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_MemberTask_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/js/components/admin/MemberTask.vue?vue&type=template&id=266160ea&":
+/*!*************************************************************************************!*\
+  !*** ./resources/js/components/admin/MemberTask.vue?vue&type=template&id=266160ea& ***!
+  \*************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_MemberTask_vue_vue_type_template_id_266160ea___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib??vue-loader-options!./MemberTask.vue?vue&type=template&id=266160ea& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/admin/MemberTask.vue?vue&type=template&id=266160ea&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_MemberTask_vue_vue_type_template_id_266160ea___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_MemberTask_vue_vue_type_template_id_266160ea___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+
+
+
+/***/ }),
+
 /***/ "./resources/js/components/layout/TheFooter.vue":
 /*!******************************************************!*\
   !*** ./resources/js/components/layout/TheFooter.vue ***!
@@ -29168,6 +33107,75 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/js/components/page/TaskDetail.vue":
+/*!*****************************************************!*\
+  !*** ./resources/js/components/page/TaskDetail.vue ***!
+  \*****************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _TaskDetail_vue_vue_type_template_id_329c175b___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./TaskDetail.vue?vue&type=template&id=329c175b& */ "./resources/js/components/page/TaskDetail.vue?vue&type=template&id=329c175b&");
+/* harmony import */ var _TaskDetail_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./TaskDetail.vue?vue&type=script&lang=js& */ "./resources/js/components/page/TaskDetail.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _TaskDetail_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _TaskDetail_vue_vue_type_template_id_329c175b___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _TaskDetail_vue_vue_type_template_id_329c175b___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/components/page/TaskDetail.vue"
+/* harmony default export */ __webpack_exports__["default"] = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/js/components/page/TaskDetail.vue?vue&type=script&lang=js&":
+/*!******************************************************************************!*\
+  !*** ./resources/js/components/page/TaskDetail.vue?vue&type=script&lang=js& ***!
+  \******************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_TaskDetail_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib??ref--4-0!../../../../node_modules/vue-loader/lib??vue-loader-options!./TaskDetail.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/page/TaskDetail.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_TaskDetail_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/js/components/page/TaskDetail.vue?vue&type=template&id=329c175b&":
+/*!************************************************************************************!*\
+  !*** ./resources/js/components/page/TaskDetail.vue?vue&type=template&id=329c175b& ***!
+  \************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_TaskDetail_vue_vue_type_template_id_329c175b___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib??vue-loader-options!./TaskDetail.vue?vue&type=template&id=329c175b& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/page/TaskDetail.vue?vue&type=template&id=329c175b&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_TaskDetail_vue_vue_type_template_id_329c175b___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_TaskDetail_vue_vue_type_template_id_329c175b___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+
+
+
+/***/ }),
+
 /***/ "./resources/js/router.js":
 /*!********************************!*\
   !*** ./resources/js/router.js ***!
@@ -29194,6 +33202,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _components_admin_KindOfTasks__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./components/admin/KindOfTasks */ "./resources/js/components/admin/KindOfTasks.vue");
 /* harmony import */ var _components_page_ShowUser__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./components/page/ShowUser */ "./resources/js/components/page/ShowUser.vue");
 /* harmony import */ var _components_page_AttendanceDetail__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./components/page/AttendanceDetail */ "./resources/js/components/page/AttendanceDetail.vue");
+/* harmony import */ var _components_page_TaskDetail__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./components/page/TaskDetail */ "./resources/js/components/page/TaskDetail.vue");
+/* harmony import */ var _components_admin_MemberAttendance__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ./components/admin/MemberAttendance */ "./resources/js/components/admin/MemberAttendance.vue");
+/* harmony import */ var _components_admin_MemberAttendanceDetail__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ./components/admin/MemberAttendanceDetail */ "./resources/js/components/admin/MemberAttendanceDetail.vue");
+/* harmony import */ var _components_admin_MemberTask__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ./components/admin/MemberTask */ "./resources/js/components/admin/MemberTask.vue");
+
+
+
+
 
 
 
@@ -29271,6 +33287,22 @@ var router = new vue_router__WEBPACK_IMPORTED_MODULE_1__["default"]({
     path: '/attendanceDetail',
     name: 'attendanceDetail',
     component: _components_page_AttendanceDetail__WEBPACK_IMPORTED_MODULE_15__["default"]
+  }, {
+    path: '/taskDetail',
+    name: 'taskDetail',
+    component: _components_page_TaskDetail__WEBPACK_IMPORTED_MODULE_16__["default"]
+  }, {
+    path: '/memberAttendance',
+    name: 'memberAttendance',
+    component: _components_admin_MemberAttendance__WEBPACK_IMPORTED_MODULE_17__["default"]
+  }, {
+    path: '/memberAttendanceDetail',
+    name: 'memberAttendanceDetail',
+    component: _components_admin_MemberAttendanceDetail__WEBPACK_IMPORTED_MODULE_18__["default"]
+  }, {
+    path: '/memberTask',
+    name: 'memberTask',
+    component: _components_admin_MemberTask__WEBPACK_IMPORTED_MODULE_19__["default"]
   }]
 });
 /* harmony default export */ __webpack_exports__["default"] = (router);

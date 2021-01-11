@@ -1,6 +1,8 @@
 <template>
   <div>
-    <p>showUser</p>
+    <div style="text-align: center;" class="showUserTitle">
+      <h3 style="padding: 10px;">ユーザー情報</h3>
+    </div>
 
     <div class="row">
       <div class="col-lg-3"></div>
@@ -97,7 +99,9 @@
       <div class="col-lg-3"></div>
     </div>
 
-    <button @click.stop.prevent="goHome()">戻る</button>
+    <div style="text-align:center; padding-top: 20px;" class="homeButton">
+      <button @click.stop.prevent="goHome()" type="button" class="btn btn-outline-info">ホームへ戻る</button>
+    </div>
   </div>
 </template>
 

@@ -1,7 +1,7 @@
 <template>
   <div>
     <div style="text-align: center;" class="ResultOfAttendanceTitle">
-      <h3 style="padding-top: 10px;">勤務実績表</h3>
+      <h3 style="padding-top: 10px;">{{ userName }}さんの勤務実績表</h3>
     </div>
 
     <div class="calendar-title" style="display: flex; justify-content: center">
@@ -28,17 +28,17 @@
       <tbody>
         <tr v-for="record in calendar">
           <th v-if="record.day !== '土'　&& record.day !== '日'" scope="row">
-            <router-link class="weekdays" :to="{name:'attendanceDetail',params:{theDay: record.theDay, nextDay: record.nextDay}}">
+            <router-link class="weekdays" :to="{name:'memberAttendanceDetail',params:{id: id, name: userName, theDay: record.theDay, nextDay: record.nextDay}}">
               {{ record.date }}({{ record.day }})
             </router-link>
           </th>
           <th v-if="record.day === '土'" scope="row">
-            <router-link class="saturday" :to="{name:'attendanceDetail',params:{theDay: record.theDay, nextDay: record.nextDay}}">
+            <router-link class="saturday" :to="{name:'memberAttendanceDetail',params:{id: id, name: userName, theDay: record.theDay, nextDay: record.nextDay}}">
               {{ record.date }}({{ record.day }})
             </router-link>
           </th>
           <th v-if="record.day === '日'" scope="row">
-            <router-link class="sunday" :to="{name:'attendanceDetail',params:{theDay: record.theDay, nextDay: record.nextDay}}">
+            <router-link class="sunday" :to="{name:'memberAttendanceDetail',params:{id: id, name: userName, theDay: record.theDay, nextDay: record.nextDay}}">
               {{ record.date }}({{ record.day }})
             </router-link>
           </th>
@@ -61,6 +61,8 @@
 export default {
   data() {
     return {
+      id: this.$route.params.id,
+      userName: this.$route.params.name,
       currentYear:0,
       currentMonth:0,
       currentDate:0,
@@ -76,6 +78,10 @@ export default {
     [this.currentYear,  this.currentMonth, this.currentDate] = [date.getFullYear(), date.getMonth() + 1, date.getDate()];
   },
   mounted() {
+    var id = this.$route.params.id;
+    if (id == null) {
+      this.$router.push("/groupMember");
+    }
     this.calendarMaker();
    },
   methods:{
@@ -93,7 +99,7 @@ export default {
       this.$router.push("/");
     },
     calendarMaker() {
-      var authId = document.querySelector("meta[name='user-id']").getAttribute('content');
+      var authId = this.$route.params.id;
       const theDay = new Date(this.currentYear, this.currentMonth - 1, 1);
       const toDay = new Date(this.currentYear, this.currentMonth, 1);
       this.performances = [];

@@ -1,7 +1,11 @@
 <template>
   <div>
-    <p>既にグループに参加しています。</p>
-    <button @click.stop.prevent="goHome()">ホームへ戻る</button>
+    <div style="text-align: center;" class="theTitle">
+      <h3 style="padding: 10px;">既にグループに参加しています。</h3>
+    </div>
+    <div style="text-align:center; padding-top: 20px;" class="homeButton">
+      <button @click.stop.prevent="goHome()" type="button" class="btn btn-outline-info">ホームへ戻る</button>
+    </div>
   </div>
 </template>
 

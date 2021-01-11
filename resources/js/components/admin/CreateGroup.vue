@@ -1,21 +1,29 @@
 <template>
   <div>
-    <p>CreateGroup</p>
-    <p>hey!!createGroup!!</p>
+    <div style="text-align: center;" class="createGroupTitle">
+      <h3 style="padding: 10px;">グループ作成</h3>
+    </div>
     
     <ValidationObserver　class="form-group" ref="observer" action="/group" id="group" method="post" tag="form" v-slot="{ invalid }">
       <input type="hidden" name="_token" :value="csrf" />
-      <div class="input-group mb-3">
-        <span class="input-group-text" id="inputGroup-sizing-default">グループ or 会社名</span>
-        <validation-provider name="グループ名" rules="required|max:100" v-slot="{ errors }">
-          <input v-model="name" name="name" type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" />
-          <div class="alert alert-danger" v-show="errors[0]">{{ errors[0] }}</div>
-        </validation-provider>
+      
+      <div class="col-lg-3"></div>
+      <div class="col-lg-6">
+        <div>
+          <validation-provider name="グループ名" rules="required|max:100" v-slot="{ errors }">
+            <div class="alert alert-danger" v-show="errors[0]">{{ errors[0] }}</div>
+            <div class="input-group input-group-lg">
+              <input v-model="name" name="name" type="text" class="form-control" placeholder="グループ名 or 会社名" aria-label="グループ名 or 会社名" aria-describedby="inputGroup-sizing-default" />
+              <button type="button" class="btn btn-primary" @click="createG()">作成</button>
+            </div>
+          </validation-provider>
+        </div>
       </div>
-      <button type="button" class="btn btn-primary" @click="createG()">作成</button>
+      <div class="col-lg-3"></div>
     </ValidationObserver>
-
-    <button @click.stop.prevent="goHome()">戻る</button>
+    <div style="text-align:center; padding-top: 20px;" class="homeButton">
+      <button @click.stop.prevent="goHome()" type="button" class="btn btn-outline-info">ホームへ戻る</button>
+    </div>
   </div>
 </template>
 
