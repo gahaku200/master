@@ -2573,6 +2573,20 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -2585,7 +2599,18 @@ __webpack_require__.r(__webpack_exports__);
       calendar: [],
       performances: [],
       holidays: [],
-      lastArray: ''
+      lastArray: '',
+      totalTimeInt: 0,
+      totalOvertimeInt: 0,
+      totalMidnightTimeInt: 0,
+      totalMidnightOvertimeInt: 0,
+      totalRestTimeInt: 0,
+      totalTime: '',
+      totalOvertime: '',
+      totalMidnightTime: '',
+      totalMidnightOvertime: '',
+      totalRestTime: '',
+      total: ''
     };
   },
   created: function created() {
@@ -2621,6 +2646,11 @@ __webpack_require__.r(__webpack_exports__);
     calendarMaker: function calendarMaker() {
       var _this = this;
 
+      this.totalTimeInt = 0;
+      this.totalOvertimeInt = 0;
+      this.totalMidnightTimeInt = 0;
+      this.totalMidnightOvertimeInt = 0;
+      this.totalRestTimeInt = 0;
       var authId = this.$route.params.id;
       var theDay = new Date(this.currentYear, this.currentMonth - 1, 1);
       var toDay = new Date(this.currentYear, this.currentMonth, 1);
@@ -2698,6 +2728,11 @@ __webpack_require__.r(__webpack_exports__);
             }
           }
 
+          _this.totalTimeInt += time;
+          _this.totalOvertimeInt += overtime;
+          _this.totalMidnightTimeInt += midnightTime;
+          _this.totalMidnightOvertimeInt += midnightOvertime;
+          _this.totalRestTimeInt += restTime;
           params1 = _this.currentYear + ',' + _this.currentMonth + ',' + i;
           plusOne = i + 1;
           params2 = _this.currentYear + ',' + _this.currentMonth + ',' + plusOne;
@@ -2734,6 +2769,13 @@ __webpack_require__.r(__webpack_exports__);
 
           _loop(i);
         }
+
+        _this.totalTime = _this.convertTime(Math.floor(_this.totalTimeInt / 1000));
+        _this.totalOvertime = _this.convertTime(Math.floor(_this.totalOvertimeInt / 1000));
+        _this.totalMidnightTime = _this.convertTime(Math.floor(_this.totalMidnightTimeInt / 1000));
+        _this.totalMidnightOvertime = _this.convertTime(Math.floor(_this.totalMidnightOvertimeInt / 1000));
+        _this.totalRestTime = _this.convertTime(Math.floor(_this.totalRestTimeInt / 1000));
+        _this.total = _this.convertTime(Math.floor((_this.totalTimeInt + _this.totalOvertimeInt + _this.totalMidnightTimeInt + _this.totalMidnightOvertimeInt) / 1000));
       })["catch"](function (error) {
         console.log(error);
       });
@@ -5663,6 +5705,20 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -5673,7 +5729,18 @@ __webpack_require__.r(__webpack_exports__);
       calendar: [],
       performances: [],
       holidays: [],
-      lastArray: ''
+      lastArray: '',
+      totalTimeInt: 0,
+      totalOvertimeInt: 0,
+      totalMidnightTimeInt: 0,
+      totalMidnightOvertimeInt: 0,
+      totalRestTimeInt: 0,
+      totalTime: '',
+      totalOvertime: '',
+      totalMidnightTime: '',
+      totalMidnightOvertime: '',
+      totalRestTime: '',
+      total: ''
     };
   },
   created: function created() {
@@ -5703,6 +5770,11 @@ __webpack_require__.r(__webpack_exports__);
     calendarMaker: function calendarMaker() {
       var _this = this;
 
+      this.totalTimeInt = 0;
+      this.totalOvertimeInt = 0;
+      this.totalMidnightTimeInt = 0;
+      this.totalMidnightOvertimeInt = 0;
+      this.totalRestTimeInt = 0;
       var authId = document.querySelector("meta[name='user-id']").getAttribute('content');
       var theDay = new Date(this.currentYear, this.currentMonth - 1, 1);
       var toDay = new Date(this.currentYear, this.currentMonth, 1);
@@ -5780,6 +5852,11 @@ __webpack_require__.r(__webpack_exports__);
             }
           }
 
+          _this.totalTimeInt += time;
+          _this.totalOvertimeInt += overtime;
+          _this.totalMidnightTimeInt += midnightTime;
+          _this.totalMidnightOvertimeInt += midnightOvertime;
+          _this.totalRestTimeInt += restTime;
           params1 = _this.currentYear + ',' + _this.currentMonth + ',' + i;
           plusOne = i + 1;
           params2 = _this.currentYear + ',' + _this.currentMonth + ',' + plusOne;
@@ -5816,6 +5893,13 @@ __webpack_require__.r(__webpack_exports__);
 
           _loop(i);
         }
+
+        _this.totalTime = _this.convertTime(Math.floor(_this.totalTimeInt / 1000));
+        _this.totalOvertime = _this.convertTime(Math.floor(_this.totalOvertimeInt / 1000));
+        _this.totalMidnightTime = _this.convertTime(Math.floor(_this.totalMidnightTimeInt / 1000));
+        _this.totalMidnightOvertime = _this.convertTime(Math.floor(_this.totalMidnightOvertimeInt / 1000));
+        _this.totalRestTime = _this.convertTime(Math.floor(_this.totalRestTimeInt / 1000));
+        _this.total = _this.convertTime(Math.floor((_this.totalTimeInt + _this.totalOvertimeInt + _this.totalMidnightTimeInt + _this.totalMidnightOvertimeInt) / 1000));
       })["catch"](function (error) {
         console.log(error);
       });
@@ -11908,133 +11992,164 @@ var render = function() {
       ]
     ),
     _vm._v(" "),
+    _c(
+      "div",
+      {
+        staticClass: "ResultOfAttendanceTotal",
+        staticStyle: { "text-align": "center" }
+      },
+      [
+        _c("div", { staticClass: "badge rounded-pill bg-success" }, [
+          _c("h4", { staticStyle: { padding: "10px 10px 5px 10px" } }, [
+            _vm._v("合計勤務時間：" + _vm._s(_vm.total))
+          ])
+        ])
+      ]
+    ),
+    _vm._v(" "),
     _c("table", { staticClass: "table" }, [
       _vm._m(0),
       _vm._v(" "),
       _c(
         "tbody",
-        _vm._l(_vm.calendar, function(record) {
-          return _c("tr", [
-            record.day !== "土" && record.day !== "日"
-              ? _c(
-                  "th",
-                  { attrs: { scope: "row" } },
-                  [
-                    _c(
-                      "router-link",
-                      {
-                        staticClass: "weekdays",
-                        attrs: {
-                          to: {
-                            name: "memberAttendanceDetail",
-                            params: {
-                              id: _vm.id,
-                              name: _vm.userName,
-                              theDay: record.theDay,
-                              nextDay: record.nextDay
+        [
+          _vm._l(_vm.calendar, function(record) {
+            return _c("tr", [
+              record.day !== "土" && record.day !== "日"
+                ? _c(
+                    "th",
+                    { attrs: { scope: "row" } },
+                    [
+                      _c(
+                        "router-link",
+                        {
+                          staticClass: "weekdays",
+                          attrs: {
+                            to: {
+                              name: "memberAttendanceDetail",
+                              params: {
+                                id: _vm.id,
+                                name: _vm.userName,
+                                theDay: record.theDay,
+                                nextDay: record.nextDay
+                              }
                             }
                           }
-                        }
-                      },
-                      [
-                        _vm._v(
-                          "\n            " +
-                            _vm._s(record.date) +
-                            "(" +
-                            _vm._s(record.day) +
-                            ")\n          "
-                        )
-                      ]
-                    )
-                  ],
-                  1
-                )
-              : _vm._e(),
-            _vm._v(" "),
-            record.day === "土"
-              ? _c(
-                  "th",
-                  { attrs: { scope: "row" } },
-                  [
-                    _c(
-                      "router-link",
-                      {
-                        staticClass: "saturday",
-                        attrs: {
-                          to: {
-                            name: "memberAttendanceDetail",
-                            params: {
-                              id: _vm.id,
-                              name: _vm.userName,
-                              theDay: record.theDay,
-                              nextDay: record.nextDay
+                        },
+                        [
+                          _vm._v(
+                            "\n            " +
+                              _vm._s(record.date) +
+                              "(" +
+                              _vm._s(record.day) +
+                              ")\n          "
+                          )
+                        ]
+                      )
+                    ],
+                    1
+                  )
+                : _vm._e(),
+              _vm._v(" "),
+              record.day === "土"
+                ? _c(
+                    "th",
+                    { attrs: { scope: "row" } },
+                    [
+                      _c(
+                        "router-link",
+                        {
+                          staticClass: "saturday",
+                          attrs: {
+                            to: {
+                              name: "memberAttendanceDetail",
+                              params: {
+                                id: _vm.id,
+                                name: _vm.userName,
+                                theDay: record.theDay,
+                                nextDay: record.nextDay
+                              }
                             }
                           }
-                        }
-                      },
-                      [
-                        _vm._v(
-                          "\n            " +
-                            _vm._s(record.date) +
-                            "(" +
-                            _vm._s(record.day) +
-                            ")\n          "
-                        )
-                      ]
-                    )
-                  ],
-                  1
-                )
-              : _vm._e(),
-            _vm._v(" "),
-            record.day === "日"
-              ? _c(
-                  "th",
-                  { attrs: { scope: "row" } },
-                  [
-                    _c(
-                      "router-link",
-                      {
-                        staticClass: "sunday",
-                        attrs: {
-                          to: {
-                            name: "memberAttendanceDetail",
-                            params: {
-                              id: _vm.id,
-                              name: _vm.userName,
-                              theDay: record.theDay,
-                              nextDay: record.nextDay
+                        },
+                        [
+                          _vm._v(
+                            "\n            " +
+                              _vm._s(record.date) +
+                              "(" +
+                              _vm._s(record.day) +
+                              ")\n          "
+                          )
+                        ]
+                      )
+                    ],
+                    1
+                  )
+                : _vm._e(),
+              _vm._v(" "),
+              record.day === "日"
+                ? _c(
+                    "th",
+                    { attrs: { scope: "row" } },
+                    [
+                      _c(
+                        "router-link",
+                        {
+                          staticClass: "sunday",
+                          attrs: {
+                            to: {
+                              name: "memberAttendanceDetail",
+                              params: {
+                                id: _vm.id,
+                                name: _vm.userName,
+                                theDay: record.theDay,
+                                nextDay: record.nextDay
+                              }
                             }
                           }
-                        }
-                      },
-                      [
-                        _vm._v(
-                          "\n            " +
-                            _vm._s(record.date) +
-                            "(" +
-                            _vm._s(record.day) +
-                            ")\n          "
-                        )
-                      ]
-                    )
-                  ],
-                  1
-                )
-              : _vm._e(),
+                        },
+                        [
+                          _vm._v(
+                            "\n            " +
+                              _vm._s(record.date) +
+                              "(" +
+                              _vm._s(record.day) +
+                              ")\n          "
+                          )
+                        ]
+                      )
+                    ],
+                    1
+                  )
+                : _vm._e(),
+              _vm._v(" "),
+              _c("td", [_vm._v(_vm._s(record.time))]),
+              _vm._v(" "),
+              _c("td", [_vm._v(_vm._s(record.overtime))]),
+              _vm._v(" "),
+              _c("td", [_vm._v(_vm._s(record.midnightTime))]),
+              _vm._v(" "),
+              _c("td", [_vm._v(_vm._s(record.midnightOvertime))]),
+              _vm._v(" "),
+              _c("td", [_vm._v(_vm._s(record.restTime))])
+            ])
+          }),
+          _vm._v(" "),
+          _c("tr", [
+            _c("th", [_vm._v("合計時間")]),
             _vm._v(" "),
-            _c("td", [_vm._v(_vm._s(record.time))]),
+            _c("td", [_vm._v(_vm._s(_vm.totalTime))]),
             _vm._v(" "),
-            _c("td", [_vm._v(_vm._s(record.overtime))]),
+            _c("td", [_vm._v(_vm._s(_vm.totalOvertime))]),
             _vm._v(" "),
-            _c("td", [_vm._v(_vm._s(record.midnightTime))]),
+            _c("td", [_vm._v(_vm._s(_vm.totalMidnightTime))]),
             _vm._v(" "),
-            _c("td", [_vm._v(_vm._s(record.midnightOvertime))]),
+            _c("td", [_vm._v(_vm._s(_vm.totalMidnightOvertime))]),
             _vm._v(" "),
-            _c("td", [_vm._v(_vm._s(record.restTime))])
+            _c("td", [_vm._v(_vm._s(_vm.totalRestTime))])
           ])
-        }),
-        0
+        ],
+        2
       )
     ]),
     _vm._v(" "),
@@ -15237,127 +15352,158 @@ var render = function() {
       ]
     ),
     _vm._v(" "),
+    _c(
+      "div",
+      {
+        staticClass: "ResultOfAttendanceTotal",
+        staticStyle: { "text-align": "center" }
+      },
+      [
+        _c("div", { staticClass: "badge rounded-pill bg-success" }, [
+          _c("h4", { staticStyle: { padding: "10px 10px 5px 10px" } }, [
+            _vm._v("合計勤務時間：" + _vm._s(_vm.total))
+          ])
+        ])
+      ]
+    ),
+    _vm._v(" "),
     _c("table", { staticClass: "table" }, [
       _vm._m(1),
       _vm._v(" "),
       _c(
         "tbody",
-        _vm._l(_vm.calendar, function(record) {
-          return _c("tr", [
-            record.day !== "土" && record.day !== "日"
-              ? _c(
-                  "th",
-                  { attrs: { scope: "row" } },
-                  [
-                    _c(
-                      "router-link",
-                      {
-                        staticClass: "weekdays",
-                        attrs: {
-                          to: {
-                            name: "attendanceDetail",
-                            params: {
-                              theDay: record.theDay,
-                              nextDay: record.nextDay
+        [
+          _vm._l(_vm.calendar, function(record) {
+            return _c("tr", [
+              record.day !== "土" && record.day !== "日"
+                ? _c(
+                    "th",
+                    { attrs: { scope: "row" } },
+                    [
+                      _c(
+                        "router-link",
+                        {
+                          staticClass: "weekdays",
+                          attrs: {
+                            to: {
+                              name: "attendanceDetail",
+                              params: {
+                                theDay: record.theDay,
+                                nextDay: record.nextDay
+                              }
                             }
                           }
-                        }
-                      },
-                      [
-                        _vm._v(
-                          "\n            " +
-                            _vm._s(record.date) +
-                            "(" +
-                            _vm._s(record.day) +
-                            ")\n          "
-                        )
-                      ]
-                    )
-                  ],
-                  1
-                )
-              : _vm._e(),
-            _vm._v(" "),
-            record.day === "土"
-              ? _c(
-                  "th",
-                  { attrs: { scope: "row" } },
-                  [
-                    _c(
-                      "router-link",
-                      {
-                        staticClass: "saturday",
-                        attrs: {
-                          to: {
-                            name: "attendanceDetail",
-                            params: {
-                              theDay: record.theDay,
-                              nextDay: record.nextDay
+                        },
+                        [
+                          _vm._v(
+                            "\n            " +
+                              _vm._s(record.date) +
+                              "(" +
+                              _vm._s(record.day) +
+                              ")\n          "
+                          )
+                        ]
+                      )
+                    ],
+                    1
+                  )
+                : _vm._e(),
+              _vm._v(" "),
+              record.day === "土"
+                ? _c(
+                    "th",
+                    { attrs: { scope: "row" } },
+                    [
+                      _c(
+                        "router-link",
+                        {
+                          staticClass: "saturday",
+                          attrs: {
+                            to: {
+                              name: "attendanceDetail",
+                              params: {
+                                theDay: record.theDay,
+                                nextDay: record.nextDay
+                              }
                             }
                           }
-                        }
-                      },
-                      [
-                        _vm._v(
-                          "\n            " +
-                            _vm._s(record.date) +
-                            "(" +
-                            _vm._s(record.day) +
-                            ")\n          "
-                        )
-                      ]
-                    )
-                  ],
-                  1
-                )
-              : _vm._e(),
-            _vm._v(" "),
-            record.day === "日"
-              ? _c(
-                  "th",
-                  { attrs: { scope: "row" } },
-                  [
-                    _c(
-                      "router-link",
-                      {
-                        staticClass: "sunday",
-                        attrs: {
-                          to: {
-                            name: "attendanceDetail",
-                            params: {
-                              theDay: record.theDay,
-                              nextDay: record.nextDay
+                        },
+                        [
+                          _vm._v(
+                            "\n            " +
+                              _vm._s(record.date) +
+                              "(" +
+                              _vm._s(record.day) +
+                              ")\n          "
+                          )
+                        ]
+                      )
+                    ],
+                    1
+                  )
+                : _vm._e(),
+              _vm._v(" "),
+              record.day === "日"
+                ? _c(
+                    "th",
+                    { attrs: { scope: "row" } },
+                    [
+                      _c(
+                        "router-link",
+                        {
+                          staticClass: "sunday",
+                          attrs: {
+                            to: {
+                              name: "attendanceDetail",
+                              params: {
+                                theDay: record.theDay,
+                                nextDay: record.nextDay
+                              }
                             }
                           }
-                        }
-                      },
-                      [
-                        _vm._v(
-                          "\n            " +
-                            _vm._s(record.date) +
-                            "(" +
-                            _vm._s(record.day) +
-                            ")\n          "
-                        )
-                      ]
-                    )
-                  ],
-                  1
-                )
-              : _vm._e(),
+                        },
+                        [
+                          _vm._v(
+                            "\n            " +
+                              _vm._s(record.date) +
+                              "(" +
+                              _vm._s(record.day) +
+                              ")\n          "
+                          )
+                        ]
+                      )
+                    ],
+                    1
+                  )
+                : _vm._e(),
+              _vm._v(" "),
+              _c("td", [_vm._v(_vm._s(record.time))]),
+              _vm._v(" "),
+              _c("td", [_vm._v(_vm._s(record.overtime))]),
+              _vm._v(" "),
+              _c("td", [_vm._v(_vm._s(record.midnightTime))]),
+              _vm._v(" "),
+              _c("td", [_vm._v(_vm._s(record.midnightOvertime))]),
+              _vm._v(" "),
+              _c("td", [_vm._v(_vm._s(record.restTime))])
+            ])
+          }),
+          _vm._v(" "),
+          _c("tr", [
+            _c("th", [_vm._v("合計時間")]),
             _vm._v(" "),
-            _c("td", [_vm._v(_vm._s(record.time))]),
+            _c("td", [_vm._v(_vm._s(_vm.totalTime))]),
             _vm._v(" "),
-            _c("td", [_vm._v(_vm._s(record.overtime))]),
+            _c("td", [_vm._v(_vm._s(_vm.totalOvertime))]),
             _vm._v(" "),
-            _c("td", [_vm._v(_vm._s(record.midnightTime))]),
+            _c("td", [_vm._v(_vm._s(_vm.totalMidnightTime))]),
             _vm._v(" "),
-            _c("td", [_vm._v(_vm._s(record.midnightOvertime))]),
+            _c("td", [_vm._v(_vm._s(_vm.totalMidnightOvertime))]),
             _vm._v(" "),
-            _c("td", [_vm._v(_vm._s(record.restTime))])
+            _c("td", [_vm._v(_vm._s(_vm.totalRestTime))])
           ])
-        }),
-        0
+        ],
+        2
       )
     ]),
     _vm._v(" "),

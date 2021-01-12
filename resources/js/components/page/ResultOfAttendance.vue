@@ -14,6 +14,12 @@
       </span>
     </div>
 
+    <div style="text-align: center;" class="ResultOfAttendanceTotal">
+      <div class="badge rounded-pill bg-success">
+        <h4 style="padding: 10px 10px 5px 10px;">合計勤務時間：{{ total }}</h4>
+      </div>
+    </div>
+
     <table class="table">
       <thead>
         <tr>
@@ -42,11 +48,19 @@
               {{ record.date }}({{ record.day }})
             </router-link>
           </th>
-          <td>{{record.time}}</td>
-          <td>{{record.overtime}}</td>
-          <td>{{record.midnightTime}}</td>
-          <td>{{record.midnightOvertime}}</td>
-          <td>{{record.restTime}}</td>
+          <td>{{ record.time }}</td>
+          <td>{{ record.overtime }}</td>
+          <td>{{ record.midnightTime }}</td>
+          <td>{{ record.midnightOvertime }}</td>
+          <td>{{ record.restTime }}</td>
+        </tr>
+        <tr>
+          <th>合計時間</th>
+          <td>{{ totalTime }}</td>
+          <td>{{ totalOvertime }}</td>
+          <td>{{ totalMidnightTime }}</td>
+          <td>{{ totalMidnightOvertime }}</td>
+          <td>{{ totalRestTime }}</td>
         </tr>
       </tbody>
     </table>
@@ -69,6 +83,17 @@ export default {
       performances: [],
       holidays:[],
       lastArray: '',
+      totalTimeInt: 0,
+      totalOvertimeInt: 0,
+      totalMidnightTimeInt: 0,
+      totalMidnightOvertimeInt: 0,
+      totalRestTimeInt: 0,
+      totalTime: '',
+      totalOvertime: '',
+      totalMidnightTime: '',
+      totalMidnightOvertime: '',
+      totalRestTime: '',
+      total: '',
     };
   },
   created(){
@@ -93,6 +118,11 @@ export default {
       this.$router.push("/");
     },
     calendarMaker() {
+      this.totalTimeInt = 0;
+      this.totalOvertimeInt = 0;
+      this.totalMidnightTimeInt = 0;
+      this.totalMidnightOvertimeInt = 0;
+      this.totalRestTimeInt = 0;
       var authId = document.querySelector("meta[name='user-id']").getAttribute('content');
       const theDay = new Date(this.currentYear, this.currentMonth - 1, 1);
       const toDay = new Date(this.currentYear, this.currentMonth, 1);
@@ -163,6 +193,11 @@ export default {
                 }
               }
             }
+            this.totalTimeInt += time;
+            this.totalOvertimeInt += overtime;
+            this.totalMidnightTimeInt += midnightTime;
+            this.totalMidnightOvertimeInt += midnightOvertime;
+            this.totalRestTimeInt += restTime;
 
             var params1 = this.currentYear + ',' + this.currentMonth + ',' + i;
             var plusOne = i + 1;
@@ -179,6 +214,12 @@ export default {
               nextDay: params2,
               });
           }
+          this.totalTime = this.convertTime(Math.floor(this.totalTimeInt / 1000));
+          this.totalOvertime = this.convertTime(Math.floor(this.totalOvertimeInt / 1000));
+          this.totalMidnightTime = this.convertTime(Math.floor(this.totalMidnightTimeInt / 1000));
+          this.totalMidnightOvertime = this.convertTime(Math.floor(this.totalMidnightOvertimeInt / 1000));
+          this.totalRestTime = this.convertTime(Math.floor(this.totalRestTimeInt / 1000));
+          this.total = this.convertTime(Math.floor((this.totalTimeInt + this.totalOvertimeInt + this.totalMidnightTimeInt + this.totalMidnightOvertimeInt)/ 1000));
         }).catch( error => { console.log(error); })
     },
     convertTime(diffTime) {
