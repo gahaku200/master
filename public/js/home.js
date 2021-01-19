@@ -115,8 +115,8 @@
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! /Users/asadatakeaki/laravel_vue_attendance/resources/js/home.js */"./resources/js/home.js");
-module.exports = __webpack_require__(/*! /Users/asadatakeaki/laravel_vue_attendance/resources/sass/app.scss */"./resources/sass/app.scss");
+__webpack_require__(/*! /var/www/html/resources/js/home.js */"./resources/js/home.js");
+module.exports = __webpack_require__(/*! /var/www/html/resources/sass/app.scss */"./resources/sass/app.scss");
 
 
 /***/ })
