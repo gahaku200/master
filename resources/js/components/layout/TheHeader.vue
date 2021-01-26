@@ -3,7 +3,7 @@
     <div class="bg-dark text-white container-fluid">
       <div class="rowRow" style="display: flex; justify-content: space-between">
         <div class="headerLeft" style="align-self: center">
-          <h2 @click="goHome()">勤怠APP</h2>
+          <h2 @click="goHome()">勤怠test</h2>
         </div>
         <div class="login" style="display: flex; justify-content: space-between">
           <div style="align-self: center">
