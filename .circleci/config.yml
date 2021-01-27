@@ -58,6 +58,8 @@ jobs:
           name: deploy
           command: |
             ssh -o StrictHostKeyChecking=no -t webApp@${HOST_NAME} "cd master && \
+              git checkout -f && \
+              git clean -df && \
               git pull origin master && \
               composer install -n --no-dev --prefer-dist && \
               npm ci && \
