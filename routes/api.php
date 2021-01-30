@@ -24,8 +24,8 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::group(['middleware' => 'api'],function(){
     Route::get('/getGroup/{group_id}',function($group_id){
-        $user = App\User::select('id', 'name', 'now_task', 'now_task_start')
-        ->where('group_id',$group_id)->get();
+        $user = App\User::where('group_id',$group_id)
+        ->select('id', 'name', 'now_task', 'now_task_start')->get();
         return $user;
     });
     Route::get('/attendance/{id}', 'Api\AttendanceController@confirm');
