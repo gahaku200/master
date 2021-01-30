@@ -239,7 +239,7 @@ export default {
     },
     calcAttendance() {
       const theDay = new Date(this.$route.params.theDay);
-      const nextDay = new Date(this.$route.params.nextDay);
+      const nextDay = new Date(theDay.getTime() + 86400000);
       const theMonth = theDay.getMonth() + 1;
       this.detailDate = theDay.getFullYear() + '/' + theMonth  + '/' + theDay.getDate();
       this.detailDay = this.weeks[theDay.getDay()];
@@ -250,8 +250,11 @@ export default {
         day: theDay,
         to_day: nextDay,
       }
+      console.log(theDay);
+      console.log(nextDay);
       axios.post('/api/userAttendance/' + authId, data)
         .then(res =>  {
+          console.log(res.data);
           if (res.data != 'noData') {
             performances = res.data;
           }

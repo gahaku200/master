@@ -24,7 +24,7 @@ class CreateUsersTable extends Migration
             $table->boolean('is_admin')->default(false);
             $table->integer('group_id')->nullable()->default(null);
             $table->string('now_task')->nullable();
-            $table->date('now_task_start')->nullable();
+            $table->dateTime('now_task_start')->nullable();
         });
     }
 
