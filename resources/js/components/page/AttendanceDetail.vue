@@ -253,8 +253,6 @@ export default {
         day: checkFrom,
         to_day: checkTo,
       }
-      console.log(theDay);
-      console.log(nextDay);
       axios.post('/api/userAttendance/' + authId, data)
         .then(res =>  {
           console.log(res.data);
