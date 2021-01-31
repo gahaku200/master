@@ -4,7 +4,7 @@
       <h3 style="padding-top: 10px;">勤務詳細</h3>
     </div>
     <h2 style="text-align: center">{{detailDate}}(
-      <nobr v-if="detailDay !== '土'　&& detailDay !== '日'">{{detailDay}}</nobr>
+      <nobr v-if="detailDay !== '土' && detailDay !== '日'">{{detailDay}}</nobr>
       <nobr v-if="detailDay === '土'" style="color: blue">{{detailDay}}</nobr>
       <nobr v-if="detailDay === '日'" style="color: red">{{detailDay}}</nobr>
     )</h2>
@@ -246,9 +246,12 @@ export default {
 
       var authId = document.querySelector("meta[name='user-id']").getAttribute('content');
       var performances = [];
+
+      const checkFrom = new Date(theDay.getTime() + 32400000);
+      const checkTo = new Date(checkFrom.getTime() + 86400000);
       const data = {
-        day: theDay,
-        to_day: nextDay,
+        day: checkFrom,
+        to_day: checkTo,
       }
       console.log(theDay);
       console.log(nextDay);
@@ -355,7 +358,30 @@ export default {
             for(let y = 1; y <= loopTime; y++) {
               am5 += hours24;
               pm10 += hours24;
-              if (y == loopTime) {
+              if (loopTime == 1) {
+                midnightTime = am5 - hours24 - pastData;
+                time = hours8 - midnightTime;
+                overtime = pm10 - am5 - time;
+                midnightOvertime += 7200000;
+                if (nowData <= am5) {
+                  midnightOvertime += nowData - theDay.getTime() - (hours24 * y);
+                } else if (nowData > am5 && nowData <= pm10) {
+                  midnightOvertime += 18000000;
+                  overtime += nowData - am5;
+                } else {
+                  midnightOvertime += 18000000;
+                  overtime += 61200000;
+                  midnightOvertime += nowData - pm10;
+                }
+              } else if (y == 1) {
+                midnightTime = am5 - hours24 - pastData;
+                time = hours8 - midnightTime;
+                overtime = pm10 - am5 - time;
+                midnightOvertime += 7200000;
+              } else if (y == loopTime) {
+                midnightOvertime += 18000000;
+                overtime += 61200000;
+                midnightOvertime += 7200000;
                 if (nowData <= am5) {
                   midnightOvertime += nowData - theDay.getTime() - (hours24 * y);
                 } else if (nowData > am5 && nowData <= pm10) {

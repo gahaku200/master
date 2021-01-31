@@ -2415,6 +2415,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       this.$router.push("/");
     },
     createTask: function createTask() {
+      var _this2 = this;
+
       return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee() {
         var group_id;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee$(_context) {
@@ -2422,7 +2424,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             switch (_context.prev = _context.next) {
               case 0:
                 group_id = document.querySelector("meta[name='group-id']").getAttribute('content');
-                document.querySelector("#kindOfTask").submit();
+
+                if (_this2.taskName != '') {
+                  document.querySelector("#kindOfTask").submit();
+                } else {
+                  _this2.$router.go({
+                    path: _this2.$router.currentRoute.path,
+                    force: true
+                  });
+                }
 
               case 2:
               case "end":
@@ -2451,26 +2461,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       this.editName = name;
     },
     deleteTask: function deleteTask() {
-      var _this2 = this;
-
-      axios.post('/api/kindOfTask/delete/' + this.taskId).then(function (res) {
-        _this2.tasks = [];
-        res.data.forEach(function (task) {
-          _this2.tasks.push({
-            id: task.id,
-            orderNum: task.orderNum,
-            taskName: task.taskName
-          });
-        });
-      })["catch"](function (error) {
-        console.log(error);
-      });
-    },
-    up: function up(id) {
       var _this3 = this;
 
-      this.taskId = id;
-      axios.post('/api/kindOfTask/up/' + this.taskId).then(function (res) {
+      axios.post('/api/kindOfTask/delete/' + this.taskId).then(function (res) {
         _this3.tasks = [];
         res.data.forEach(function (task) {
           _this3.tasks.push({
@@ -2483,14 +2476,31 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         console.log(error);
       });
     },
-    down: function down(id) {
+    up: function up(id) {
       var _this4 = this;
 
       this.taskId = id;
-      axios.post('/api/kindOfTask/down/' + this.taskId).then(function (res) {
+      axios.post('/api/kindOfTask/up/' + this.taskId).then(function (res) {
         _this4.tasks = [];
         res.data.forEach(function (task) {
           _this4.tasks.push({
+            id: task.id,
+            orderNum: task.orderNum,
+            taskName: task.taskName
+          });
+        });
+      })["catch"](function (error) {
+        console.log(error);
+      });
+    },
+    down: function down(id) {
+      var _this5 = this;
+
+      this.taskId = id;
+      axios.post('/api/kindOfTask/down/' + this.taskId).then(function (res) {
+        _this5.tasks = [];
+        res.data.forEach(function (task) {
+          _this5.tasks.push({
             id: task.id,
             orderNum: task.orderNum,
             taskName: task.taskName
@@ -2734,8 +2744,6 @@ __webpack_require__.r(__webpack_exports__);
           _this.totalMidnightOvertimeInt += midnightOvertime;
           _this.totalRestTimeInt += restTime;
           params1 = _this.currentYear + ',' + _this.currentMonth + ',' + i;
-          plusOne = i + 1;
-          params2 = _this.currentYear + ',' + _this.currentMonth + ',' + plusOne;
 
           _this.calendar.push({
             date: date,
@@ -2745,8 +2753,7 @@ __webpack_require__.r(__webpack_exports__);
             midnightTime: _this.convertTime(Math.floor(midnightTime / 1000)),
             midnightOvertime: _this.convertTime(Math.floor(midnightOvertime / 1000)),
             restTime: _this.convertTime(Math.floor(restTime / 1000)),
-            theDay: params1,
-            nextDay: params2
+            theDay: params1
           });
         };
 
@@ -2764,8 +2771,6 @@ __webpack_require__.r(__webpack_exports__);
           var loopTime;
           var resultArray;
           var params1;
-          var plusOne;
-          var params2;
 
           _loop(i);
         }
@@ -2866,7 +2871,32 @@ __webpack_require__.r(__webpack_exports__);
               am5 += hours24;
               pm10 += hours24;
 
-              if (y == loopTime) {
+              if (loopTime == 1) {
+                midnightTime = am5 - hours24 - pastData;
+                time = hours8 - midnightTime;
+                overtime = pm10 - am5 - time;
+                midnightOvertime += 7200000;
+
+                if (nowData <= am5) {
+                  midnightOvertime += nowData - theDay.getTime() - hours24 * y;
+                } else if (nowData > am5 && nowData <= pm10) {
+                  midnightOvertime += 18000000;
+                  overtime += nowData - am5;
+                } else {
+                  midnightOvertime += 18000000;
+                  overtime += 61200000;
+                  midnightOvertime += nowData - pm10;
+                }
+              } else if (y == 1) {
+                midnightTime = am5 - hours24 - pastData;
+                time = hours8 - midnightTime;
+                overtime = pm10 - am5 - time;
+                midnightOvertime += 7200000;
+              } else if (y == loopTime) {
+                midnightOvertime += 18000000;
+                overtime += 61200000;
+                midnightOvertime += 7200000;
+
                 if (nowData <= am5) {
                   midnightOvertime += nowData - theDay.getTime() - hours24 * y;
                 } else if (nowData > am5 && nowData <= pm10) {
@@ -3277,7 +3307,7 @@ vue__WEBPACK_IMPORTED_MODULE_0___default.a.use(v_calendar__WEBPACK_IMPORTED_MODU
         if (this.count == 0) {
           this.count = 1;
         } else {
-          var authId = document.querySelector("meta[name='user-id']").getAttribute('content');
+          var authId = this.$route.params.id;
           axios.get('/api/from_day/' + authId + '/' + this.theTime).then(function (res) {
             _this.from_day = res.data;
             axios.get('/api/to_day/' + authId + '/' + _this.theTime).then(function (res) {
@@ -3357,15 +3387,17 @@ vue__WEBPACK_IMPORTED_MODULE_0___default.a.use(v_calendar__WEBPACK_IMPORTED_MODU
       var _this2 = this;
 
       var theDay = new Date(this.$route.params.theDay);
-      var nextDay = new Date(this.$route.params.nextDay);
+      var nextDay = new Date(theDay.getTime() + 86400000);
       var theMonth = theDay.getMonth() + 1;
       this.detailDate = theDay.getFullYear() + '/' + theMonth + '/' + theDay.getDate();
       this.detailDay = this.weeks[theDay.getDay()];
       var authId = this.$route.params.id;
       var performances = [];
+      var checkFrom = new Date(theDay.getTime() + 32400000);
+      var checkTo = new Date(checkFrom.getTime() + 86400000);
       var data = {
-        day: theDay,
-        to_day: nextDay
+        day: checkFrom,
+        to_day: checkTo
       };
       axios.post('/api/userAttendance/' + authId, data).then(function (res) {
         if (res.data != 'noData') {
@@ -3478,7 +3510,32 @@ vue__WEBPACK_IMPORTED_MODULE_0___default.a.use(v_calendar__WEBPACK_IMPORTED_MODU
               am5 += hours24;
               pm10 += hours24;
 
-              if (y == loopTime) {
+              if (loopTime == 1) {
+                midnightTime = am5 - hours24 - pastData;
+                time = hours8 - midnightTime;
+                overtime = pm10 - am5 - time;
+                midnightOvertime += 7200000;
+
+                if (nowData <= am5) {
+                  midnightOvertime += nowData - theDay.getTime() - hours24 * y;
+                } else if (nowData > am5 && nowData <= pm10) {
+                  midnightOvertime += 18000000;
+                  overtime += nowData - am5;
+                } else {
+                  midnightOvertime += 18000000;
+                  overtime += 61200000;
+                  midnightOvertime += nowData - pm10;
+                }
+              } else if (y == 1) {
+                midnightTime = am5 - hours24 - pastData;
+                time = hours8 - midnightTime;
+                overtime = pm10 - am5 - time;
+                midnightOvertime += 7200000;
+              } else if (y == loopTime) {
+                midnightOvertime += 18000000;
+                overtime += 61200000;
+                midnightOvertime += 7200000;
+
                 if (nowData <= am5) {
                   midnightOvertime += nowData - theDay.getTime() - hours24 * y;
                 } else if (nowData > am5 && nowData <= pm10) {
@@ -4518,9 +4575,11 @@ vue__WEBPACK_IMPORTED_MODULE_0___default.a.use(v_calendar__WEBPACK_IMPORTED_MODU
       this.detailDay = this.weeks[theDay.getDay()];
       var authId = document.querySelector("meta[name='user-id']").getAttribute('content');
       var performances = [];
+      var checkFrom = new Date(theDay.getTime() + 32400000);
+      var checkTo = new Date(checkFrom.getTime() + 86400000);
       var data = {
-        day: theDay,
-        to_day: nextDay
+        day: checkFrom,
+        to_day: checkTo
       };
       console.log(theDay);
       console.log(nextDay);
@@ -4637,7 +4696,32 @@ vue__WEBPACK_IMPORTED_MODULE_0___default.a.use(v_calendar__WEBPACK_IMPORTED_MODU
               am5 += hours24;
               pm10 += hours24;
 
-              if (y == loopTime) {
+              if (loopTime == 1) {
+                midnightTime = am5 - hours24 - pastData;
+                time = hours8 - midnightTime;
+                overtime = pm10 - am5 - time;
+                midnightOvertime += 7200000;
+
+                if (nowData <= am5) {
+                  midnightOvertime += nowData - theDay.getTime() - hours24 * y;
+                } else if (nowData > am5 && nowData <= pm10) {
+                  midnightOvertime += 18000000;
+                  overtime += nowData - am5;
+                } else {
+                  midnightOvertime += 18000000;
+                  overtime += 61200000;
+                  midnightOvertime += nowData - pm10;
+                }
+              } else if (y == 1) {
+                midnightTime = am5 - hours24 - pastData;
+                time = hours8 - midnightTime;
+                overtime = pm10 - am5 - time;
+                midnightOvertime += 7200000;
+              } else if (y == loopTime) {
+                midnightOvertime += 18000000;
+                overtime += 61200000;
+                midnightOvertime += 7200000;
+
                 if (nowData <= am5) {
                   midnightOvertime += nowData - theDay.getTime() - hours24 * y;
                 } else if (nowData > am5 && nowData <= pm10) {
@@ -5853,8 +5937,6 @@ __webpack_require__.r(__webpack_exports__);
           _this.totalMidnightOvertimeInt += midnightOvertime;
           _this.totalRestTimeInt += restTime;
           params1 = _this.currentYear + ',' + _this.currentMonth + ',' + i;
-          plusOne = i + 1;
-          params2 = _this.currentYear + ',' + _this.currentMonth + ',' + plusOne;
 
           _this.calendar.push({
             date: date,
@@ -5864,8 +5946,7 @@ __webpack_require__.r(__webpack_exports__);
             midnightTime: _this.convertTime(Math.floor(midnightTime / 1000)),
             midnightOvertime: _this.convertTime(Math.floor(midnightOvertime / 1000)),
             restTime: _this.convertTime(Math.floor(restTime / 1000)),
-            theDay: params1,
-            nextDay: params2
+            theDay: params1
           });
         };
 
@@ -5883,8 +5964,6 @@ __webpack_require__.r(__webpack_exports__);
           var loopTime;
           var resultArray;
           var params1;
-          var plusOne;
-          var params2;
 
           _loop(i);
         }
@@ -5985,7 +6064,32 @@ __webpack_require__.r(__webpack_exports__);
               am5 += hours24;
               pm10 += hours24;
 
-              if (y == loopTime) {
+              if (loopTime == 1) {
+                midnightTime = am5 - hours24 - pastData;
+                time = hours8 - midnightTime;
+                overtime = pm10 - am5 - time;
+                midnightOvertime += 7200000;
+
+                if (nowData <= am5) {
+                  midnightOvertime += nowData - theDay.getTime() - hours24 * y;
+                } else if (nowData > am5 && nowData <= pm10) {
+                  midnightOvertime += 18000000;
+                  overtime += nowData - am5;
+                } else {
+                  midnightOvertime += 18000000;
+                  overtime += 61200000;
+                  midnightOvertime += nowData - pm10;
+                }
+              } else if (y == 1) {
+                midnightTime = am5 - hours24 - pastData;
+                time = hours8 - midnightTime;
+                overtime = pm10 - am5 - time;
+                midnightOvertime += 7200000;
+              } else if (y == loopTime) {
+                midnightOvertime += 18000000;
+                overtime += 61200000;
+                midnightOvertime += 7200000;
+
                 if (nowData <= am5) {
                   midnightOvertime += nowData - theDay.getTime() - hours24 * y;
                 } else if (nowData > am5 && nowData <= pm10) {
@@ -12027,8 +12131,7 @@ var render = function() {
                               params: {
                                 id: _vm.id,
                                 name: _vm.userName,
-                                theDay: record.theDay,
-                                nextDay: record.nextDay
+                                theDay: record.theDay
                               }
                             }
                           }
@@ -12063,8 +12166,7 @@ var render = function() {
                               params: {
                                 id: _vm.id,
                                 name: _vm.userName,
-                                theDay: record.theDay,
-                                nextDay: record.nextDay
+                                theDay: record.theDay
                               }
                             }
                           }
@@ -12099,8 +12201,7 @@ var render = function() {
                               params: {
                                 id: _vm.id,
                                 name: _vm.userName,
-                                theDay: record.theDay,
-                                nextDay: record.nextDay
+                                theDay: record.theDay
                               }
                             }
                           }
@@ -15362,10 +15463,7 @@ var render = function() {
                           attrs: {
                             to: {
                               name: "attendanceDetail",
-                              params: {
-                                theDay: record.theDay,
-                                nextDay: record.nextDay
-                              }
+                              params: { theDay: record.theDay }
                             }
                           }
                         },
@@ -15396,10 +15494,7 @@ var render = function() {
                           attrs: {
                             to: {
                               name: "attendanceDetail",
-                              params: {
-                                theDay: record.theDay,
-                                nextDay: record.nextDay
-                              }
+                              params: { theDay: record.theDay }
                             }
                           }
                         },
@@ -15430,10 +15525,7 @@ var render = function() {
                           attrs: {
                             to: {
                               name: "attendanceDetail",
-                              params: {
-                                theDay: record.theDay,
-                                nextDay: record.nextDay
-                              }
+                              params: { theDay: record.theDay }
                             }
                           }
                         },

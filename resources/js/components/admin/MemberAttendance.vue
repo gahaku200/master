@@ -34,17 +34,17 @@
       <tbody>
         <tr v-for="record in calendar">
           <th v-if="record.day !== '土'　&& record.day !== '日'" scope="row">
-            <router-link class="weekdays" :to="{name:'memberAttendanceDetail',params:{id: id, name: userName, theDay: record.theDay, nextDay: record.nextDay}}">
+            <router-link class="weekdays" :to="{name:'memberAttendanceDetail',params:{id: id, name: userName, theDay: record.theDay}}">
               {{ record.date }}({{ record.day }})
             </router-link>
           </th>
           <th v-if="record.day === '土'" scope="row">
-            <router-link class="saturday" :to="{name:'memberAttendanceDetail',params:{id: id, name: userName, theDay: record.theDay, nextDay: record.nextDay}}">
+            <router-link class="saturday" :to="{name:'memberAttendanceDetail',params:{id: id, name: userName, theDay: record.theDay}}">
               {{ record.date }}({{ record.day }})
             </router-link>
           </th>
           <th v-if="record.day === '日'" scope="row">
-            <router-link class="sunday" :to="{name:'memberAttendanceDetail',params:{id: id, name: userName, theDay: record.theDay, nextDay: record.nextDay}}">
+            <router-link class="sunday" :to="{name:'memberAttendanceDetail',params:{id: id, name: userName, theDay: record.theDay}}">
               {{ record.date }}({{ record.day }})
             </router-link>
           </th>
@@ -206,8 +206,7 @@ export default {
             this.totalRestTimeInt += restTime;
 
             var params1 = this.currentYear + ',' + this.currentMonth + ',' + i;
-            var plusOne = i + 1;
-            var params2 = this.currentYear + ',' + this.currentMonth + ',' + plusOne;
+
             this.calendar.push({
               date: date,
               day: day,
@@ -217,7 +216,6 @@ export default {
               midnightOvertime: this.convertTime(Math.floor(midnightOvertime / 1000)),
               restTime: this.convertTime(Math.floor(restTime / 1000)),
               theDay: params1,
-              nextDay: params2,
               });
           }
           this.totalTime = this.convertTime(Math.floor(this.totalTimeInt / 1000));
@@ -298,7 +296,30 @@ export default {
             for(let y = 1; y <= loopTime; y++) {
               am5 += hours24;
               pm10 += hours24;
-              if (y == loopTime) {
+              if (loopTime == 1) {
+                midnightTime = am5 - hours24 - pastData;
+                time = hours8 - midnightTime;
+                overtime = pm10 - am5 - time;
+                midnightOvertime += 7200000;
+                if (nowData <= am5) {
+                  midnightOvertime += nowData - theDay.getTime() - (hours24 * y);
+                } else if (nowData > am5 && nowData <= pm10) {
+                  midnightOvertime += 18000000;
+                  overtime += nowData - am5;
+                } else {
+                  midnightOvertime += 18000000;
+                  overtime += 61200000;
+                  midnightOvertime += nowData - pm10;
+                }
+              } else if (y == 1) {
+                midnightTime = am5 - hours24 - pastData;
+                time = hours8 - midnightTime;
+                overtime = pm10 - am5 - time;
+                midnightOvertime += 7200000;
+              } else if (y == loopTime) {
+                midnightOvertime += 18000000;
+                overtime += 61200000;
+                midnightOvertime += 7200000;
                 if (nowData <= am5) {
                   midnightOvertime += nowData - theDay.getTime() - (hours24 * y);
                 } else if (nowData > am5 && nowData <= pm10) {

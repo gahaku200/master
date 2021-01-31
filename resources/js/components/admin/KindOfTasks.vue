@@ -115,7 +115,11 @@ export default {
     },
     async createTask() {
       var group_id = document.querySelector("meta[name='group-id']").getAttribute('content');
-      document.querySelector("#kindOfTask").submit();
+      if (this.taskName != '') {
+        document.querySelector("#kindOfTask").submit();
+      } else {
+        this.$router.go({path: this.$router.currentRoute.path, force: true})
+      }
     },
     edit(id, name) {
       this.taskId = id;
