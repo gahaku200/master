@@ -3911,6 +3911,9 @@ vue__WEBPACK_IMPORTED_MODULE_0___default.a.use(v_calendar__WEBPACK_IMPORTED_MODU
   methods: {
     switchItem: function switchItem() {
       this.searchSwitch = !this.searchSwitch;
+      this.year = '';
+      this.month = '';
+      this.theDate = '';
     },
     searchTaskMonth: function searchTaskMonth() {
       if (this.selectedYear != 'initial' && this.selectedMonth != 'initial') {
@@ -6742,6 +6745,8 @@ vue__WEBPACK_IMPORTED_MODULE_0___default.a.use(v_calendar__WEBPACK_IMPORTED_MODU
   methods: {
     switchItem: function switchItem() {
       this.searchSwitch = !this.searchSwitch;
+      this.year = '';
+      this.month = '';
       this.theDate = '';
     },
     searchTaskMonth: function searchTaskMonth() {
