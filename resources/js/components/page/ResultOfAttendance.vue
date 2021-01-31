@@ -33,7 +33,7 @@
       </thead>
       <tbody>
         <tr v-for="record in calendar">
-          <th v-if="record.day !== '土'　&& record.day !== '日'" scope="row">
+          <th v-if="record.day !== '土' && record.day !== '日'" scope="row">
             <router-link class="weekdays" :to="{name:'attendanceDetail',params:{theDay: record.theDay}}">
               {{ record.date }}({{ record.day }})
             </router-link>
@@ -290,7 +290,30 @@ export default {
             for(let y = 1; y <= loopTime; y++) {
               am5 += hours24;
               pm10 += hours24;
-              if (y == loopTime) {
+              if (loopTime == 1) {
+                midnightTime = am5 - hours24 - pastData;
+                time = hours8 - midnightTime;
+                overtime = pm10 - am5 - time;
+                midnightOvertime += 7200000;
+                if (nowData <= am5) {
+                  midnightOvertime += nowData - theDay.getTime() - (hours24 * y);
+                } else if (nowData > am5 && nowData <= pm10) {
+                  midnightOvertime += 18000000;
+                  overtime += nowData - am5;
+                } else {
+                  midnightOvertime += 18000000;
+                  overtime += 61200000;
+                  midnightOvertime += nowData - pm10;
+                }
+              } else if (y == 1) {
+                midnightTime = am5 - hours24 - pastData;
+                time = hours8 - midnightTime;
+                overtime = pm10 - am5 - time;
+                midnightOvertime += 7200000;
+              } else if (y == loopTime) {
+                midnightOvertime += 18000000;
+                overtime += 61200000;
+                midnightOvertime += 7200000;
                 if (nowData <= am5) {
                   midnightOvertime += nowData - theDay.getTime() - (hours24 * y);
                 } else if (nowData > am5 && nowData <= pm10) {
