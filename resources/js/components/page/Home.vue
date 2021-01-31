@@ -128,7 +128,7 @@ export default {
   data() {
     return {
       groupId: null,
-      type: 'A',
+      type: '',
       isTask: false,
       selected: 'initial',
       tasks: [],
@@ -161,7 +161,9 @@ export default {
 
     axios.get('/api/attendance/' + authId)
       .then(res =>  {
-        this.attendanceRecords = res.data;
+        res.data.forEach((attendance) => {
+          this.attendanceRecords.push({on_duty: attendance.on_duty, time: attendance.time});
+        })
         var duty = res.data[res.data.length - 1].on_duty;
         if (duty == '退勤') {
           this.type = 'A';
@@ -173,7 +175,7 @@ export default {
           this.type = 'C';
           this.isTask = true;
         }
-      }).catch( error => { console.log(error); })
+      }).catch( error => { console.log(error); this.type = 'A'; })
 
     axios.get('/api/getKindOfTasks/' + group_id)
       .then(res =>  {
@@ -261,7 +263,7 @@ export default {
     },
     attendance() {
       const data = {
-      on_duty: this.on_duty
+      on_duty: this.on_duty,
       }
       var id = document.querySelector("meta[name='user-id']").getAttribute('content');
       axios.post('/api/attendance/' + id, data)

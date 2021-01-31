@@ -3,7 +3,7 @@
     <div class="bg-dark text-white container-fluid">
       <div class="rowRow" style="display: flex; justify-content: space-between">
         <div class="headerLeft" style="align-self: center">
-          <h2 @click="goHome()">勤怠godアプリ</h2>
+          <h2 @click="goHome()">勤怠App</h2>
         </div>
         <div class="login" style="display: flex; justify-content: space-between">
           <div style="align-self: center">
@@ -35,9 +35,9 @@
                 <p @click="goResultOfAttendance()">勤務実績表</p>
                 <p @click="goTaskDetail()">タスク実績表</p>
                 <p v-if="auth.group_id === null" @click="goCreateGroup()">グループ作成</p>
-                <p v-if="auth.is_admin === '1'" @click="goInviteMember()">メンバー招待</p>
-                <p v-if="auth.is_admin === '1'" @click="goGroupMember()">メンバー情報</p>
-                <p v-if="auth.is_admin === '1'" @click="goKindOfTasks()">タスク種類</p>
+                <p v-if="auth.is_admin === true" @click="goInviteMember()">メンバー招待</p>
+                <p v-if="auth.is_admin === true" @click="goGroupMember()">メンバー情報</p>
+                <p v-if="auth.is_admin === true" @click="goKindOfTasks()">タスク種類</p>
                 <p>
                   <a class="logout" id="header-nav__logout" @click="logout()">ログアウト</a>
                   <form id="logout-form" action="/logout" method="POST" style="display: none;">
@@ -62,9 +62,7 @@ export default {
   },
   data() {
     return {
-      groupEX: 'YJC',
       isActive: false,
-      username: '浅田　剛明',
       open: false,
       align: 'right',
       groups: [],

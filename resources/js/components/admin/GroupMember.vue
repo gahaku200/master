@@ -19,7 +19,7 @@
             <tbody>
               <tr v-for="user in users">
                 <td scope="row"></td>
-                <td>{{ user.name }}</td>
+                <td style="vertical-align: middle;">{{ user.name }}</td>
                 <td style="text-align: right;">
                   <router-link type="button" class="btn btn-outline-primary" :to="{name:'memberAttendance',params:{id: user.id, name: user.name}}">
                     勤怠詳細

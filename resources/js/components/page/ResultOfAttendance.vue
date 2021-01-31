@@ -34,17 +34,17 @@
       <tbody>
         <tr v-for="record in calendar">
           <th v-if="record.day !== '土'　&& record.day !== '日'" scope="row">
-            <router-link class="weekdays" :to="{name:'attendanceDetail',params:{theDay: record.theDay, nextDay: record.nextDay}}">
+            <router-link class="weekdays" :to="{name:'attendanceDetail',params:{theDay: record.theDay}}">
               {{ record.date }}({{ record.day }})
             </router-link>
           </th>
           <th v-if="record.day === '土'" scope="row">
-            <router-link class="saturday" :to="{name:'attendanceDetail',params:{theDay: record.theDay, nextDay: record.nextDay}}">
+            <router-link class="saturday" :to="{name:'attendanceDetail',params:{theDay: record.theDay}}">
               {{ record.date }}({{ record.day }})
             </router-link>
           </th>
           <th v-if="record.day === '日'" scope="row">
-            <router-link class="sunday" :to="{name:'attendanceDetail',params:{theDay: record.theDay, nextDay: record.nextDay}}">
+            <router-link class="sunday" :to="{name:'attendanceDetail',params:{theDay: record.theDay}}">
               {{ record.date }}({{ record.day }})
             </router-link>
           </th>
@@ -200,8 +200,7 @@ export default {
             this.totalRestTimeInt += restTime;
 
             var params1 = this.currentYear + ',' + this.currentMonth + ',' + i;
-            var plusOne = i + 1;
-            var params2 = this.currentYear + ',' + this.currentMonth + ',' + plusOne;
+
             this.calendar.push({
               date: date,
               day: day,
@@ -211,7 +210,6 @@ export default {
               midnightOvertime: this.convertTime(Math.floor(midnightOvertime / 1000)),
               restTime: this.convertTime(Math.floor(restTime / 1000)),
               theDay: params1,
-              nextDay: params2,
               });
           }
           this.totalTime = this.convertTime(Math.floor(this.totalTimeInt / 1000));

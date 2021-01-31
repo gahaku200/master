@@ -39,24 +39,11 @@
                     </div>
                   </div>
 
-                  <div class="form-group formCheckbox">
-                    <div>
-                      <div class="checkbox">
-                        <label>
-                          <input type="checkbox" name="remember" /> ログインを継続する
-                        </label>
-                      </div>
-                    </div>
-                  </div>
-
                   <div class="form-group formLogin">
                     <div>
                       <button type="submit" class="btn btn-primary">ログイン</button>
                     </div>
                   </div>
-                  <!--<div class="forgetPass">
-                    <a class="btn btn-link" href>パスワードをお忘れですか?</a>
-                  </div>-->
                 </ValidationObserver>
               </div>
             </div>

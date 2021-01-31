@@ -4059,9 +4059,7 @@ __webpack_require__.r(__webpack_exports__);
   },
   data: function data() {
     return {
-      groupEX: 'YJC',
       isActive: false,
-      username: '浅田　剛明',
       open: false,
       align: 'right',
       groups: [],
@@ -4514,7 +4512,7 @@ vue__WEBPACK_IMPORTED_MODULE_0___default.a.use(v_calendar__WEBPACK_IMPORTED_MODU
       var _this2 = this;
 
       var theDay = new Date(this.$route.params.theDay);
-      var nextDay = new Date(this.$route.params.nextDay);
+      var nextDay = new Date(theDay.getTime() + 86400000);
       var theMonth = theDay.getMonth() + 1;
       this.detailDate = theDay.getFullYear() + '/' + theMonth + '/' + theDay.getDate();
       this.detailDay = this.weeks[theDay.getDay()];
@@ -4524,7 +4522,11 @@ vue__WEBPACK_IMPORTED_MODULE_0___default.a.use(v_calendar__WEBPACK_IMPORTED_MODU
         day: theDay,
         to_day: nextDay
       };
+      console.log(theDay);
+      console.log(nextDay);
       axios.post('/api/userAttendance/' + authId, data).then(function (res) {
+        console.log(res.data);
+
         if (res.data != 'noData') {
           performances = res.data;
         }
@@ -4995,7 +4997,7 @@ __webpack_require__.r(__webpack_exports__);
   data: function data() {
     return {
       groupId: null,
-      type: 'A',
+      type: '',
       isTask: false,
       selected: 'initial',
       tasks: [],
@@ -5031,7 +5033,12 @@ __webpack_require__.r(__webpack_exports__);
       console.log(error);
     });
     axios.get('/api/attendance/' + authId).then(function (res) {
-      _this.attendanceRecords = res.data;
+      res.data.forEach(function (attendance) {
+        _this.attendanceRecords.push({
+          on_duty: attendance.on_duty,
+          time: attendance.time
+        });
+      });
       var duty = res.data[res.data.length - 1].on_duty;
 
       if (duty == '退勤') {
@@ -5046,6 +5053,7 @@ __webpack_require__.r(__webpack_exports__);
       }
     })["catch"](function (error) {
       console.log(error);
+      _this.type = 'A';
     });
     axios.get('/api/getKindOfTasks/' + group_id).then(function (res) {
       _this.tasks = [];
@@ -5289,19 +5297,6 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 //
 //
 //
@@ -11024,7 +11019,9 @@ var render = function() {
                 return _c("tr", [
                   _c("td", { attrs: { scope: "row" } }),
                   _vm._v(" "),
-                  _c("td", [_vm._v(_vm._s(user.name))]),
+                  _c("td", { staticStyle: { "vertical-align": "middle" } }, [
+                    _vm._v(_vm._s(user.name))
+                  ]),
                   _vm._v(" "),
                   _c(
                     "td",
@@ -13114,7 +13111,7 @@ var render = function() {
                     }
                   }
                 },
-                [_vm._v("勤怠godアプリ")]
+                [_vm._v("勤怠App")]
               )
             ]
           ),
@@ -13308,7 +13305,7 @@ var render = function() {
                                     )
                                   : _vm._e(),
                                 _vm._v(" "),
-                                _vm.auth.is_admin === "1"
+                                _vm.auth.is_admin === true
                                   ? _c(
                                       "p",
                                       {
@@ -13322,7 +13319,7 @@ var render = function() {
                                     )
                                   : _vm._e(),
                                 _vm._v(" "),
-                                _vm.auth.is_admin === "1"
+                                _vm.auth.is_admin === true
                                   ? _c(
                                       "p",
                                       {
@@ -13336,7 +13333,7 @@ var render = function() {
                                     )
                                   : _vm._e(),
                                 _vm._v(" "),
-                                _vm.auth.is_admin === "1"
+                                _vm.auth.is_admin === true
                                   ? _c(
                                       "p",
                                       {
@@ -14728,28 +14725,6 @@ var render = function() {
                                 1
                               )
                             ]),
-                            _vm._v(" "),
-                            _c(
-                              "div",
-                              { staticClass: "form-group formCheckbox" },
-                              [
-                                _c("div", [
-                                  _c("div", { staticClass: "checkbox" }, [
-                                    _c("label", [
-                                      _c("input", {
-                                        attrs: {
-                                          type: "checkbox",
-                                          name: "remember"
-                                        }
-                                      }),
-                                      _vm._v(
-                                        " ログインを継続する\n                      "
-                                      )
-                                    ])
-                                  ])
-                                ])
-                              ]
-                            ),
                             _vm._v(" "),
                             _c("div", { staticClass: "form-group formLogin" }, [
                               _c("div", [
