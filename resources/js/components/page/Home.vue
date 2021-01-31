@@ -61,7 +61,7 @@
               <tbody>
                 <tr v-for="attendance in attendanceRecords">
                   <td scope="row"></td>
-                  <td style="padding-left: 24px">{{ attendance.on_duty }}</td>
+                  <td>{{ attendance.on_duty }}</td>
                   <td>{{ attendance.time }}</td>
                 </tr>
               </tbody>
