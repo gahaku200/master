@@ -4581,8 +4581,6 @@ vue__WEBPACK_IMPORTED_MODULE_0___default.a.use(v_calendar__WEBPACK_IMPORTED_MODU
         day: checkFrom,
         to_day: checkTo
       };
-      console.log(theDay);
-      console.log(nextDay);
       axios.post('/api/userAttendance/' + authId, data).then(function (res) {
         console.log(res.data);
 
