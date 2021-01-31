@@ -14458,11 +14458,7 @@ var render = function() {
                         return _c("tr", [
                           _c("td", { attrs: { scope: "row" } }),
                           _vm._v(" "),
-                          _c(
-                            "td",
-                            { staticStyle: { "padding-left": "24px" } },
-                            [_vm._v(_vm._s(attendance.on_duty))]
-                          ),
+                          _c("td", [_vm._v(_vm._s(attendance.on_duty))]),
                           _vm._v(" "),
                           _c("td", [_vm._v(_vm._s(attendance.time))])
                         ])
