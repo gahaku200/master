@@ -132,6 +132,8 @@ export default {
   methods: {
     switchItem() {
       this.searchSwitch = !this.searchSwitch;
+      this.year = '';
+      this.month = '';
       this.theDate = '';
     },
     searchTaskMonth() {
