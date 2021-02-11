@@ -67,6 +67,7 @@ class AttendanceController extends Controller
           ->orderBy('time', 'asc')
           ->where('time', '>=', $request->get('day'))
           ->get();
+
         if ($empty->count() == 0) {
           return 'noData';
         }
@@ -78,6 +79,16 @@ class AttendanceController extends Controller
           if ($que == '出勤') {
             return $attendance;
           } else {
+            $check = User::find($id)->attendance()
+              ->orderBy('time', 'asc')
+              ->where('time', '>=', $request->get('day'))
+              ->where('on_duty', '出勤')
+              ->get();
+            
+            if ($check->count() == 0) {
+              return 'noData';
+            }
+
             $q = User::find($id)->attendance()
               ->orderBy('time', 'asc')
               ->where('time', '>=', $request->get('day'))

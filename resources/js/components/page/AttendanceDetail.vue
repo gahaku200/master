@@ -255,7 +255,6 @@ export default {
       }
       axios.post('/api/userAttendance/' + authId, data)
         .then(res =>  {
-          console.log(res.data);
           if (res.data != 'noData') {
             performances = res.data;
           }
