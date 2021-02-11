@@ -2664,10 +2664,12 @@ __webpack_require__.r(__webpack_exports__);
       var authId = this.$route.params.id;
       var theDay = new Date(this.currentYear, this.currentMonth - 1, 1);
       var toDay = new Date(this.currentYear, this.currentMonth, 1);
+      var theDay2 = new Date(this.currentYear, this.currentMonth - 1, 1, 9);
+      var toDay2 = new Date(this.currentYear, this.currentMonth, 1, 9);
       this.performances = [];
       var data = {
-        day: theDay,
-        to_day: toDay
+        day: theDay2,
+        to_day: toDay2
       };
       axios.post('/api/userAttendance/' + authId, data).then(function (res) {
         if (res.data != 'noData') {
@@ -4585,8 +4587,6 @@ vue__WEBPACK_IMPORTED_MODULE_0___default.a.use(v_calendar__WEBPACK_IMPORTED_MODU
         to_day: checkTo
       };
       axios.post('/api/userAttendance/' + authId, data).then(function (res) {
-        console.log(res.data);
-
         if (res.data != 'noData') {
           performances = res.data;
         }
@@ -5858,10 +5858,12 @@ __webpack_require__.r(__webpack_exports__);
       var authId = document.querySelector("meta[name='user-id']").getAttribute('content');
       var theDay = new Date(this.currentYear, this.currentMonth - 1, 1);
       var toDay = new Date(this.currentYear, this.currentMonth, 1);
+      var theDay2 = new Date(this.currentYear, this.currentMonth - 1, 1, 9);
+      var toDay2 = new Date(this.currentYear, this.currentMonth, 1, 9);
       this.performances = [];
       var data = {
-        day: theDay,
-        to_day: toDay
+        day: theDay2,
+        to_day: toDay2
       };
       axios.post('/api/userAttendance/' + authId, data).then(function (res) {
         if (res.data != 'noData') {

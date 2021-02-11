@@ -132,10 +132,12 @@ export default {
       var authId = this.$route.params.id;
       const theDay = new Date(this.currentYear, this.currentMonth - 1, 1);
       const toDay = new Date(this.currentYear, this.currentMonth, 1);
+      const theDay2 = new Date(this.currentYear, this.currentMonth - 1, 1, 9);
+      const toDay2 = new Date(this.currentYear, this.currentMonth, 1, 9);
       this.performances = [];
       const data = {
-        day: theDay,
-        to_day: toDay
+        day: theDay2,
+        to_day: toDay2
       }
       axios.post('/api/userAttendance/' + authId, data)
         .then(res =>  {
